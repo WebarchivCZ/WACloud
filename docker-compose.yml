@@ -6,3 +6,7 @@ services:
     container_name: nkp-solr
     ports:
       - "8983:8983"
+    volumes:
+      - solr-data:/var/solr
+volumes:
+  solr-data:

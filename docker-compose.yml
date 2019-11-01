@@ -1,0 +1,8 @@
+version: '3'
+services:
+  solr:
+    build: ./solr
+    image: inqool/nkp-solr
+    container_name: nkp-solr
+    ports:
+      - "8983:8983"

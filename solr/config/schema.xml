@@ -68,26 +68,42 @@
 
     <field name="id" type="string"/>
     <field name="url" type="string" docValues="false" indexed="true" stored="true"/>
+    <field name="title" type="text_cz" docValues="false" indexed="true" stored="true"/>
     <field name="headlines" type="texts_cz" docValues="false" indexed="true" stored="true"/>
     <field name="links" type="texts" docValues="false" indexed="true" stored="true"/>
+    <field name="language" type="string" docValues="false" indexed="true" stored="true"/>
     <field name="plain-text" type="text_cz" docValues="false" indexed="true" stored="true"/>
 
-    <field name="content" type="text_general" docValues="false" indexed="false" stored="false"/>
+
+
+<!--    <field name="content" type="text_general" docValues="false" indexed="false" stored="false"/>-->
     <field name="plain-text-tokens" type="texts_cz" docValues="false" indexed="false" stored="false"/>
     <field name="plain-text-sentences" type="texts_cz" docValues="false" indexed="false" stored="false"/>
-    <field name="urlkey" type="string" docValues="false" indexed="false" stored="false"/>
-    <field name="mime-type" type="string" docValues="false" indexed="false" stored="false"/>
-    <field name="timestamp" type="string" docValues="false" indexed="false" stored="false"/>
-    <field name="response-code" type="string" docValues="false" indexed="false" stored="false"/>
-    <field name="digest" type="string" docValues="false" indexed="false" stored="false"/>
-    <field name="redirect-url" type="string" docValues="false" indexed="false" stored="false"/>
+<!--    <field name="urlkey" type="string" docValues="false" indexed="false" stored="false"/>-->
+<!--    <field name="mime-type" type="string" docValues="false" indexed="false" stored="false"/>-->
+<!--    <field name="timestamp" type="string" docValues="false" indexed="false" stored="false"/>-->
+<!--    <field name="response-code" type="string" docValues="false" indexed="false" stored="false"/>-->
+<!--    <field name="digest" type="string" docValues="false" indexed="false" stored="false"/>-->
+<!--    <field name="redirect-url" type="string" docValues="false" indexed="false" stored="false"/>-->
     <field name="robot-meta-tags" type="texts" docValues="false" indexed="false" stored="false"/>
     <field name="warc-offset" type="plong" docValues="false" indexed="false" stored="false"/>
     <field name="warc-record-size" type="plong" docValues="false" indexed="false" stored="false"/>
-    <field name="warc-filename" type="string" docValues="false" indexed="false" stored="false"/>
-    <field name="web-page-type" type="string" docValues="false" indexed="false" stored="false"/>
+<!--    <field name="warc-filename" type="string" docValues="false" indexed="false" stored="false"/>-->
+<!--    <field name="web-page-type" type="string" docValues="false" indexed="false" stored="false"/>-->
     <field name="topics" type="texts" docValues="false" indexed="false" stored="false"/>
     <field name="sentiment" type="pdouble" docValues="false" indexed="false" stored="false"/>
 
+
+
+<!--    <field name="plain-text_my" type="text_cz_my" docValues="false" indexed="true" stored="true"/>-->
+<!--    <field name="content_base" type="string" docValues="false" indexed="true" stored="false"/>-->
+<!--    <copyField source="plain-text" dest="plain-text_my"/>-->
+<!--    <copyField source="content" dest="content_base"/>-->
+
+<!--    <field name="rec-headers-all" type="texts" docValues="false" indexed="false" stored="false"/>-->
+<!--    <copyField source="*" dest="rec-headers-all"/>-->
+<!--    <copyField source="rec-headers.*" dest="rec-headers-all"/>-->
+
     <dynamicField name="*" type="text_general" docValues="false" indexed="false" stored="false"/>
 </schema>
+

@@ -1,13 +1,20 @@
 version: '3'
 services:
+  db:
+    image: postgres:12-alpine
+    restart: always
+    container_name: nkp-db
+    environment:
+      POSTGRES_USER: nkp
+      POSTGRES_PASSWORD: prototype
+    volumes:
+      - nkp_db:/var/lib/postgresql
   client:
     build: ./client
     image: inqool/nkp-client
     container_name: nkp-client
     ports:
       - "5000:80"
-    volumes:
-      - yarn_cache:/home/node/.cache/yarn nkp-client
     environment:
       - API_HOST=api
   api:
@@ -16,17 +23,9 @@ services:
     container_name: nkp-api
     ports:
       - "8080:8080"
-    volumes:
-      - maven_repo:/root/.m2
   solr:
     build: ./solr
     image: inqool/nkp-solr
     container_name: nkp-solr
-    ports:
-      - "8983:8983"
-    volumes:
-      - solr-data:/var/solr
 volumes:
-  yarn_cache:
-  maven_repo:
-  solr-data:
+  nkp_db:

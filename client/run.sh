@@ -1,6 +1,5 @@
 #!/bin/sh
 cd /root
-yarn install
 yarn build
 
 mv build/* /var/www/localhost/htdocs

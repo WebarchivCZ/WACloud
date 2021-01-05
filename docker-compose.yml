@@ -6,7 +6,7 @@ services:
     container_name: nkp-db
     environment:
       POSTGRES_USER: nkp
-      POSTGRES_PASSWORD: prototype
+      POSTGRES_PASSWORD: CHANGEME
     volumes:
       - nkp_db:/var/lib/postgresql
   client:

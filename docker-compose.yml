@@ -27,5 +27,8 @@ services:
     build: ./solr
     image: inqool/nkp-solr
     container_name: nkp-solr
+    volumes:
+      - solr_data:/var/solr
 volumes:
   nkp_db:
+  solr_data:

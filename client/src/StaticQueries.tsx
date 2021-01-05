@@ -19,7 +19,7 @@ function StaticQueries({queries, setQueries}:{queries:IQuery[], setQueries:(quer
   
   const handleQueryTypeChange = (index: number, event: React.ChangeEvent<{ value: unknown }>) => {
     let q:IQuery[] = _.cloneDeep(queries);
-    q[index].type = event.target.value as string;
+    q[index].searchType = event.target.value as string;
     setQueries(q);
   };
   
@@ -37,7 +37,7 @@ function StaticQueries({queries, setQueries}:{queries:IQuery[], setQueries:(quer
   
   const handleChangeContextLength = (index: number, event: React.ChangeEvent<{ value: unknown }>) => {
     let q:IQuery[] = _.cloneDeep(queries);
-    q[index].contextLength = event.target.value as number;
+    q[index].contextSize = event.target.value as number;
     setQueries(q);
   };
   
@@ -56,7 +56,7 @@ function StaticQueries({queries, setQueries}:{queries:IQuery[], setQueries:(quer
   
   const handleAddQuery = () => {
     let q:IQuery[] = _.cloneDeep(queries);
-    q.push({queries: [], context: false, searchText: "", type: ""});
+    q.push({queries: [], query: "", context: false, searchText: "", searchType: ""});
     setQueries(q);
   };
   
@@ -82,12 +82,12 @@ function StaticQueries({queries, setQueries}:{queries:IQuery[], setQueries:(quer
                     <Select
                       labelId="query-type-label"
                       id="query-type"
-                      value={query.type}
+                      value={query.searchType}
                       onChange={(event) => handleQueryTypeChange(index, event)}
                     >
-                      <MenuItem value="frequency">Frequency</MenuItem>
-                      <MenuItem value="colocation">Colocation</MenuItem>
-                      <MenuItem value="occurence">Occurence</MenuItem>
+                      <MenuItem value="FREQUENCY">Frequency</MenuItem>
+                      <MenuItem value="COLLOCATION">Colocation</MenuItem>
+                      <MenuItem value="OCCURENCE">Occurence</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -113,7 +113,7 @@ function StaticQueries({queries, setQueries}:{queries:IQuery[], setQueries:(quer
                     
                     <Grid item xs={7}>
                       <FormControlLabel
-                        control={<TextField label="počet" type="number" value={query.contextLength} onChange={(event) => handleChangeContextLength(index, event)} />}
+                        control={<TextField label="počet" type="number" value={query.contextSize} onChange={(event) => handleChangeContextLength(index, event)} />}
                         label="Počet slov kontextu"
                         labelPlacement="start"
                       />

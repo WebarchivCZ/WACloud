@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Grid, Typography, TextField, makeStyles, Fab, FormControl, InputLabel, Select, MenuItem, Slider } from '@material-ui/core';
 import { KeyboardDatePicker } from '@material-ui/pickers';
 import { format } from 'date-fns'
+import { IFilter } from './App';
+import _ from 'lodash';
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -24,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function Filters() {
+function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter) => any}) {
 	const classes = useStyles();
 	
   const [selectedDateFrom, setSelectedDateFrom] = useState<Date | null>(
@@ -39,12 +41,13 @@ function Filters() {
   const [pageType, setPageType] = useState<string | null>("");
   const [urlSelect, setUrlSelect] = useState<string | null>("contain");
   const [url, setUrl] = useState<string | null>("");
-  const [filter, setFilter] = useState<string | null>("");
   const [topics, setTopics] = useState<string[]>([]);
   const [webTypes, setWebTypes] = useState<string[]>([]);
   
   const appendFilter = (text: string) => {
-    setFilter(filter + text);
+    let f:IFilter = _.cloneDeep(filter);
+    f.filter = f.filter + text;
+    setFilter(f);
   };
 
   const handleDateFromChange = (date: Date | null) => {
@@ -72,7 +75,19 @@ function Filters() {
     setUrl(event.target.value);
   };
   const handleChangeFilter = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFilter(event.target.value);
+    let f:IFilter = _.cloneDeep(filter);
+    f.filter = event.target.value;
+    setFilter(f);
+  };
+  const handleChangeIdentificators = (event: React.ChangeEvent<HTMLInputElement>) => {
+    let f:IFilter = _.cloneDeep(filter);
+    f.filterIdsList = event.target.value;
+    setFilter(f);
+  };
+  const handleChangeRecords = (event: React.ChangeEvent<HTMLInputElement>) => {
+    let f:IFilter = _.cloneDeep(filter);
+    f.filterRandomSize = parseInt(event.target.value);
+    setFilter(f);
   };
   
   const handleAppendUrl = () => {
@@ -344,20 +359,20 @@ function Filters() {
           <Typography variant="body1" className={classes.selectLabel}>
             Zatím máte složeno:
           </Typography>
-          <TextField label="Filter" style={{width: "100%"}} value={filter} onChange={handleChangeFilter}/>
+          <TextField label="Filter" style={{width: "100%"}} value={filter.filter} onChange={handleChangeFilter}/>
         </Grid>
         
         <Grid item xs={12}>
           <Typography variant="body1" className={classes.selectLabel}>
             Textové zadání identifikatoru:
           </Typography>
-          <TextField label="Identifikator" style={{width: "100%"}} multiline={true} />
+          <TextField label="Identifikator" style={{width: "100%"}} multiline={true} value={filter.filterIdsList} onChange={handleChangeIdentificators}/>
         </Grid>
         
         <Grid item xs={12}>
           <Typography variant="body1" className={classes.selectLabel}>
             Počet náhodně vybraných záznamů: 
-            <TextField label="počet" type="number" className={classes.urlSelect} style={{width: "20%"}}/>
+            <TextField label="počet" type="number" className={classes.urlSelect} style={{width: "20%"}} value={filter.filterRandomSize} onChange={handleChangeRecords}/>
           </Typography>
         </Grid>
   	  </Grid>

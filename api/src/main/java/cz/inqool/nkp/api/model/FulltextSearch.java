@@ -34,11 +34,11 @@ public class FulltextSearch extends AuditModel {
     private Search search;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "started_at", nullable = false)
+    @Column(name = "started_at", nullable = true)
     private Date startedAt;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "finished_at", nullable = false)
+    @Column(name = "finished_at", nullable = true)
     private Date finishedAt;
     
     @Enumerated(EnumType.STRING)

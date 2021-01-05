@@ -1,5 +1,5 @@
-FROM solr:8.2
-MAINTAINER sekan@inqool.cz
+FROM solr:8.6.3-slim
+LABEL maintainer="sekan@inqool.cz"
 
 ADD config-base /opt/solr/server/solr/configsets/nkpconfig-base
 ADD config-query /opt/solr/server/solr/configsets/nkpconfig-query

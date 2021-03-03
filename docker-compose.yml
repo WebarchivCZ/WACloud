@@ -4,9 +4,10 @@ services:
     image: postgres:12-alpine
     restart: always
     container_name: nkp-db
+    env_file:
+      - ./.env
     environment:
       POSTGRES_USER: nkp
-      POSTGRES_PASSWORD: CHANGEME
     volumes:
       - nkp_db:/var/lib/postgresql
   client:
@@ -21,6 +22,8 @@ services:
     build: ./api
     image: inqool/nkp-api
     container_name: nkp-api
+    env_file:
+      - ./.env
     ports:
       - "8080:8080"
   solr:

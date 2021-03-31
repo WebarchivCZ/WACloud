@@ -9,7 +9,7 @@ before_script:
   - "chmod 700 ~/.ssh"
   - "echo \"$SSH_KNOWN_HOSTS\" > ~/.ssh/known_hosts"
 
-deploy:
+deploy-test:
   stage: deploy
   tags:
     - dev
@@ -21,6 +21,6 @@ deploy:
   script:
     - "which rsync >/dev/null || ( apk --update add rsync )"
     - "rsync -O -arvce 'ssh' $PWD/* $USER@$HOST:$APP_DIR"
-    - "ssh $USER@$HOST \"(cd $APP_DIR; docker-compose up -d --build) || exit 1\""
+    - "ssh $USER@$HOST \"(cd $APP_DIR; find . -type d -print0 | xargs -0 chmod 0775 && find . -type f -print0 | xargs -0 chmod 0664 && docker-compose up -d --build) || exit 1\""
   only:
-    - master
+    - test

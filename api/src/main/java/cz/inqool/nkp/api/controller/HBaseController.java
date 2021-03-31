@@ -29,21 +29,26 @@ public class HBaseController {
     
     private static byte[] family = "cf1".getBytes();
     private static byte[] qualifier = Bytes.toBytes("value");
-    
+
     @Value("${hbase.zookeeper.quorum}")
     private String hbaseHost;
+
+    @Value("${zookeeper.znode.parent}")
+    private String zookeeperNode;
     
     private Configuration getConfig() throws MasterNotRunningException, ZooKeeperConnectionException, IOException {
         Configuration config = HBaseConfiguration.create();
         config.set("hbase.zookeeper.quorum", hbaseHost);
-        log.info("HBase host: " + config.get("hbase.zookeeper.quorum"));
+        config.set("zookeeper.znode.parent", zookeeperNode);
+        log.info("HBase host: " + config.get("hbase.zookeeper.quorum")+config.get("zookeeper.znode.parent"));
         HBaseAdmin.available(config);
         return config;
     }
 	
     private static String getRowValue(Table table, String row) throws IOException {
-	Result r = table.get(new Get(Bytes.toBytes(row)));
-	return Bytes.toString(r.getValue(family, qualifier)); 
+        // TODO Fix if no values exist
+        Result r = table.get(new Get(Bytes.toBytes(row)));
+        return Bytes.toString(r.getValue(family, qualifier));
     }
 
     @GetMapping("/api/hbase/index")
@@ -66,14 +71,14 @@ public class HBaseController {
     @GetMapping("/api/hbase/config")
     public HBaseConfig getHBaseConfig() throws IOException {
         Configuration config = getConfig();
-	try (Connection connection = ConnectionFactory.createConnection(config)) {
-	    Table table = connection.getTable(TableName.valueOf("config"));
-	    
-	    ObjectMapper mapper = new ObjectMapper();
-	    Map<String, Long> topics = mapper.readValue(getRowValue(table, "topics"), new TypeReference<Map<String, Long>>() {});
-	    Map<String, Long> types = mapper.readValue(getRowValue(table, "webtypes"), new TypeReference<Map<String, Long>>() {});
-	    
-	    return new HBaseConfig(topics, types);
-	}
+        try (Connection connection = ConnectionFactory.createConnection(config)) {
+            Table table = connection.getTable(TableName.valueOf("config"));
+
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Long> topics = mapper.readValue(getRowValue(table, "topics"), new TypeReference<Map<String, Long>>() {});
+            Map<String, Long> types = mapper.readValue(getRowValue(table, "webtypes"), new TypeReference<Map<String, Long>>() {});
+
+            return new HBaseConfig(topics, types);
+        }
     }
 }

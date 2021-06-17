@@ -1,4 +1,4 @@
-FROM solr:8.6.3-slim
+FROM solr:7-slim
 LABEL maintainer="sekan@inqool.cz"
 
 ADD config-base /opt/solr/server/solr/configsets/nkpconfig-base

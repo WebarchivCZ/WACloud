@@ -7,8 +7,11 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import cz.inqool.nkp.api.dto.SolrBaseEntry;
+import cz.inqool.nkp.api.dto.SolrQueryEntry;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.impl.XMLResponseParser;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -40,21 +43,18 @@ public class SearchController {
     }
 
     @PostMapping("/api/search/solr")
-    public List<Map<String, Object>> search(@Valid @RequestBody SearchRequest request) throws SolrServerException, IOException {
-    	String urlString = "http://solr:8983/solr/nkpbase";
+    public List<SolrQueryEntry> search(@Valid @RequestBody SearchRequest request) throws SolrServerException, IOException {
+    	String urlString = "http://solr:8983/solr/nkpquery";
         HttpSolrClient solr = new HttpSolrClient.Builder(urlString).build();
         solr.setParser(new XMLResponseParser());
         
         SolrQuery query = new SolrQuery();
         query.set("q", request.getFilter());
+        query.setRows(10);
         QueryResponse response = solr.query(query);
-         
+
         SolrDocumentList docList = response.getResults();
-         
-        List<Map<String, Object>> result = new ArrayList<>();
-        for (SolrDocument doc : docList) {
-        	result.add(doc.getFieldValueMap());
-        }
-        return result;
+        DocumentObjectBinder binder = new DocumentObjectBinder();
+        return binder.getBeans(SolrQueryEntry.class, docList);
     }    
 }

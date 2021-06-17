@@ -72,8 +72,8 @@
     <field name="harvestType" type="string" docValues="false" indexed="true" stored="true"/>
     <field name="webType" type="string" docValues="false" indexed="true" stored="true"/>
     <field name="pageType" type="string" docValues="false" indexed="true" stored="true"/>
-    <field name="topics" type="texts" docValues="false" indexed="false" stored="false"/>
-    <field name="sentiment" type="pdouble" docValues="false" indexed="false" stored="false"/>
+    <field name="topics" type="texts" docValues="false" indexed="true" stored="true"/>
+    <field name="sentiment" type="pdouble" docValues="false" indexed="true" stored="true"/>
 
     <dynamicField name="*" type="text_general" docValues="false" indexed="false" stored="false"/>
 </schema>

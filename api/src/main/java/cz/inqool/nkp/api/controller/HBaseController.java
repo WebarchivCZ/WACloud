@@ -36,10 +36,14 @@ public class HBaseController {
 
     @Value("${hbase.zookeeper.quorum}")
     private String hbaseHost;
+
+    @Value("${zookeeper.znode.parent}")
+    private String zookeeperNode;
     
     private Configuration getConfig() throws IOException {
         Configuration config = HBaseConfiguration.create();
         config.set("hbase.zookeeper.quorum", hbaseHost);
+        config.set("zookeeper.znode.parent", zookeeperNode);
         HBaseAdmin.available(config);
         return config;
     }

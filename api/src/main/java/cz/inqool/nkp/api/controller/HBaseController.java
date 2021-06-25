@@ -82,24 +82,24 @@ public class HBaseController {
     }
 	
     @GetMapping("/api/topic")
-    public Map<String, Long> getTopics() throws IOException {
+    public Set<String> getTopics() throws IOException {
         Configuration config = getConfig();
         try (Connection connection = ConnectionFactory.createConnection(config)) {
             Table table = connection.getTable(TableName.valueOf("config"));
 
             ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(getRowValue(table, "topics"), new TypeReference<Map<String, Long>>() {});
+            return new TreeSet<>(mapper.readValue(getRowValue(table, "topics"), new TypeReference<Map<String, Long>>() {}).keySet());
         }
     }
 
     @GetMapping("/api/webtype")
-    public Map<String, Long> getWebTypes() throws IOException {
+    public Set<String> getWebTypes() throws IOException {
         Configuration config = getConfig();
         try (Connection connection = ConnectionFactory.createConnection(config)) {
             Table table = connection.getTable(TableName.valueOf("config"));
 
             ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(getRowValue(table, "webtypes"), new TypeReference<Map<String, Long>>() {});
+            return new TreeSet<>(mapper.readValue(getRowValue(table, "webtypes"), new TypeReference<Map<String, Long>>() {}).keySet());
         }
     }
 

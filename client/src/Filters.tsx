@@ -107,7 +107,7 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
   };
   
   useEffect(() => {
-    fetch("/api/topics")
+    fetch("/api/topic")
       .then(res => res.json())
       .then(
         (result) => {
@@ -117,7 +117,7 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
           setTopics([]);
         }
       )
-    fetch("/api/web-types")
+    fetch("/api/webtype")
       .then(res => res.json())
       .then(
         (result) => {
@@ -158,40 +158,40 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body1">
-                Datum sklizne
-              </Typography>
-            </Grid>
-            <Grid item xs={9}>
-              <Typography variant="body1" className={classes.datesText}>
-                Od:
-                <KeyboardDatePicker
-                  disableToolbar
-                  variant="inline"
-                  format="dd.MM.yyyy"
-                  margin="normal"
-                  value={selectedDateFrom}
-                  onChange={handleDateFromChange}
-                  className={classes.dates}
-                />
-              </Typography>
-              <Typography variant="body1" className={classes.datesText}>
-                Do:
-                <KeyboardDatePicker
-                  disableToolbar
-                  variant="inline"
-                  format="dd.MM.yyyy"
-                  margin="normal"
-                  value={selectedDateTo}
-                  onChange={handleDateToChange}
-                  className={classes.dates}
-                />
-              </Typography>
-            </Grid>
-            <Grid item xs={3}>
-              <Fab variant="extended" onClick={() => appendFilter("date:["+format(selectedDateFrom ? selectedDateFrom : 0, "dd.MM.yyyy")+" TO "+format(selectedDateTo ? selectedDateTo : 0, "dd.MM.yyyy")+"]")}>Vložit</Fab>
-            </Grid>
+            {/*<Grid item xs={12}>*/}
+            {/*  <Typography variant="body1">*/}
+            {/*    Datum sklizne*/}
+            {/*  </Typography>*/}
+            {/*</Grid>*/}
+            {/*<Grid item xs={9}>*/}
+            {/*  <Typography variant="body1" className={classes.datesText}>*/}
+            {/*    Od:*/}
+            {/*    <KeyboardDatePicker*/}
+            {/*      disableToolbar*/}
+            {/*      variant="inline"*/}
+            {/*      format="dd.MM.yyyy"*/}
+            {/*      margin="normal"*/}
+            {/*      value={selectedDateFrom}*/}
+            {/*      onChange={handleDateFromChange}*/}
+            {/*      className={classes.dates}*/}
+            {/*    />*/}
+            {/*  </Typography>*/}
+            {/*  <Typography variant="body1" className={classes.datesText}>*/}
+            {/*    Do:*/}
+            {/*    <KeyboardDatePicker*/}
+            {/*      disableToolbar*/}
+            {/*      variant="inline"*/}
+            {/*      format="dd.MM.yyyy"*/}
+            {/*      margin="normal"*/}
+            {/*      value={selectedDateTo}*/}
+            {/*      onChange={handleDateToChange}*/}
+            {/*      className={classes.dates}*/}
+            {/*    />*/}
+            {/*  </Typography>*/}
+            {/*</Grid>*/}
+            {/*<Grid item xs={3}>*/}
+            {/*  <Fab variant="extended" onClick={() => appendFilter("date:["+format(selectedDateFrom ? selectedDateFrom : 0, "dd.MM.yyyy")+" TO "+format(selectedDateTo ? selectedDateTo : 0, "dd.MM.yyyy")+"]")}>Vložit</Fab>*/}
+            {/*</Grid>*/}
             
             <Grid item xs={4}>
               <Typography variant="body1" className={classes.selectLabel}>
@@ -225,38 +225,38 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
           </Grid>
         </Grid>
         <Grid item md={6} xs={12}>
-          <Grid container spacing={1}>
-            <Grid item xs={4}>
-              <Typography variant="body1" className={classes.selectLabel}>
-                Typ sklizne:
-              </Typography>
-            </Grid>
-            <Grid item xs={4}>
-              <FormControl style={{width: "100%"}}>
-                <InputLabel id="harvest-type-label">Typ sklizne</InputLabel>
-                <Select
-                  labelId="harvest-type-label"
-                  id="harvest-type"
-                  value={harvestType}
-                  onChange={handleHarvestTypeChange}
-                >
-                  <MenuItem value="partial">častečná</MenuItem>
-                  <MenuItem value="full">plná</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={4} >
-              <Grid container justify="center" spacing={1}>
-                <Grid item>
-                  <Fab size="small" onClick={() => appendFilter("harvestType:\""+harvestType+"\"")}>=</Fab>
-                </Grid>
-                <Grid item>
-                  <Fab size="small" onClick={() => appendFilter("NOT harvestType:\""+harvestType+"\"")}>≠</Fab>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
-  
+          {/*<Grid container spacing={1}>*/}
+          {/*  <Grid item xs={4}>*/}
+          {/*    <Typography variant="body1" className={classes.selectLabel}>*/}
+          {/*      Typ sklizne:*/}
+          {/*    </Typography>*/}
+          {/*  </Grid>*/}
+          {/*  <Grid item xs={4}>*/}
+          {/*    <FormControl style={{width: "100%"}}>*/}
+          {/*      <InputLabel id="harvest-type-label">Typ sklizne</InputLabel>*/}
+          {/*      <Select*/}
+          {/*        labelId="harvest-type-label"*/}
+          {/*        id="harvest-type"*/}
+          {/*        value={harvestType}*/}
+          {/*        onChange={handleHarvestTypeChange}*/}
+          {/*      >*/}
+          {/*        <MenuItem value="partial">častečná</MenuItem>*/}
+          {/*        <MenuItem value="full">plná</MenuItem>*/}
+          {/*      </Select>*/}
+          {/*    </FormControl>*/}
+          {/*  </Grid>*/}
+          {/*  <Grid item xs={4} >*/}
+          {/*    <Grid container justify="center" spacing={1}>*/}
+          {/*      <Grid item>*/}
+          {/*        <Fab size="small" onClick={() => appendFilter("harvestType:\""+harvestType+"\"")}>=</Fab>*/}
+          {/*      </Grid>*/}
+          {/*      <Grid item>*/}
+          {/*        <Fab size="small" onClick={() => appendFilter("NOT harvestType:\""+harvestType+"\"")}>≠</Fab>*/}
+          {/*      </Grid>*/}
+          {/*    </Grid>*/}
+          {/*  </Grid>*/}
+          {/*</Grid>*/}
+
           <Grid container spacing={1}>
             <Grid item xs={4}>
               <Typography variant="body1" className={classes.selectLabel}>
@@ -287,7 +287,7 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
               </Grid>
             </Grid>
           </Grid>
-  
+
           <Grid container spacing={1}>
             <Grid item xs={4}>
               <Typography variant="body1" className={classes.selectLabel}>
@@ -312,47 +312,47 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
             <Grid item xs={4} >
               <Grid container justify="center" spacing={1}>
                 <Grid item>
-                  <Fab size="small" onClick={() => appendFilter("theme:\""+theme+"\"")}>=</Fab>
+                  <Fab size="small" onClick={() => appendFilter("topics:\""+theme+"\"")}>=</Fab>
                 </Grid>
                 <Grid item>
-                  <Fab size="small" onClick={() => appendFilter("NOT theme:\""+theme+"\"")}>≠</Fab>
+                  <Fab size="small" onClick={() => appendFilter("NOT topics:\""+theme+"\"")}>≠</Fab>
                 </Grid>
               </Grid>
             </Grid>
           </Grid>
-  
-          <Grid container spacing={1}>
-            <Grid item xs={4}>
-              <Typography variant="body1" className={classes.selectLabel}>
-                Typ stránky:
-              </Typography>
-            </Grid>
-            <Grid item xs={4}>
-              <FormControl style={{width: "100%"}}>
-                <InputLabel id="page-type-label">Typ stránky</InputLabel>
-                <Select
-                  labelId="page-type-label"
-                  id="page-type"
-                  value={pageType}
-                  onChange={handlePageTypeChange}
-                >
-                  {webTypes.map((value) => {
-                    return  <MenuItem key={value} value={value}>{value}</MenuItem>
-                  })}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={4}>
-              <Grid container justify="center" spacing={1}>
-                <Grid item>
-                  <Fab size="small" onClick={() => appendFilter("pageType:\""+pageType+"\"")}>=</Fab>
-                </Grid>
-                <Grid item>
-                  <Fab size="small" onClick={() => appendFilter("NOT pageType:\""+pageType+"\"")}>≠</Fab>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
+
+          {/*<Grid container spacing={1}>*/}
+          {/*  <Grid item xs={4}>*/}
+          {/*    <Typography variant="body1" className={classes.selectLabel}>*/}
+          {/*      Typ stránky:*/}
+          {/*    </Typography>*/}
+          {/*  </Grid>*/}
+          {/*  <Grid item xs={4}>*/}
+          {/*    <FormControl style={{width: "100%"}}>*/}
+          {/*      <InputLabel id="page-type-label">Typ stránky</InputLabel>*/}
+          {/*      <Select*/}
+          {/*        labelId="page-type-label"*/}
+          {/*        id="page-type"*/}
+          {/*        value={pageType}*/}
+          {/*        onChange={handlePageTypeChange}*/}
+          {/*      >*/}
+          {/*        {webTypes.map((value) => {*/}
+          {/*          return  <MenuItem key={value} value={value}>{value}</MenuItem>*/}
+          {/*        })}*/}
+          {/*      </Select>*/}
+          {/*    </FormControl>*/}
+          {/*  </Grid>*/}
+          {/*  <Grid item xs={4}>*/}
+          {/*    <Grid container justify="center" spacing={1}>*/}
+          {/*      <Grid item>*/}
+          {/*        <Fab size="small" onClick={() => appendFilter("pageType:\""+pageType+"\"")}>=</Fab>*/}
+          {/*      </Grid>*/}
+          {/*      <Grid item>*/}
+          {/*        <Fab size="small" onClick={() => appendFilter("NOT pageType:\""+pageType+"\"")}>≠</Fab>*/}
+          {/*      </Grid>*/}
+          {/*    </Grid>*/}
+          {/*  </Grid>*/}
+          {/*</Grid>*/}
         </Grid>
         
         <Grid item xs={12}>
@@ -362,19 +362,19 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
           <TextField label="Filter" style={{width: "100%"}} value={filter.filter} onChange={handleChangeFilter}/>
         </Grid>
         
-        <Grid item xs={12}>
-          <Typography variant="body1" className={classes.selectLabel}>
-            Textové zadání identifikatoru:
-          </Typography>
-          <TextField label="Identifikator" style={{width: "100%"}} multiline={true} value={filter.filterIdsList} onChange={handleChangeIdentificators}/>
-        </Grid>
+        {/*<Grid item xs={12}>*/}
+        {/*  <Typography variant="body1" className={classes.selectLabel}>*/}
+        {/*    Textové zadání identifikatoru:*/}
+        {/*  </Typography>*/}
+        {/*  <TextField label="Identifikator" style={{width: "100%"}} multiline={true} value={filter.filterIdsList} onChange={handleChangeIdentificators}/>*/}
+        {/*</Grid>*/}
         
-        <Grid item xs={12}>
-          <Typography variant="body1" className={classes.selectLabel}>
-            Počet náhodně vybraných záznamů: 
-            <TextField label="počet" type="number" className={classes.urlSelect} style={{width: "20%"}} value={filter.filterRandomSize} onChange={handleChangeRecords}/>
-          </Typography>
-        </Grid>
+        {/*<Grid item xs={12}>*/}
+        {/*  <Typography variant="body1" className={classes.selectLabel}>*/}
+        {/*    Počet náhodně vybraných záznamů: */}
+        {/*    <TextField label="počet" type="number" className={classes.urlSelect} style={{width: "20%"}} value={filter.filterRandomSize} onChange={handleChangeRecords}/>*/}
+        {/*  </Typography>*/}
+        {/*</Grid>*/}
   	  </Grid>
     </>
   );

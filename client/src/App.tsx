@@ -42,15 +42,23 @@ function App() {
   const [sent, setSent] = useState<boolean>(false);
   
   const handleSearch = () => {
-    fetch("/api/create", {
+    fetch("/api/search/solr/zip", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({filter, queries}),
+        body: JSON.stringify({filter: filter.filter}),
       })
-      .then(res => res.json())
-      .then(_res => setSent(true))
+      .then(response => response.blob())
+      .then(blob => {
+        var url = window.URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = "filename.xlsx";
+        document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
+        a.click();
+        a.remove();  //afterwards we remove the element again
+      })
       .catch(_error => setError(true));
   };
   
@@ -67,7 +75,7 @@ function App() {
       <Container className={classes.root}>
         <CssBaseline/>
         <Filters filter={filter} setFilter={setFilter}/>
-        <StaticQueries queries={queries} setQueries={setQueries}/>
+        {/*<StaticQueries queries={queries} setQueries={setQueries}/>*/}
         <Grid item xs={12} justify="flex-end" style={{textAlign: "right", paddingRight: "2rem"}}>
           <Fab variant="extended" color="primary" onClick={handleSearch}>Vyhledat</Fab>
         </Grid>

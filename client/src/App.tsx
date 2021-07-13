@@ -37,7 +37,7 @@ function App() {
 	const classes = useStyles();
   
   const [queries, setQueries] = useState<IQuery[]>([]);
-  const [filter, setFilter] = useState<IFilter>({filter: "", filterIdsList: ""});
+  const [filter, setFilter] = useState<IFilter>({filter: "", filterIdsList: "", filterRandomSize: 100});
   const [error, setError] = useState<boolean>(false);
   const [sent, setSent] = useState<boolean>(false);
   
@@ -47,14 +47,14 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({filter: filter.filter}),
+        body: JSON.stringify({filter: filter.filter, entries: filter.filterRandomSize}),
       })
       .then(response => response.blob())
       .then(blob => {
         var url = window.URL.createObjectURL(blob);
         var a = document.createElement('a');
         a.href = url;
-        a.download = "filename.xlsx";
+        a.download = "results.zip";
         document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
         a.click();
         a.remove();  //afterwards we remove the element again
@@ -76,7 +76,7 @@ function App() {
         <CssBaseline/>
         <Filters filter={filter} setFilter={setFilter}/>
         {/*<StaticQueries queries={queries} setQueries={setQueries}/>*/}
-        <Grid item xs={12} justify="flex-end" style={{textAlign: "right", paddingRight: "2rem"}}>
+        <Grid item xs={12} justify="flex-end" style={{textAlign: "right", paddingRight: "2rem", marginTop: "2rem"}}>
           <Fab variant="extended" color="primary" onClick={handleSearch}>Vyhledat</Fab>
         </Grid>
   	  </Container>

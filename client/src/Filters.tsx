@@ -4,6 +4,7 @@ import { KeyboardDatePicker } from '@material-ui/pickers';
 import { format } from 'date-fns'
 import { IFilter } from './App';
 import _ from 'lodash';
+import {Autocomplete} from "@material-ui/lab";
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -38,9 +39,13 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
   const [harvestType, setHarvestType] = useState<string | null>("");
   const [sentiment, setSentiment] = useState<number | number[]>([-1,1]);
   const [theme, setTheme] = useState<string | null>("");
-  const [pageType, setPageType] = useState<string | null>("");
+  const [inputTheme, setInputTheme] = useState<string | undefined>("");
+  const [pageType, setPageType] = useState<string | undefined>("");
   const [urlSelect, setUrlSelect] = useState<string | null>("contain");
   const [url, setUrl] = useState<string | null>("");
+  const [link, setLink] = useState<string | null>("");
+  const [headline, setHeadline] = useState<string | null>("");
+  const [plaintext, setPlaintext] = useState<string | null>("");
   const [topics, setTopics] = useState<string[]>([]);
   const [webTypes, setWebTypes] = useState<string[]>([]);
   
@@ -61,9 +66,6 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
   };
   const handleSentimentChange = (_event: any, newValue: number | number[]) => {
     setSentiment(newValue);
-  };
-  const handleThemeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setTheme(event.target.value as string);
   };
   const handlePageTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setPageType(event.target.value as string);
@@ -87,22 +89,24 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
   const handleChangeRecords = (event: React.ChangeEvent<HTMLInputElement>) => {
     let f:IFilter = _.cloneDeep(filter);
     f.filterRandomSize = parseInt(event.target.value);
+    if (f.filterRandomSize > 100) f.filterRandomSize = 100;
+    if (f.filterRandomSize < 1) f.filterRandomSize = 1;
     setFilter(f);
   };
   
   const handleAppendUrl = () => {
     switch(urlSelect) {
       case "contain":
-        appendFilter("url:\""+url+"\"");
+        appendFilter("url:/.*"+url+".*/");
         break;
       case "contain-not":
-        appendFilter("NOT url:\""+url+"\"");
+        appendFilter("NOT url:/.*"+url+".*/");
         break;
       case "equal-not":
-        appendFilter("NOT url:\"^"+url+"$\"");
+        appendFilter("NOT url:\""+url+"\"");
         break;
       default:
-        appendFilter("url:\"^"+url+"$\"");
+        appendFilter("url:\""+url+"\"");
     }
   };
   
@@ -149,6 +153,9 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
                 </Grid>
                 <Grid item>
                   <Fab size="small" onClick={() => appendFilter(" OR ")}>OR</Fab>
+                </Grid>
+                <Grid item>
+                  <Fab size="small" onClick={() => appendFilter(" NOT ")}>NOT</Fab>
                 </Grid>
                 <Grid item>
                   <Fab size="small" onClick={() => appendFilter("(")}>(</Fab>
@@ -221,6 +228,38 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
             </Grid>
             <Grid item xs={3} >
               <Fab variant="extended" onClick={handleAppendUrl}>Vložit</Fab>
+            </Grid>
+
+            <Grid item xs={4}>
+              <Typography variant="body1" className={classes.selectLabel}>
+                Odkaz (obsahuje):
+              </Typography>
+            </Grid>
+            <Grid item xs={5}>
+              <TextField
+                label="Link"
+                value={link}
+                onChange={(event) => setLink(event.target.value)}
+              />
+            </Grid>
+            <Grid item xs={3} >
+              <Fab variant="extended" onClick={() => appendFilter("links:\""+link+"\"")}>Vložit</Fab>
+            </Grid>
+
+            <Grid item xs={4}>
+              <Typography variant="body1" className={classes.selectLabel}>
+                Nadpis:
+              </Typography>
+            </Grid>
+            <Grid item xs={5}>
+              <TextField
+                label="Nadpis"
+                value={headline}
+                onChange={(event) => setHeadline(event.target.value)}
+              />
+            </Grid>
+            <Grid item xs={3} >
+              <Fab variant="extended" onClick={() => appendFilter("headlines:\""+headline+"\"")}>Vložit</Fab>
             </Grid>
           </Grid>
         </Grid>
@@ -296,17 +335,20 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
             </Grid>
             <Grid item xs={4}>
               <FormControl style={{width: "100%"}}>
-                <InputLabel id="theme-label">Téma</InputLabel>
-                <Select
-                  labelId="theme-label"
+                <Autocomplete
                   id="theme"
                   value={theme}
-                  onChange={handleThemeChange}
-                >
-                  {topics.map((value) => {
-                    return  <MenuItem key={value} value={value}>{value}</MenuItem>
-                  })}
-                </Select>
+                  onChange={(event, newValue) => {
+                    setTheme(newValue);
+                  }}
+                  inputValue={inputTheme}
+                  onInputChange={(event, newValue) => {
+                    setInputTheme(newValue);
+                  }}
+                  options={topics.sort((a, b) => -b.toLowerCase().localeCompare(a.toLowerCase()))}
+                  groupBy={(option) => option.toLowerCase().charAt(0)}
+                  renderInput={(params) => <TextField {...params} label="Téma" />}
+                />
               </FormControl>
             </Grid>
             <Grid item xs={4} >
@@ -318,6 +360,24 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
                   <Fab size="small" onClick={() => appendFilter("NOT topics:\""+theme+"\"")}>≠</Fab>
                 </Grid>
               </Grid>
+            </Grid>
+          </Grid>
+
+          <Grid container spacing={1}>
+            <Grid item xs={4}>
+              <Typography variant="body1" className={classes.selectLabel}>
+                Text:
+              </Typography>
+            </Grid>
+            <Grid item xs={5}>
+              <TextField
+                label="Text"
+                value={plaintext}
+                onChange={(event) => setPlaintext(event.target.value)}
+              />
+            </Grid>
+            <Grid item xs={3} >
+              <Fab variant="extended" onClick={() => appendFilter("plainText:\""+plaintext+"\"")}>Vložit</Fab>
             </Grid>
           </Grid>
 
@@ -355,7 +415,7 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
           {/*</Grid>*/}
         </Grid>
         
-        <Grid item xs={12}>
+        <Grid item xs={12} style={{margin: '2rem 0'}}>
           <Typography variant="body1" className={classes.selectLabel}>
             Zatím máte složeno:
           </Typography>
@@ -369,12 +429,12 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
         {/*  <TextField label="Identifikator" style={{width: "100%"}} multiline={true} value={filter.filterIdsList} onChange={handleChangeIdentificators}/>*/}
         {/*</Grid>*/}
         
-        {/*<Grid item xs={12}>*/}
-        {/*  <Typography variant="body1" className={classes.selectLabel}>*/}
-        {/*    Počet náhodně vybraných záznamů: */}
-        {/*    <TextField label="počet" type="number" className={classes.urlSelect} style={{width: "20%"}} value={filter.filterRandomSize} onChange={handleChangeRecords}/>*/}
-        {/*  </Typography>*/}
-        {/*</Grid>*/}
+        <Grid item xs={12} justify="flex-end" style={{textAlign: "right"}}>
+          <Typography variant="body1" className={classes.selectLabel}>
+            Počet {/*náhodně vybraných*/} záznamů:
+            <TextField label="počet" inputProps={{min: 1, max: 100}} type="number" className={classes.urlSelect} style={{width: "20%"}} value={filter.filterRandomSize} onChange={handleChangeRecords}/>
+          </Typography>
+        </Grid>
   	  </Grid>
     </>
   );

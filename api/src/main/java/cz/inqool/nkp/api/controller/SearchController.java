@@ -70,7 +70,7 @@ public class SearchController {
 
         SolrQuery query = new SolrQuery();
         query.set("q", request.getFilter());
-        query.setRows(100);
+        query.setRows(Math.min(Math.max(request.getEntries().intValue(), 1), 100));
         QueryResponse response = solr.query(query);
 
         SolrDocumentList docList = response.getResults();

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Grid, Typography, TextField, makeStyles, Fab, FormControl, InputLabel, Select, MenuItem, Slider } from '@material-ui/core';
 import { KeyboardDatePicker } from '@material-ui/pickers';
 import { format } from 'date-fns'
-import { IFilter } from './App';
+import { IFilter } from './SearchForm';
 import _ from 'lodash';
 import {Autocomplete} from "@material-ui/lab";
 
@@ -89,8 +89,8 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
   const handleChangeRecords = (event: React.ChangeEvent<HTMLInputElement>) => {
     let f:IFilter = _.cloneDeep(filter);
     f.filterRandomSize = parseInt(event.target.value);
-    if (f.filterRandomSize > 100) f.filterRandomSize = 100;
-    if (f.filterRandomSize < 1) f.filterRandomSize = 1;
+    if (f.filterRandomSize > 1000) f.filterRandomSize = 1000;
+    if (f.filterRandomSize < 10) f.filterRandomSize = 10;
     setFilter(f);
   };
   
@@ -165,40 +165,40 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
                 </Grid>
               </Grid>
             </Grid>
-            {/*<Grid item xs={12}>*/}
-            {/*  <Typography variant="body1">*/}
-            {/*    Datum sklizne*/}
-            {/*  </Typography>*/}
-            {/*</Grid>*/}
-            {/*<Grid item xs={9}>*/}
-            {/*  <Typography variant="body1" className={classes.datesText}>*/}
-            {/*    Od:*/}
-            {/*    <KeyboardDatePicker*/}
-            {/*      disableToolbar*/}
-            {/*      variant="inline"*/}
-            {/*      format="dd.MM.yyyy"*/}
-            {/*      margin="normal"*/}
-            {/*      value={selectedDateFrom}*/}
-            {/*      onChange={handleDateFromChange}*/}
-            {/*      className={classes.dates}*/}
-            {/*    />*/}
-            {/*  </Typography>*/}
-            {/*  <Typography variant="body1" className={classes.datesText}>*/}
-            {/*    Do:*/}
-            {/*    <KeyboardDatePicker*/}
-            {/*      disableToolbar*/}
-            {/*      variant="inline"*/}
-            {/*      format="dd.MM.yyyy"*/}
-            {/*      margin="normal"*/}
-            {/*      value={selectedDateTo}*/}
-            {/*      onChange={handleDateToChange}*/}
-            {/*      className={classes.dates}*/}
-            {/*    />*/}
-            {/*  </Typography>*/}
-            {/*</Grid>*/}
-            {/*<Grid item xs={3}>*/}
-            {/*  <Fab variant="extended" onClick={() => appendFilter("date:["+format(selectedDateFrom ? selectedDateFrom : 0, "dd.MM.yyyy")+" TO "+format(selectedDateTo ? selectedDateTo : 0, "dd.MM.yyyy")+"]")}>Vložit</Fab>*/}
-            {/*</Grid>*/}
+            <Grid item xs={12}>
+              <Typography variant="body1">
+                Datum sklizne
+              </Typography>
+            </Grid>
+            <Grid item xs={9}>
+              <Typography variant="body1" className={classes.datesText}>
+                Od:
+                <KeyboardDatePicker
+                  disableToolbar
+                  variant="inline"
+                  format="dd.MM.yyyy"
+                  margin="normal"
+                  value={selectedDateFrom}
+                  onChange={handleDateFromChange}
+                  className={classes.dates}
+                />
+              </Typography>
+              <Typography variant="body1" className={classes.datesText}>
+                Do:
+                <KeyboardDatePicker
+                  disableToolbar
+                  variant="inline"
+                  format="dd.MM.yyyy"
+                  margin="normal"
+                  value={selectedDateTo}
+                  onChange={handleDateToChange}
+                  className={classes.dates}
+                />
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <Fab variant="extended" onClick={() => appendFilter("date:["+format(selectedDateFrom ? selectedDateFrom : 0, "yyyy-MM-dd")+"T00:00:00Z TO "+format(selectedDateTo ? selectedDateTo : 0, "yyyy-MM-dd")+"T00:00:00Z]")}>Vložit</Fab>
+            </Grid>
             
             <Grid item xs={4}>
               <Typography variant="body1" className={classes.selectLabel}>
@@ -230,37 +230,37 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
               <Fab variant="extended" onClick={handleAppendUrl}>Vložit</Fab>
             </Grid>
 
-            <Grid item xs={4}>
-              <Typography variant="body1" className={classes.selectLabel}>
-                Odkaz (obsahuje):
-              </Typography>
-            </Grid>
-            <Grid item xs={5}>
-              <TextField
-                label="Link"
-                value={link}
-                onChange={(event) => setLink(event.target.value)}
-              />
-            </Grid>
-            <Grid item xs={3} >
-              <Fab variant="extended" onClick={() => appendFilter("links:\""+link+"\"")}>Vložit</Fab>
-            </Grid>
+            {/*<Grid item xs={4}>*/}
+            {/*  <Typography variant="body1" className={classes.selectLabel}>*/}
+            {/*    Odkaz (obsahuje):*/}
+            {/*  </Typography>*/}
+            {/*</Grid>*/}
+            {/*<Grid item xs={5}>*/}
+            {/*  <TextField*/}
+            {/*    label="Link"*/}
+            {/*    value={link}*/}
+            {/*    onChange={(event) => setLink(event.target.value)}*/}
+            {/*  />*/}
+            {/*</Grid>*/}
+            {/*<Grid item xs={3} >*/}
+            {/*  <Fab variant="extended" onClick={() => appendFilter("links:\""+link+"\"")}>Vložit</Fab>*/}
+            {/*</Grid>*/}
 
-            <Grid item xs={4}>
-              <Typography variant="body1" className={classes.selectLabel}>
-                Nadpis:
-              </Typography>
-            </Grid>
-            <Grid item xs={5}>
-              <TextField
-                label="Nadpis"
-                value={headline}
-                onChange={(event) => setHeadline(event.target.value)}
-              />
-            </Grid>
-            <Grid item xs={3} >
-              <Fab variant="extended" onClick={() => appendFilter("headlines:\""+headline+"\"")}>Vložit</Fab>
-            </Grid>
+            {/*<Grid item xs={4}>*/}
+            {/*  <Typography variant="body1" className={classes.selectLabel}>*/}
+            {/*    Nadpis:*/}
+            {/*  </Typography>*/}
+            {/*</Grid>*/}
+            {/*<Grid item xs={5}>*/}
+            {/*  <TextField*/}
+            {/*    label="Nadpis"*/}
+            {/*    value={headline}*/}
+            {/*    onChange={(event) => setHeadline(event.target.value)}*/}
+            {/*  />*/}
+            {/*</Grid>*/}
+            {/*<Grid item xs={3} >*/}
+            {/*  <Fab variant="extended" onClick={() => appendFilter("headlines:\""+headline+"\"")}>Vložit</Fab>*/}
+            {/*</Grid>*/}
           </Grid>
         </Grid>
         <Grid item md={6} xs={12}>
@@ -363,23 +363,23 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
             </Grid>
           </Grid>
 
-          <Grid container spacing={1}>
-            <Grid item xs={4}>
-              <Typography variant="body1" className={classes.selectLabel}>
-                Text:
-              </Typography>
-            </Grid>
-            <Grid item xs={5}>
-              <TextField
-                label="Text"
-                value={plaintext}
-                onChange={(event) => setPlaintext(event.target.value)}
-              />
-            </Grid>
-            <Grid item xs={3} >
-              <Fab variant="extended" onClick={() => appendFilter("plainText:\""+plaintext+"\"")}>Vložit</Fab>
-            </Grid>
-          </Grid>
+          {/*<Grid container spacing={1}>*/}
+          {/*  <Grid item xs={4}>*/}
+          {/*    <Typography variant="body1" className={classes.selectLabel}>*/}
+          {/*      Text:*/}
+          {/*    </Typography>*/}
+          {/*  </Grid>*/}
+          {/*  <Grid item xs={5}>*/}
+          {/*    <TextField*/}
+          {/*      label="Text"*/}
+          {/*      value={plaintext}*/}
+          {/*      onChange={(event) => setPlaintext(event.target.value)}*/}
+          {/*    />*/}
+          {/*  </Grid>*/}
+          {/*  <Grid item xs={3} >*/}
+          {/*    <Fab variant="extended" onClick={() => appendFilter("plainText:\""+plaintext+"\"")}>Vložit</Fab>*/}
+          {/*  </Grid>*/}
+          {/*</Grid>*/}
 
           {/*<Grid container spacing={1}>*/}
           {/*  <Grid item xs={4}>*/}
@@ -432,7 +432,7 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
         <Grid item xs={12} justify="flex-end" style={{textAlign: "right"}}>
           <Typography variant="body1" className={classes.selectLabel}>
             Počet {/*náhodně vybraných*/} záznamů:
-            <TextField label="počet" inputProps={{min: 1, max: 100}} type="number" className={classes.urlSelect} style={{width: "20%"}} value={filter.filterRandomSize} onChange={handleChangeRecords}/>
+            <TextField label="počet" inputProps={{min: 10, max: 1000}} type="number" className={classes.urlSelect} style={{width: "20%"}} value={filter.filterRandomSize} onChange={handleChangeRecords}/>
           </Typography>
         </Grid>
   	  </Grid>

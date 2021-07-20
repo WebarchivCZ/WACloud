@@ -16,7 +16,8 @@ public class FulltextSearch extends AuditModel {
     public enum Type {
         FREQUENCY,
         COLLOCATION,
-        OCCURENCE
+        OCCURENCE,
+		RAW
     }
     
 	@Id

@@ -3,7 +3,7 @@ import { Grid, makeStyles, Fab, FormControl, InputLabel, Select, MenuItem, Typog
 import _ from 'lodash';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { IQuery } from './App';
+import { IQuery } from './SearchForm';
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -85,9 +85,10 @@ function StaticQueries({queries, setQueries}:{queries:IQuery[], setQueries:(quer
                       value={query.searchType}
                       onChange={(event) => handleQueryTypeChange(index, event)}
                     >
-                      <MenuItem value="FREQUENCY">Frequency</MenuItem>
+                      {/*<MenuItem value="FREQUENCY">Frequency</MenuItem>*/}
                       <MenuItem value="COLLOCATION">Colocation</MenuItem>
-                      <MenuItem value="OCCURENCE">Occurence</MenuItem>
+                      {/*<MenuItem value="OCCURENCE">Occurence</MenuItem>*/}
+                      <MenuItem value="RAW">Raw</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -103,21 +104,25 @@ function StaticQueries({queries, setQueries}:{queries:IQuery[], setQueries:(quer
                         />
                       </FormControl>
                     </Grid>
-                    
-                    <Grid item xs={5}>
-                      <FormControlLabel
-                        control={<Checkbox color="primary" checked={query.context} onChange={(event) => handleChangeContext(index, event)} />}
-                        label="Přidat kontext"
-                      />
-                    </Grid>
-                    
-                    <Grid item xs={7}>
-                      <FormControlLabel
-                        control={<TextField label="počet" type="number" value={query.contextSize} onChange={(event) => handleChangeContextLength(index, event)} />}
-                        label="Počet slov kontextu"
-                        labelPlacement="start"
-                      />
-                    </Grid>
+
+                    {query.searchType === "COLLOCATION" && (
+                      <>
+                        <Grid item xs={5}>
+                          <FormControlLabel
+                            control={<Checkbox color="primary" checked={query.context} onChange={(event) => handleChangeContext(index, event)} />}
+                            label="Přidat kontext"
+                          />
+                        </Grid>
+
+                        <Grid item xs={7}>
+                          <FormControlLabel
+                            control={<TextField label="počet" type="number" value={query.contextSize} onChange={(event) => handleChangeContextLength(index, event)} />}
+                            label="Počet slov kontextu"
+                            labelPlacement="start"
+                          />
+                        </Grid>
+                      </>
+                    )}
                   </Grid>
                 </Grid>
                 

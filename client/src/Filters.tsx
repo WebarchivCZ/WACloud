@@ -381,38 +381,38 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
           {/*  </Grid>*/}
           {/*</Grid>*/}
 
-          {/*<Grid container spacing={1}>*/}
-          {/*  <Grid item xs={4}>*/}
-          {/*    <Typography variant="body1" className={classes.selectLabel}>*/}
-          {/*      Typ stránky:*/}
-          {/*    </Typography>*/}
-          {/*  </Grid>*/}
-          {/*  <Grid item xs={4}>*/}
-          {/*    <FormControl style={{width: "100%"}}>*/}
-          {/*      <InputLabel id="page-type-label">Typ stránky</InputLabel>*/}
-          {/*      <Select*/}
-          {/*        labelId="page-type-label"*/}
-          {/*        id="page-type"*/}
-          {/*        value={pageType}*/}
-          {/*        onChange={handlePageTypeChange}*/}
-          {/*      >*/}
-          {/*        {webTypes.map((value) => {*/}
-          {/*          return  <MenuItem key={value} value={value}>{value}</MenuItem>*/}
-          {/*        })}*/}
-          {/*      </Select>*/}
-          {/*    </FormControl>*/}
-          {/*  </Grid>*/}
-          {/*  <Grid item xs={4}>*/}
-          {/*    <Grid container justify="center" spacing={1}>*/}
-          {/*      <Grid item>*/}
-          {/*        <Fab size="small" onClick={() => appendFilter("pageType:\""+pageType+"\"")}>=</Fab>*/}
-          {/*      </Grid>*/}
-          {/*      <Grid item>*/}
-          {/*        <Fab size="small" onClick={() => appendFilter("NOT pageType:\""+pageType+"\"")}>≠</Fab>*/}
-          {/*      </Grid>*/}
-          {/*    </Grid>*/}
-          {/*  </Grid>*/}
-          {/*</Grid>*/}
+          <Grid container spacing={1}>
+            <Grid item xs={4}>
+              <Typography variant="body1" className={classes.selectLabel}>
+                Typ stránky:
+              </Typography>
+            </Grid>
+            <Grid item xs={4}>
+              <FormControl style={{width: "100%"}}>
+                <InputLabel id="page-type-label">Typ stránky</InputLabel>
+                <Select
+                  labelId="page-type-label"
+                  id="page-type"
+                  value={pageType}
+                  onChange={handlePageTypeChange}
+                >
+                  {webTypes.map((value) => {
+                    return  <MenuItem key={value} value={value}>{value}</MenuItem>
+                  })}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={4}>
+              <Grid container justify="center" spacing={1}>
+                <Grid item>
+                  <Fab size="small" onClick={() => appendFilter("webType:\""+pageType+"\"")}>=</Fab>
+                </Grid>
+                <Grid item>
+                  <Fab size="small" onClick={() => appendFilter("NOT webType:\""+pageType+"\"")}>≠</Fab>
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
         </Grid>
         
         <Grid item xs={12} style={{margin: '2rem 0'}}>

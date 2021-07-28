@@ -96,7 +96,7 @@ public class HBaseController {
 
         int totalCount = 0;
         int count = 0;
-        String[] columns = new String[]{"urlkey", "topics", "sentiment", "harvest-id"};
+        String[] columns = new String[]{"urlkey", "topics", "sentiment", "harvest-id", "web-page-type"};
         Map<String, byte[]> filters = new HashMap<String, byte[]>(){{
             put("harvest-id", harvestId.getBytes());
         }};
@@ -105,6 +105,7 @@ public class HBaseController {
             for (Result result : scanner) {
                 String id = Bytes.toString(result.getRow());
                 String url = Bytes.toString(result.getValue(HBaseService.family, "urlkey".getBytes()));
+                String webType = Bytes.toString(result.getValue(HBaseService.family, "web-page-type".getBytes()));
 
                 String topicsJson = Bytes.toString(result.getValue(HBaseService.family, "topics".getBytes()));
                 List<String> topics = null;
@@ -121,7 +122,8 @@ public class HBaseController {
                         .setTopics(topics)
                         .setUrl(url)
                         .setDate(harvest.getDate())
-                        .setHarvestType(harvest.getType());
+                        .setHarvestType(harvest.getType())
+                        .setWebType(webType);
                 solrBase.addBean(entry);
 
                 count += 1;

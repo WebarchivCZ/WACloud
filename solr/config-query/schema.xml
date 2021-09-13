@@ -42,7 +42,7 @@
         <analyzer>
             <tokenizer class="solr.StandardTokenizerFactory"/>
             <filter class="solr.LowerCaseFilterFactory"/>
-            <filter class="solr.StopFilterFactory" words="lang/stopwords_cz.txt" ignoreCase="true"/>
+            <filter class="solr.ManagedStopFilterFactory" managed="czech"/>
             <filter class="solr.CzechStemFilterFactory"/>
         </analyzer>
     </fieldType>
@@ -50,7 +50,7 @@
         <analyzer>
             <tokenizer class="solr.StandardTokenizerFactory"/>
             <filter class="solr.LowerCaseFilterFactory"/>
-            <filter class="solr.StopFilterFactory" words="lang/stopwords_cz.txt" ignoreCase="true"/>
+            <filter class="solr.ManagedStopFilterFactory" managed="czech"/>
             <filter class="solr.CzechStemFilterFactory"/>
         </analyzer>
     </fieldType>
@@ -59,7 +59,7 @@
         <analyzer>
             <tokenizer class="solr.StandardTokenizerFactory"/>
             <filter class="solr.LowerCaseFilterFactory"/>
-            <filter class="solr.StopFilterFactory" words="lang/stopwords_cz.txt" ignoreCase="true"/>
+            <filter class="solr.ManagedStopFilterFactory" managed="czech"/>
         </analyzer>
     </fieldType>
 

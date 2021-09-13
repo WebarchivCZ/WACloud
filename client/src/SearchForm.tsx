@@ -3,6 +3,7 @@ import { Grid, Fab, Snackbar } from '@material-ui/core';
 import Filters from './Filters';
 import StaticQueries from './StaticQueries';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
+import stopWordsCzech from "./StopWords";
 
 
 export interface IQuery {
@@ -18,6 +19,7 @@ export interface IQuery {
 export interface IFilter {
   filter: string,
   filterIdsList: string,
+  stopWords: string[],
   filterRandomSize?: number
 }
 
@@ -27,7 +29,7 @@ function Alert(props: AlertProps) {
 
 function SearchForm() {
   const [queries, setQueries] = useState<IQuery[]>([]);
-  const [filter, setFilter] = useState<IFilter>({filter: "", filterIdsList: "", filterRandomSize: 1000});
+  const [filter, setFilter] = useState<IFilter>({filter: "", filterIdsList: "", stopWords: stopWordsCzech.sort(), filterRandomSize: 1000});
   const [error, setError] = useState<boolean>(false);
   const [sent, setSent] = useState<boolean>(false);
 
@@ -40,7 +42,8 @@ function SearchForm() {
       body: JSON.stringify({
         base: {
           filter: (filter.filter.length === 0 ? "*:*" : filter.filter),
-          entries: filter.filterRandomSize
+          entries: filter.filterRandomSize,
+          stopWords: filter.stopWords.map(v => v.trim())
         }, queries: queries.map(function(x) {
           return {
             type: x.searchType,

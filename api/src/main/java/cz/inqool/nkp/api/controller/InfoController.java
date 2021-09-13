@@ -12,7 +12,7 @@ public class InfoController {
 	@GetMapping("/api")
 	public Map<String, String> info() {
 		return new HashMap<String, String>() {{
-			put("version", "0.1.1");
+			put("version", "0.1.2");
 		}};
 	}
 

@@ -30,14 +30,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @RestController
 public class SearchController {
     private static final Logger log = LoggerFactory.getLogger(HBaseController.class);
     public static final String STRIP_CHARS = ",<.>/?;:'\"[{]}\\|=+-_)(*&^%$#@!~`";
+    private static final String STOP_WORDS_RESOURCE = "czech";
 
     @Autowired
     HBaseService hbase;
@@ -47,6 +51,47 @@ public class SearchController {
 
     @Value("${solr.query.host.query}")
     private String solrQueryHost;
+
+    private List<String> getStopWords() throws IOException {
+        String json = WebClient.create(solrQueryHost.trim()+"/schema/analysis/stopwords/"+STOP_WORDS_RESOURCE)
+                .get()
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> result = mapper.readValue(json, new TypeReference<Map<String, Object>>(){});
+        Map<String, Object> wordSet = (Map<String, Object>)result.get("wordSet");
+        return (List<String>)wordSet.get("managedList");
+    }
+
+    private void addStopWords(List<String> stopWords) {
+        Map<String, Object> body = new HashMap<>();
+        Map<String, Boolean> initArgs = new HashMap<>();
+        initArgs.put("ignoreCase", true);
+        body.put("initArgs", initArgs);
+        body.put("managedList", stopWords);
+
+        WebClient.create(solrQueryHost.trim()+"/schema/analysis/stopwords/"+STOP_WORDS_RESOURCE)
+                .put()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(body), body.getClass())
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+    }
+
+    private void clearStopWords() throws IOException {
+        List<String> words = getStopWords();
+        WebClient.RequestHeadersUriSpec<?> request = WebClient
+                .create(solrQueryHost.trim() + "/schema/analysis/stopwords/" + STOP_WORDS_RESOURCE + "/")
+                .delete();
+        for (String word : words) {
+            request.uri(word)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+        }
+    }
 
     @PostMapping(value="/api/search", produces="application/zip")
     public byte[] search(@Valid @RequestBody RequestDTO request) throws SolrServerException, IOException {
@@ -68,6 +113,11 @@ public class SearchController {
         solrQuery.deleteByQuery("*:*");
         solrQuery.commit();
         log.info("Index cleared");
+
+        List<String> stopWords = Arrays.asList(request.getBase().getStopWords().clone());
+        clearStopWords();
+        addStopWords(stopWords);
+        log.info("Stopwords changed");
 
         Table main = hbase.table("main");
         ObjectMapper mapper = new ObjectMapper();
@@ -155,34 +205,49 @@ public class SearchController {
 
                     for (Map.Entry<String, Map<String, List<String>>> entry : response.getHighlighting().entrySet()) {
                         String id = entry.getKey();
+
+                        String url = idToUrl.get(id);
+                        if (!resultMap.containsKey(url)) {
+                            resultMap.put(url, new TreeMap<String, List<String>>());
+                        }
+                        Map<String, List<String>> resultForUrl = resultMap.get(url);
+
                         String plainText = entry.getValue().get("plainText").get(0);
                         String[] words = plainText.replace('\n', ' ').split("\\s+");
                         for (int i = 1; i < words.length; i++) {
                             if (words[i].startsWith("<em>")) {
-                                String collocation = StringUtils.strip(words[i-1], STRIP_CHARS).toLowerCase(locale);
-                                int start = Math.max(0, i-1-query.getContextSize());
-                                int stop = Math.min(words.length, i+query.getContextSize());
-                                String context = String.join(" ", Arrays.copyOfRange(words, start, stop));
-                                String url = idToUrl.get(id);
-                                if (!resultMap.containsKey(url)) {
-                                    resultMap.put(url, new TreeMap<String, List<String>>());
+                                // Collocation before
+                                int ni = i-1;
+                                String collocation = null;
+                                while (ni > 0 && (collocation == null || stopWords.contains(collocation))) {
+                                    collocation = StringUtils.strip(words[ni], STRIP_CHARS).toLowerCase(locale);
+                                    ni -= 1;
                                 }
-                                Map<String, List<String>> resultForUrl = resultMap.get(url);
-                                if (!resultForUrl.containsKey(collocation)) {
-                                    resultForUrl.put(collocation, new ArrayList<String>());
+                                if (collocation != null && !stopWords.contains(collocation)) {
+                                    int start = Math.max(0, i-1-query.getContextSize());
+                                    int stop = Math.min(words.length, i+query.getContextSize());
+                                    String context = String.join(" ", Arrays.copyOfRange(words, start, stop));
+                                    if (!resultForUrl.containsKey(collocation)) {
+                                        resultForUrl.put(collocation, new ArrayList<String>());
+                                    }
+                                    resultForUrl.get(collocation).add(context);
                                 }
-                                resultForUrl.get(collocation).add(context);
 
+                                // Skip some words
                                 while (i+1 < words.length && words[i+1].startsWith("<em>")) {
                                     i++;
                                 }
-                                i++;
 
-                                if (i < words.length) {
-                                    collocation = StringUtils.strip(words[i], STRIP_CHARS).toLowerCase(locale);
-                                    start = Math.max(0, i-query.getContextSize());
-                                    stop = Math.min(words.length, i+1+query.getContextSize());
-                                    context = String.join(" ", Arrays.copyOfRange(words, start, stop));
+                                // Collocation after
+                                collocation = null;
+                                while (i+1 < words.length && (collocation == null || stopWords.contains(collocation))) {
+                                    collocation = StringUtils.strip(words[i+1], STRIP_CHARS).toLowerCase(locale);
+                                    i += 1;
+                                }
+                                if (collocation != null && !stopWords.contains(collocation)) {
+                                    int start = Math.max(0, i - query.getContextSize());
+                                    int stop = Math.min(words.length, i + 1 + query.getContextSize());
+                                    String context = String.join(" ", Arrays.copyOfRange(words, start, stop));
                                     if (!resultForUrl.containsKey(collocation)) {
                                         resultForUrl.put(collocation, new ArrayList<String>());
                                     }

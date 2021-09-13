@@ -48,10 +48,12 @@ function StaticQueries({queries, setQueries}:{queries:IQuery[], setQueries:(quer
   };
   
   const handleAddQueryText = (index: number) => {
-    let q:IQuery[] = _.cloneDeep(queries);
-    q[index].queries.push(q[index].searchText);
-    q[index].searchText = "";
-    setQueries(q);
+    if (queries[index].searchText.length > 0) {
+      let q:IQuery[] = _.cloneDeep(queries);
+      q[index].queries.push(q[index].searchText);
+      q[index].searchText = "";
+      setQueries(q);
+    }
   };
   
   const handleAddQuery = () => {

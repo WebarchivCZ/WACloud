@@ -1,10 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Typography, TextField, makeStyles, Fab, FormControl, InputLabel, Select, MenuItem, Slider } from '@material-ui/core';
+import {
+  Grid,
+  Typography,
+  TextField,
+  makeStyles,
+  Fab,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Slider,
+  Chip,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Paper
+} from '@material-ui/core';
 import { KeyboardDatePicker } from '@material-ui/pickers';
 import { format } from 'date-fns'
 import { IFilter } from './SearchForm';
 import _ from 'lodash';
 import {Autocomplete} from "@material-ui/lab";
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -24,7 +41,27 @@ const useStyles = makeStyles((theme) => ({
     position: "relative",
     top: "-23px",
     left: "10px"
-  }
+  },
+  chipsPaper: {
+    display: 'flex',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    listStyle: 'none',
+    padding: 0,
+    margin: 0,
+  },
+  chip: {
+    margin: theme.spacing(0.2),
+  },
+  accordionHeading: {
+    fontSize: theme.typography.pxToRem(15),
+    flexBasis: '33.33%',
+    flexShrink: 0,
+  },
+  accordionSecondaryHeading: {
+    fontSize: theme.typography.pxToRem(15),
+    color: theme.palette.text.secondary,
+  },
 }));
 
 function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter) => any}) {
@@ -48,6 +85,7 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
   const [plaintext, setPlaintext] = useState<string | null>("");
   const [topics, setTopics] = useState<string[]>([]);
   const [webTypes, setWebTypes] = useState<string[]>([]);
+  const [stopWord, setStopWord] = useState<string>("");
   
   const appendFilter = (text: string) => {
     let f:IFilter = _.cloneDeep(filter);
@@ -81,9 +119,26 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
     f.filter = event.target.value;
     setFilter(f);
   };
+  const handleChangeStopWord = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setStopWord(event.target.value);
+  };
+  const handleAddStopWord = () => {
+    if (stopWord.length > 0) {
+      let f:IFilter = _.cloneDeep(filter);
+      f.stopWords.push(stopWord);
+      f.stopWords = f.stopWords.sort();
+      setFilter(f);
+      setStopWord("");
+    }
+  };
   const handleChangeIdentificators = (event: React.ChangeEvent<HTMLInputElement>) => {
     let f:IFilter = _.cloneDeep(filter);
     f.filterIdsList = event.target.value;
+    setFilter(f);
+  };
+  const handleDeleteStopWord = (index: number) => () => {
+    let f:IFilter = _.cloneDeep(filter);
+    f.stopWords.splice(index, 1)
     setFilter(f);
   };
   const handleChangeRecords = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -428,6 +483,50 @@ function Filters({filter, setFilter}:{filter:IFilter, setFilter:(filter:IFilter)
         {/*  </Typography>*/}
         {/*  <TextField label="Identifikator" style={{width: "100%"}} multiline={true} value={filter.filterIdsList} onChange={handleChangeIdentificators}/>*/}
         {/*</Grid>*/}
+
+        <Grid item xs={12}>
+          <Typography variant="body1" className={classes.selectLabel}>
+            Slova, vynechány ze zpracovávání  (stop slova):
+          </Typography>
+        </Grid>
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+          >
+            <Typography className={classes.accordionSecondaryHeading}>{filter.stopWords.slice(0, 10).join(", ") + (filter.stopWords.length > 10 ? ",..." : "")}</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Grid container spacing={1}>
+              <Grid item xs={12}>
+                <ul className={classes.chipsPaper}>
+                  {filter.stopWords.map((data, index) => {
+                    return (
+                      <li key={index}>
+                        <Chip
+                          size="small"
+                          label={data}
+                          onDelete={handleDeleteStopWord(index)}
+                          className={classes.chip}
+                        />
+                      </li>
+                    );
+                  })}
+                </ul>
+              </Grid>
+              <Grid item xs={4} style={{textAlign: "right"}}>
+                <Typography variant="body1" className={classes.selectLabel}>
+                  Přidat další slovo:
+                </Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <TextField style={{width: "100%"}} size="small" label="Slovo" value={stopWord} onChange={handleChangeStopWord}/>
+              </Grid>
+              <Grid item xs={4}>
+                <Fab size="small" variant="extended" onClick={handleAddStopWord}>Vložit</Fab>
+              </Grid>
+            </Grid>
+          </AccordionDetails>
+        </Accordion>
         
         <Grid item xs={12} justify="flex-end" style={{textAlign: "right"}}>
           <Typography variant="body1" className={classes.selectLabel}>

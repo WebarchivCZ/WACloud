@@ -34,8 +34,10 @@ services:
     container_name: nkp-solr
     volumes:
       - solr_data:/var/solr
+      - solr_cores_data:/opt/solr/server/solr/mycores
     ports:
       - "8983:8983"
 volumes:
   nkp_db:
   solr_data:
+  solr_cores_data:

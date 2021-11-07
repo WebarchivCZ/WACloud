@@ -14,9 +14,7 @@ import cz.inqool.nkp.api.model.FulltextSearch;
 import cz.inqool.nkp.api.service.HBaseService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -119,54 +117,52 @@ public class SearchController {
         addStopWords(stopWords);
         log.info("Stopwords changed");
 
-        Table main = hbase.table("main");
         ObjectMapper mapper = new ObjectMapper();
-        List<Get> gets = new ArrayList<>();
+        List<String> gets = new ArrayList<>();
 
         int groupSize = 10000;
         int idsSize = ids.length;
         for (int totalCount = 0; totalCount < idsSize;) {
-            int i = 0;
+            int i;
             for (i = 0; i < groupSize; i++) {
                 if (totalCount+i >= idsSize) {
                     break;
                 }
-                gets.add(new Get(ids[totalCount+i].getBytes()));
+                gets.add(ids[totalCount+i]);
             }
             totalCount += i;
 
-            for (Result result : main.get(gets)) {
-                String topicsJson = new String(result.getValue(HBaseService.family, "topics".getBytes()));
+            for (Result result : hbase.get("main", gets)) {
+                String topicsJson = hbase.getRowColumnAsString(result, "topics");
                 List<String> topics = null;
                 if (!topicsJson.equals("")) {
                     topics = mapper.readValue(topicsJson, new TypeReference<List<String>>() {});
                 }
 
-                String headlinesJson = new String(result.getValue(HBaseService.family, "headlines".getBytes()));
+                String headlinesJson = hbase.getRowColumnAsString(result, "headlines");
                 List<String> headlines = null;
                 if (!headlinesJson.equals("")) {
                     headlines = mapper.readValue(headlinesJson, new TypeReference<List<String>>() {});
                 }
 
-                String linksJson = new String(result.getValue(HBaseService.family, "links".getBytes()));
+                String linksJson = hbase.getRowColumnAsString(result, "links");
                 List<String> links = null;
                 if (!linksJson.equals("")) {
                     links = mapper.readValue(linksJson, new TypeReference<List<String>>() {});
                 }
 
-                byte[] sentimentBytes = result.getValue(HBaseService.family, "sentiment".getBytes());
-                Double sentiment = sentimentBytes.length == 0 ? null : Double.valueOf(new String(sentimentBytes));
+                Double sentiment = hbase.getRowColumnAsDouble(result, "sentiment");
 
                 SolrQueryEntry entry = new SolrQueryEntry();
                 entry.setId(Bytes.toString(result.getRow()))
-                        .setLanguage(Bytes.toString(result.getValue(HBaseService.family, "language".getBytes())))
-                        .setPlainText(Bytes.toString(result.getValue(HBaseService.family, "plain-text".getBytes())))
-                        .setTitle(Bytes.toString(result.getValue(HBaseService.family, "title".getBytes())))
+                        .setLanguage(hbase.getRowColumnAsString(result, "language"))
+                        .setPlainText(hbase.getRowColumnAsString(result, "plain-text"))
+                        .setTitle(hbase.getRowColumnAsString(result, "title"))
                         .setTopics(topics)
                         .setSentiment(sentiment)
                         .setHeadlines(headlines)
                         .setLinks(links)
-                        .setUrl(Bytes.toString(result.getValue(HBaseService.family, "urlkey".getBytes())));
+                        .setUrl(hbase.getRowColumnAsString(result, "urlkey"));
                 solrQuery.addBean(entry);
             }
 
@@ -274,6 +270,7 @@ public class SearchController {
                 }
                 SolrQuery collocationQuery = new SolrQuery();
                 collocationQuery.set("q", queryString.toString());
+                collocationQuery.setRows(request.getBase().getEntries());
                 QueryResponse response = solrQuery.query(collocationQuery);
 
                 SolrDocumentList docList = response.getResults();

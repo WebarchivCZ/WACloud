@@ -69,6 +69,7 @@
     <field name="id" type="string"/>
     <field name="url" type="string" docValues="false" indexed="true" stored="true"/>
     <field name="date" type="pdate" docValues="false" indexed="true" stored="true"/>
+    <field name="harvestId" type="string" docValues="false" indexed="true" stored="false"/>
     <field name="harvestType" type="string" docValues="false" indexed="true" stored="true"/>
     <field name="webType" type="string" docValues="false" indexed="true" stored="true"/>
     <field name="pageType" type="string" docValues="false" indexed="true" stored="true"/>

@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import cz.inqool.nkp.api.model.Harvest;
 
 @Repository
-public interface HarvestRepository extends JpaRepository<Harvest, Long> {
+public interface HarvestRepository extends JpaRepository<Harvest, String> {
 	
 }

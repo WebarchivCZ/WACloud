@@ -1,20 +1,25 @@
 package cz.inqool.nkp.api.service;
 
-import org.apache.hadoop.conf.Configuration;
+import cz.inqool.nkp.api.dto.Harvest;
+import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
-import org.apache.hadoop.hbase.client.Table;
 
-import java.io.IOException;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface HBaseService {
     byte[] family = "cf1".getBytes();
 
-    Configuration getConfig() throws IOException;
-    String get(Table table, String row, String column) throws IOException;
-    Map<String, byte[]> getAll(Table table, String row) throws IOException;
-    Table table(String name) throws IOException;
-    ResultScanner scan(String tableName) throws IOException;
-    ResultScanner scan(String tableName, String[] columns) throws IOException;
-    ResultScanner scan(String tableName, String[] columns, Map<String, byte[]> filters) throws IOException;
+    Result[] get(String tableName, List<String> ids);
+    ResultScanner scan(String tableName);
+    ResultScanner scan(String tableName, String[] columns);
+    ResultScanner scan(String tableName, String[] columns, Map<String, byte[]> filters);
+
+    String getRowColumnAsString(Result result, String column);
+    Double getRowColumnAsDouble(Result result, String column);
+
+    Harvest getHarvest(String id);
+    Set<String> getTopics();
+    Set<String> getWebTypes();
 }

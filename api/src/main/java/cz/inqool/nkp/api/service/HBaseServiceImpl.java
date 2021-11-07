@@ -1,5 +1,8 @@
 package cz.inqool.nkp.api.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import cz.inqool.nkp.api.dto.Harvest;
 import cz.inqool.nkp.api.exception.ResourceNotFoundException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.CompareOperator;
@@ -8,35 +11,35 @@ import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class HBaseServiceImpl implements HBaseService {
+    private static final Logger log = LoggerFactory.getLogger(HBaseService.class);
 
-    @Value("${hbase.zookeeper.quorum}")
-    private String hbaseHost;
+    private final Connection connection;
+    private final ObjectMapper mapper;
 
-    @Value("${zookeeper.znode.parent}")
-    private String zookeeperNode;
-
-    private Connection connection = null;
-
-    @Override
-    public Configuration getConfig() throws IOException {
+    public HBaseServiceImpl(@Value("${hbase.zookeeper.quorum}") String hbaseHost,
+                            @Value("${zookeeper.znode.parent}") String zookeeperNode) throws IOException {
         Configuration config = HBaseConfiguration.create();
         config.set("hbase.zookeeper.quorum", hbaseHost);
         config.set("zookeeper.znode.parent", zookeeperNode);
         HBaseAdmin.available(config);
-        return config;
+        connection = ConnectionFactory.createConnection(config);
+        mapper = new ObjectMapper();
     }
 
-    @Override
-    public String get(Table table, String row, String column) throws IOException {
+    private String get(Table table, String row, String column) throws IOException {
         Result r = table.get(new Get(Bytes.toBytes(row)));
         if (r.isEmpty()) {
             throw new ResourceNotFoundException("HBase entry with id '"+row+"' in table '"+table.getName().getNameAsString()+"' does not exist.");
@@ -48,39 +51,46 @@ public class HBaseServiceImpl implements HBaseService {
         return Bytes.toString(value);
     }
 
-    @Override
-    public Map<String, byte[]> getAll(Table table, String row) throws IOException {
-        Result r = table.get(new Get(Bytes.toBytes(row)));
-        if (r.isEmpty()) {
-            throw new ResourceNotFoundException("HBase entry with id '"+row+"' in table '"+table.getName().getNameAsString()+"' does not exist.");
+    private Map<String, byte[]> getAll(Table table, String row) {
+        try {
+            Result r = table.get(new Get(Bytes.toBytes(row)));
+            if (r.isEmpty()) {
+                throw new ResourceNotFoundException("HBase entry with id '" + row + "' in table '" + table.getName().getNameAsString() + "' does not exist.");
+            }
+            Map<String, byte[]> map = new HashMap<>();
+            for (Map.Entry<byte[], byte[]> entry : r.getFamilyMap(family).entrySet()) {
+                map.put(Bytes.toString(entry.getKey()), entry.getValue());
+            }
+            return map;
         }
-        Map<String, byte[]> map = new HashMap<>();
-        for (Map.Entry<byte[], byte[]> entry : r.getFamilyMap(family).entrySet()) {
-            map.put(Bytes.toString(entry.getKey()), entry.getValue());
+        catch (IOException exception) {
+            log.error("An error occurs while getting a row from HBase table `"+table.getName()+"`.", exception);
+            throw new RuntimeException("An internal error occurs.");
         }
-        return map;
+    }
+
+    private Table table(String name) {
+        try {
+            return connection.getTable(TableName.valueOf(name));
+        }
+        catch (IOException exception) {
+            log.error("An error occurs while getting HBase table `"+name+"`.", exception);
+            throw new RuntimeException("An internal error occurs.");
+        }
     }
 
     @Override
-    public Table table(String name) throws IOException {
-        if (connection == null) {
-            connection = ConnectionFactory.createConnection(getConfig());
-        }
-        return connection.getTable(TableName.valueOf(name));
-    }
-
-    @Override
-    public ResultScanner scan(String tableName) throws IOException {
+    public ResultScanner scan(String tableName) {
         return scan(tableName, new String[]{}, new HashMap<String, byte[]>(){});
     }
 
     @Override
-    public ResultScanner scan(String tableName, String[] columns) throws IOException {
+    public ResultScanner scan(String tableName, String[] columns) {
         return scan(tableName, columns, new HashMap<String, byte[]>(){});
     }
 
     @Override
-    public ResultScanner scan(String tableName, String[] columns, Map<String, byte[]> filters) throws IOException {
+    public ResultScanner scan(String tableName, String[] columns, Map<String, byte[]> filters) {
         Scan scan = new Scan();
         scan.addFamily(family);
         for (String column : columns) {
@@ -89,6 +99,71 @@ public class HBaseServiceImpl implements HBaseService {
         for (Map.Entry<String, byte[]> entry : filters.entrySet()) {
             scan.setFilter(new SingleColumnValueFilter(family, entry.getKey().getBytes(), CompareOperator.EQUAL, entry.getValue()));
         }
-        return table(tableName).getScanner(scan);
+        try {
+            return table(tableName).getScanner(scan);
+        }
+        catch (IOException exception) {
+            log.error("An error occurs while scanning HBase table `"+tableName+"`.", exception);
+            throw new RuntimeException("An internal error occurs.");
+        }
+    }
+
+    private Set<String> getConfig(String key) {
+        try {
+            return new TreeSet<>(mapper.readValue(this.get(this.table("config"), key, "value"),
+                    new TypeReference<Map<String, Long>>() {
+                    }).keySet());
+        }
+        catch (IOException exception) {
+            log.error("Cannot get topics from HBase.", exception);
+            return new TreeSet<>();
+        }
+    }
+
+
+    @Override
+    public Result[] get(String tableName, List<String> ids) {
+        try {
+            return table(tableName).get(ids.stream().map(id -> new Get(id.getBytes())).collect(Collectors.toList()));
+        }
+        catch (IOException exception) {
+            log.error("An error occurs while getting more ids from HBase table `"+tableName+"`.", exception);
+            throw new RuntimeException("An internal error occurs.");
+        }
+    }
+
+    @Override
+    public String getRowColumnAsString(Result result, String column) {
+        return new String(result.getValue(HBaseService.family, column.getBytes()));
+    }
+
+    @Override
+    public Double getRowColumnAsDouble(Result result, String column) {
+        byte[] value = result.getValue(HBaseService.family, column.getBytes());
+        return value.length == 0 ? null : Double.valueOf(new String(value));
+    }
+
+    @Override
+    public Harvest getHarvest(String id) {
+        Map<String, byte[]> row = getAll(table("harvest"), id);
+        Date date = null;
+        try {
+            String dateStr = Bytes.toString(row.get("date"));
+            date = new SimpleDateFormat("yyyyMMdd").parse(dateStr);
+        } catch (ParseException e) {
+            log.error(e.toString());
+        }
+        String type = Bytes.toString(row.get("type"));
+        return new Harvest(id, date, type);
+    }
+
+    @Override
+    public Set<String> getTopics() {
+        return getConfig("topics");
+    }
+
+    @Override
+    public Set<String> getWebTypes() {
+        return getConfig("webtypes");
     }
 }

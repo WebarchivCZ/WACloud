@@ -2,6 +2,7 @@ package cz.inqool.nkp.api.dto;
 
 import org.apache.solr.client.solrj.beans.Field;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -69,6 +70,10 @@ public class SolrBaseEntry {
 
     public SolrBaseEntry setDate(Date date) {
         this.date = date;
+        return this;
+    }
+    public SolrBaseEntry setDate(LocalDate date) {
+        this.date = java.sql.Date.valueOf(date);
         return this;
     }
 

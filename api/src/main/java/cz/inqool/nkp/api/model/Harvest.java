@@ -1,5 +1,6 @@
 package cz.inqool.nkp.api.model;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import javax.persistence.*;
@@ -7,32 +8,31 @@ import javax.persistence.*;
 @Entity
 @Table(name = "harvests")
 public class Harvest extends AuditModel {
+
+	public enum State {
+		UNPROCESSED,
+		PROCESSING,
+		INDEXED,
+		ERROR,
+		CLEARED
+	}
+
 	@Id
-    @GeneratedValue(generator = "question_generator")
-    @SequenceGenerator(
-            name = "question_generator",
-            sequenceName = "question_sequence",
-            initialValue = 1
-    )
-    private Long id;
-	
     @Column(columnDefinition = "text")
     private String identification;
 	
     @Column(columnDefinition = "text")
     private String type;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "date", nullable = false)
-    private Date date;
+//    @Temporal(TemporalType.TIMESTAMP)
+    @Column(columnDefinition = "date", nullable = false)
+    private LocalDate date;
 
-	public Long getId() {
-		return id;
-	}
+	@Enumerated(EnumType.STRING)
+	private Harvest.State state;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+	@Column
+	private Long entries;
 
 	public String getIdentification() {
 		return identification;
@@ -48,5 +48,29 @@ public class Harvest extends AuditModel {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public Harvest.State getState() {
+		return state;
+	}
+
+	public void setState(Harvest.State state) {
+		this.state = state;
+	}
+
+	public LocalDate getDate() {
+		return date;
+	}
+
+	public void setDate(LocalDate date) {
+		this.date = date;
+	}
+
+	public Long getEntries() {
+		return entries;
+	}
+
+	public void setEntries(Long entries) {
+		this.entries = entries;
 	}
 }

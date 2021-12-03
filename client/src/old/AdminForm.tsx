@@ -9,7 +9,7 @@ import {
   TableCell,
   Paper,
   TableBody,
-  Typography, IconButton, Snackbar
+  Typography, IconButton, Snackbar, CircularProgress
 } from '@material-ui/core';
 import {makeStyles} from "@material-ui/core/styles";
 import PublishIcon from '@material-ui/icons/Publish';
@@ -27,11 +27,24 @@ const useStyles = makeStyles((theme) => ({
 export interface IHarvest {
   identification: string,
   date: string,
-  type: string
+  type: string,
+  state: string,
+  entries: number
 }
 
 function Alert(props: AlertProps) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
+function stateToString(state: string) {
+  switch (state) {
+    case "UNPROCESSED": return "Čaká na spracovanie";
+    case "PROCESSING": return "Spracováva sa";
+    case "INDEXED": return "Importované";
+    case "ERROR": return "Chyba pri importe";
+    case "CLEARED": return "Zmazané z indexu";
+  }
+  return "Neznámy";
 }
 
 function AdminForm() {
@@ -49,7 +62,7 @@ function AdminForm() {
     setActionEnded(false);
   };
 
-  useEffect(() => {
+  const refreshHarvests = () => {
     fetch("/api/harvest")
       .then(res => res.json())
       .then(
@@ -59,7 +72,11 @@ function AdminForm() {
         (_error) => {
           setHarvests([]);
         }
-      )
+      );
+  };
+
+  useEffect(() => {
+    refreshHarvests();
     fetch("/api")
       .then(res => res.json())
       .then(
@@ -69,7 +86,10 @@ function AdminForm() {
         (_error) => {
           setVersion("");
         }
-      )
+      );
+
+    const interval = setInterval(refreshHarvests, 10000);
+    return () => clearInterval(interval)
   }, [])
 
   return (
@@ -84,7 +104,10 @@ function AdminForm() {
               <TableCell>ID</TableCell>
               <TableCell align="right">Datum</TableCell>
               <TableCell align="right">Typ</TableCell>
+              <TableCell align="right">Stav</TableCell>
+              <TableCell align="right">Záznamov</TableCell>
               <TableCell align="right">Importovat</TableCell>
+              <TableCell align="right">Zmazať</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -96,12 +119,30 @@ function AdminForm() {
                 <TableCell align="right">{row.date}</TableCell>
                 <TableCell align="right">{row.type}</TableCell>
                 <TableCell align="right">
+                  {stateToString(row.state)}
+                  {(row.state == "UNPROCESSED" || row.state == "PROCESSING") && <CircularProgress size={15} />}
+                </TableCell>
+                <TableCell align="right">{row.entries}</TableCell>
+                <TableCell align="right">
                   <IconButton aria-label="import">
                     <PublishIcon onClick={() => {
                       setActionStarted(true);
-                      fetch("/api/pump?harvestId="+row.identification, {method: 'POST'}).then(() => {
-                        setActionStarted(false)
-                        setActionEnded(true)
+                      fetch("/api/harvest/index?harvestId="+row.identification, {method: 'POST'}).then(() => {
+                        refreshHarvests();
+                        setActionStarted(false);
+                        setActionEnded(true);
+                      })
+                    }}/>
+                  </IconButton>
+                </TableCell>
+                <TableCell align="right">
+                  <IconButton aria-label="import">
+                    <PublishIcon onClick={() => {
+                      setActionStarted(true);
+                      fetch("/api/harvest/clear?harvestId="+row.identification, {method: 'POST'}).then(() => {
+                        refreshHarvests();
+                        setActionStarted(false);
+                        setActionEnded(true);
                       })
                     }}/>
                   </IconButton>
@@ -114,9 +155,10 @@ function AdminForm() {
       <Grid item xs={12} justify="flex-end" style={{textAlign: "right", paddingRight: "2rem", marginTop: "2rem"}}>
         <Fab variant="extended" color="secondary" onClick={() => {
           setActionStarted(true);
-          fetch("/api/clear", {method: 'POST'}).then(() => {
-            setActionStarted(false)
-            setActionEnded(true)
+          fetch("/api/harvest/clear-all", {method: 'POST'}).then(() => {
+            refreshHarvests();
+            setActionStarted(false);
+            setActionEnded(true);
           })
         }}>Zmazat indexy</Fab>
       </Grid>

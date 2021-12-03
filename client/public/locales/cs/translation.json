@@ -1,0 +1,68 @@
+{
+  "login": {
+    "header": "Přihlášení",
+    "name": "Přihlasovací jméno",
+    "password": "Heslo",
+    "button": "Přihlásit se",
+    "text": "Sem morbi consectetur morbi erat purus purus.",
+    "success": "Byl ste úspěšně přihlášen."
+  },
+  "logout": {
+    "header": "Přihlášení",
+    "success": "Byl ste úspěšně odhlášen."
+  },
+  "header": {
+    "newQuery": "Nový dotaz",
+    "favorite": "Oblíbené",
+    "history": "Moje dotazy",
+    "user": "Používatel",
+    "logout": "Odhlásit se"
+  },
+  "filters": {
+    "filtersSectionHeader": "Filtre",
+    "settingsSectionHeader": "Nastavení limitů",
+    "theme": "Téma",
+    "pageType": "Typ stránky",
+    "date": "Dátum sklízne",
+    "dateFrom": "Od",
+    "dateTo": "Do",
+    "operator": {
+      "label": "Operator",
+      "contain": "obsahuje",
+      "contain-not": "neobsahuje",
+      "equal": "rovna se",
+      "equal-not": "nerovna se"
+    },
+    "url": "URL",
+    "sentiment": "Sentiment",
+    "stopWords": "Stop slova",
+    "entriesLimit": "Počet záznamu"
+  },
+  "query": {
+    "header": "Dotaz",
+    "operators": "Logické operátory:",
+    "error": {
+      "title": "Došlo k chybě",
+      "message": "Došlo k neočekávané chybě. Zkuste to později znovu. "
+    },
+    "start": {
+      "title": "Dotaz byl odeslán",
+      "message": "Počkejte prosím, pracujeme na tom. "
+    },
+    "success": {
+      "title": "Dotaz byl úspěšně dokončen",
+      "message": "Výsledky svého dotazu si můžete stáhnout a uložit. "
+    },
+    "search": "Vyhledat"
+  },
+  "analytics": {
+    "title": "Analytické dotazy",
+    "queryType": "Typ dotazu",
+    "add": "+ Pridat další dotaz",
+    "delete": "Odstránit",
+    "words": "Seznam vyrazů:",
+    "wordInput": "Zadejte text pro vyhledávaní",
+    "context": "Přidat kontext",
+    "contextLength": "Počet slov kontextu:"
+  }
+}

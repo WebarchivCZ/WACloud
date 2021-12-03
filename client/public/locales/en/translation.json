@@ -1,0 +1,68 @@
+{
+  "login": {
+    "header": "Sign in",
+    "name": "User name",
+    "password": "Password",
+    "button": "Log in",
+    "text": "Sem morbi consectetur morbi erat purus purus.",
+    "success": "You were successfully logged in."
+  },
+  "logout": {
+    "header": "Log out",
+    "success": "You were successfully logged out."
+  },
+  "header": {
+    "newQuery": "New query",
+    "favorite": "Favorite",
+    "history": "My queries",
+    "user": "User",
+    "logout": "Log out"
+  },
+  "filters": {
+    "filtersSectionHeader": "Filters",
+    "settingsSectionHeader": "Settings of limits",
+    "theme": "Theme",
+    "pageType": "Page type",
+    "date": "Date of harvest",
+    "dateFrom": "From",
+    "dateTo": "To",
+    "operator": {
+      "label": "Operator",
+      "contain": "Contain",
+      "contain-not": "Not contain",
+      "equal": "Equal",
+      "equal-not": "Not equal"
+    },
+    "url": "URL",
+    "sentiment": "Sentiment",
+    "stopWords": "Stop words",
+    "entriesLimit": "Number of entries"
+  },
+  "query": {
+    "header": "Query",
+    "operators": "Logical operators:",
+    "error": {
+      "title": "An error occured",
+      "message": "An unexpected error occurred. Try again later."
+    },
+    "start": {
+      "title": "Query was submitted",
+      "message": "Please wait, we are working on it."
+    },
+    "success": {
+      "title": "Query was successfully finished",
+      "message": "You can download and save results of your query."
+    },
+    "search": "Search"
+  },
+  "analytics": {
+    "title": "Analytic queries",
+    "queryType": "Query type",
+    "add": "+ Add new query",
+    "delete": "Delete",
+    "words": "List of words:",
+    "wordInput": "Insert text for search",
+    "context": "Add context",
+    "contextLength": "Number of words in context:"
+  }
+}

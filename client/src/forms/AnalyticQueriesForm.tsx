@@ -1,20 +1,52 @@
 import React from 'react';
-import { Grid, makeStyles, Fab, FormControl, InputLabel, Select, MenuItem, Typography, TextField, Checkbox, FormControlLabel, List, ListItem, ListItemSecondaryAction, ListItemText, IconButton, Paper, Box } from '@material-ui/core';
+import {
+  Grid,
+  makeStyles,
+  Fab,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Typography,
+  TextField,
+  Checkbox,
+  FormControlLabel,
+  List,
+  ListItem,
+  ListItemSecondaryAction,
+  ListItemText,
+  IconButton,
+  Paper,
+  Box,
+  Button, Chip
+} from '@material-ui/core';
 import _ from 'lodash';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { IQuery } from './SearchForm';
+import { IQuery } from '../old/SearchForm';
+import {useTranslation} from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
   header: {
-    margin: theme.spacing(3, 0)
+    margin: theme.spacing(0, 0, 2)
   },
+  chip: {
+    margin: theme.spacing(0.5)
+  },
+  chipRoot: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    listStyle: 'none',
+    padding: theme.spacing(0.5),
+    margin: 0,
+  }
 }));
 
 
 //enum QueryType {Frequency, Colocation, Occurence}
 
-function StaticQueries({queries, setQueries}:{queries:IQuery[], setQueries:(queries: IQuery[]) => any}) {
+function AnalyticQueriesForm({queries, setQueries}:{queries:IQuery[], setQueries:(queries: IQuery[]) => any}) {
+  const { t } = useTranslation();
 	const classes = useStyles();
   
   const handleQueryTypeChange = (index: number, event: React.ChangeEvent<{ value: unknown }>) => {
@@ -70,41 +102,49 @@ function StaticQueries({queries, setQueries}:{queries:IQuery[], setQueries:(quer
   
   return (
     <>
-      <Typography variant="h4" className={classes.header}>
-        2 STATICKÉ DOTAZY
-      </Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={6}>
+          <Typography variant="h2">
+            {t('analytics.title')}
+          </Typography>
+        </Grid>
+        <Grid item xs={6}>
+          <Grid container justifyContent="flex-end">
+            <Grid item>
+              <Button variant="contained" size="large" color="primary" onClick={handleAddQuery}>
+                {t('analytics.add')}
+              </Button>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
       {queries.map((query, index) => (
         <Box my={2}>
           <Paper>
             <Box p={2}>
               <Grid container spacing={2} key={index}>
                 <Grid item md={2} xs={12}>
-                  <FormControl style={{width: "100%"}}>
-                    <InputLabel id="query-type">Typ dotazu</InputLabel>
-                    <Select
-                      labelId="query-type-label"
-                      id="query-type"
-                      value={query.searchType}
-                      onChange={(event) => handleQueryTypeChange(index, event)}
-                    >
-                      {/*<MenuItem value="FREQUENCY">Frequency</MenuItem>*/}
-                      <MenuItem value="COLLOCATION">Colocation</MenuItem>
-                      {/*<MenuItem value="OCCURENCE">Occurence</MenuItem>*/}
-                      <MenuItem value="RAW">Raw</MenuItem>
-                    </Select>
-                  </FormControl>
+                  <TextField select
+                             label={t('analytics.queryType')}
+                             fullWidth
+                             value={query.searchType}
+                             onChange={(event) => handleQueryTypeChange(index, event)}>
+                    {/*<MenuItem value="FREQUENCY">Frequency</MenuItem>*/}
+                    <MenuItem value="COLLOCATION">Colocation</MenuItem>
+                    {/*<MenuItem value="OCCURENCE">Occurence</MenuItem>*/}
+                    <MenuItem value="RAW">Raw</MenuItem>
+                  </TextField>
                 </Grid>
-                <Grid item md={5} xs={12}>
+                <Grid item md={4} xs={12}>
                   <Grid container spacing={2}>
                     <Grid item xs={12}>
-                      <FormControl style={{width: "100%"}}>
-                        <TextField 
-                          label="Zadejte text pro vyhledávaní" 
-                          value={query.searchText}
-                          onChange={(event) => handleChangeSearchText(index, event)}
-                          onKeyDown={(event) => { if(event.keyCode === 13) handleAddQueryText(index) }}
-                        />
-                      </FormControl>
+                      <TextField
+                        fullWidth
+                        label={t('analytics.wordInput')}
+                        value={query.searchText}
+                        onChange={(event) => handleChangeSearchText(index, event)}
+                        onKeyDown={(event) => { if(event.keyCode === 13) handleAddQueryText(index) }}
+                      />
                     </Grid>
 
                     {query.searchType === "COLLOCATION" && (
@@ -112,14 +152,14 @@ function StaticQueries({queries, setQueries}:{queries:IQuery[], setQueries:(quer
                         <Grid item xs={5}>
                           <FormControlLabel
                             control={<Checkbox color="primary" checked={query.context} onChange={(event) => handleChangeContext(index, event)} />}
-                            label="Přidat kontext"
+                            label={t('analytics.context')}
                           />
                         </Grid>
 
                         <Grid item xs={7}>
                           <FormControlLabel
-                            control={<TextField label="počet" type="number" value={query.contextSize} onChange={(event) => handleChangeContextLength(index, event)} />}
-                            label="Počet slov kontextu"
+                            control={<TextField type="number" value={query.contextSize} onChange={(event) => handleChangeContextLength(index, event)} />}
+                            label={t('analytics.contextLength')}
                             labelPlacement="start"
                           />
                         </Grid>
@@ -129,42 +169,41 @@ function StaticQueries({queries, setQueries}:{queries:IQuery[], setQueries:(quer
                 </Grid>
                 
                 <Grid item xs={12} md={1}>
-                  <Fab variant="extended" onClick={() => { handleAddQueryText(index) }}>Přidat</Fab>
+                  <Button variant="contained" color="primary" onClick={() => { handleAddQueryText(index) }}
+                          style={{width: '40px', height: '40px', margin: '0px'}}>
+                    <AddIcon fontSize="small"/>
+                  </Button>
                 </Grid>
                 
-                <Grid item xs={12} md={3}>
+                <Grid item xs={12} md={4}>
                   <Typography variant="body1">
-                    Seznam vyrazů
+                    {t('analytics.words')}
                   </Typography>
-                  <Paper>
-                    <List>
+                  <Box component="ul" className={classes.chipRoot}>
                       {query.queries.map((q, ind) => (
-                        <ListItem key={ind} dense>
-                          <ListItemText primary={q} />
-                          <ListItemSecondaryAction>
-                            <IconButton edge="end" aria-label="comments" onClick={() => handleDeleteQueryText(index, ind)}>
-                              <DeleteIcon />
-                            </IconButton>
-                          </ListItemSecondaryAction>
-                        </ListItem>
+                        <li key={ind}>
+                          <Chip
+                            label={q}
+                            onDelete={() => handleDeleteQueryText(index, ind)}
+                            className={classes.chip}
+                          />
+                        </li>
                       ))}
-                    </List>
-                  </Paper>
+                  </Box>
                 </Grid>
                 
                 <Grid item xs={12} md={1} justify="flex-end" style={{textAlign: "right", paddingRight: "2rem"}}>
-                  <Fab color="primary" onClick={() => handleDeleteQuery(index)}><DeleteIcon/></Fab>
+                  <Button color="secondary" variant="contained" onClick={() => handleDeleteQuery(index)}>
+                    {t('analytics.delete')}
+                  </Button>
                 </Grid>
               </Grid>
             </Box>
           </Paper>
         </Box>
       ))}
-      <Grid item xs={12}>
-        <Fab color="primary" onClick={handleAddQuery}><AddIcon/></Fab> Přidat další dotaz
-      </Grid>
     </>
   );
 }
 
-export default StaticQueries;
+export default AnalyticQueriesForm;

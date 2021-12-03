@@ -1,41 +1,52 @@
-import React  from 'react';
-import { Container, CssBaseline, makeStyles } from '@material-ui/core';
+import React, { Suspense }  from 'react';
+import { CssBaseline } from '@material-ui/core';
+import {
+  ThemeProvider,
+} from '@material-ui/core/styles';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
-import './App.css';
-import SearchForm from "./SearchForm";
-import AdminForm from "./AdminForm";
 import {
   BrowserRouter as Router,
   Switch,
   Route
 } from "react-router-dom";
+import Spinner from "./components/Spinner";
+import {theme} from "./config/theme";
+import {GlobalCss} from "./config/css";
 
-const useStyles = makeStyles(() => ({
-  root: {
-    margin: `theme.spacing(3) auto`
-  }
-}));
+// Use i18n, make it available for all components with useTranslation
+import './config/i18n'
+
+// Screens
+import AdminForm from "./old/AdminForm";
+import {LoginScreen} from "./screens/LoginScreen";
+import {SearchScreen} from "./screens/SearchScreen";
 
 function App() {
-	const classes = useStyles();
-
   return (
-  	<MuiPickersUtilsProvider utils={DateFnsUtils}>
-      <Container className={classes.root}>
-        <CssBaseline/>
-        <Router>
-          <Switch>
-            <Route path="/admin">
-              <AdminForm/>
-            </Route>
-            <Route path="/">
-              <SearchForm/>
-            </Route>
-          </Switch>
-        </Router>
-  	  </Container>
-    </MuiPickersUtilsProvider>
+    <Suspense fallback="">
+      <Suspense fallback={<Spinner />}>
+        <ThemeProvider theme={theme}>
+          <MuiPickersUtilsProvider utils={DateFnsUtils}>
+            <CssBaseline/>
+            <GlobalCss />
+            <Router>
+              <Switch>
+                <Route path="/admin">
+                  <AdminForm/>
+                </Route>
+                <Route path="/search">
+                  <SearchScreen/>
+                </Route>
+                <Route path="/">
+                  <LoginScreen/>
+                </Route>
+              </Switch>
+            </Router>
+          </MuiPickersUtilsProvider>
+        </ThemeProvider>
+      </Suspense>
+    </Suspense>
   );
 }
 

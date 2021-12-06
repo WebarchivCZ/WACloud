@@ -2,29 +2,19 @@ import React from 'react';
 import {
   Grid,
   makeStyles,
-  Fab,
-  FormControl,
-  InputLabel,
-  Select,
   MenuItem,
   Typography,
   TextField,
   Checkbox,
   FormControlLabel,
-  List,
-  ListItem,
-  ListItemSecondaryAction,
-  ListItemText,
-  IconButton,
   Paper,
   Box,
   Button, Chip
 } from '@material-ui/core';
 import _ from 'lodash';
 import AddIcon from '@material-ui/icons/Add';
-import DeleteIcon from '@material-ui/icons/Delete';
-import { IQuery } from '../old/SearchForm';
 import {useTranslation} from "react-i18next";
+import IQuery from "../interfaces/IQuery";
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -41,7 +31,6 @@ const useStyles = makeStyles((theme) => ({
     margin: 0,
   }
 }));
-
 
 //enum QueryType {Frequency, Colocation, Occurence}
 
@@ -60,16 +49,22 @@ function AnalyticQueriesForm({queries, setQueries}:{queries:IQuery[], setQueries
     q[index].searchText = event.target.value as string;
     setQueries(q);
   };
-  
+
   const handleChangeContext = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
     let q:IQuery[] = _.cloneDeep(queries);
     q[index].context = event.target.checked as boolean;
     setQueries(q);
   };
-  
+
   const handleChangeContextLength = (index: number, event: React.ChangeEvent<{ value: unknown }>) => {
     let q:IQuery[] = _.cloneDeep(queries);
     q[index].contextSize = event.target.value as number;
+    setQueries(q);
+  };
+
+  const handleChangeLimit = (index: number, event: React.ChangeEvent<{ value: string }>) => {
+    let q:IQuery[] = _.cloneDeep(queries);
+    q[index].limit = parseInt(event.target.value);
     setQueries(q);
   };
   
@@ -90,7 +85,7 @@ function AnalyticQueriesForm({queries, setQueries}:{queries:IQuery[], setQueries
   
   const handleAddQuery = () => {
     let q:IQuery[] = _.cloneDeep(queries);
-    q.push({queries: [], query: "", context: false, searchText: "", searchType: ""});
+    q.push({queries: [], query: "", context: false, searchText: "", searchType: "", limit: 10});
     setQueries(q);
   };
   
@@ -161,6 +156,20 @@ function AnalyticQueriesForm({queries, setQueries}:{queries:IQuery[], setQueries
                             control={<TextField type="number" value={query.contextSize} onChange={(event) => handleChangeContextLength(index, event)} />}
                             label={t('analytics.contextLength')}
                             labelPlacement="start"
+                          />
+                        </Grid>
+                      </>
+                    )}
+
+                    {query.searchType === "RAW" && (
+                      <>
+                        <Grid item xs={6}>
+                          <TextField type="number"
+                                     label={t('filters.entriesLimit')}
+                                     fullWidth
+                                     value={query.limit}
+                                     inputProps={{min: 1, max: 1000}}
+                                     onChange={(event) => handleChangeLimit(index, event)}
                           />
                         </Grid>
                       </>

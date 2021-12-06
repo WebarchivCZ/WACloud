@@ -1,19 +1,24 @@
 import React, {useEffect, useState} from 'react';
 import {
-  Grid,
+  CircularProgress,
   Fab,
-  TableContainer,
+  Grid,
+  IconButton,
+  Paper,
+  Snackbar,
   Table,
+  TableBody,
+  TableCell,
+  TableContainer,
   TableHead,
   TableRow,
-  TableCell,
-  Paper,
-  TableBody,
-  Typography, IconButton, Snackbar, CircularProgress
+  Typography
 } from '@material-ui/core';
 import {makeStyles} from "@material-ui/core/styles";
 import PublishIcon from '@material-ui/icons/Publish';
 import MuiAlert, {AlertProps} from "@material-ui/lab/Alert";
+import {useTranslation} from "react-i18next";
+import IHarvest from "../interfaces/IHarvest";
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -24,35 +29,22 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export interface IHarvest {
-  identification: string,
-  date: string,
-  type: string,
-  state: string,
-  entries: number
-}
-
-function Alert(props: AlertProps) {
+const Alert = (props: AlertProps) => {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-function stateToString(state: string) {
-  switch (state) {
-    case "UNPROCESSED": return "Čaká na spracovanie";
-    case "PROCESSING": return "Spracováva sa";
-    case "INDEXED": return "Importované";
-    case "ERROR": return "Chyba pri importe";
-    case "CLEARED": return "Zmazané z indexu";
-  }
-  return "Neznámy";
-}
-
-function AdminForm() {
+export const AdminHarvestsForm = () => {
   const classes = useStyles();
+  const { t } = useTranslation();
+
   const [harvests, setHarvests] = useState<IHarvest[]>([]);
   const [version, setVersion] = useState<string>("");
   const [actionStarted, setActionStarted] = useState<boolean>(false);
   const [actionEnded, setActionEnded] = useState<boolean>(false);
+
+  const stateToString = (state: string) => t('administration.harvests.states.'+(
+    ["UNPROCESSED", "PROCESSING", "INDEXED", "ERROR", "CLEARED"].includes(state) ? state : 'UNKNOWN'
+  ));
 
   const handleCloseActionStarted = () => {
     setActionStarted(false);
@@ -94,8 +86,8 @@ function AdminForm() {
 
   return (
     <>
-      <Typography variant="h4" className={classes.header}>
-        Administrace {version.length > 0 ? "(v"+version+")" : ""}
+      <Typography variant="h2" className={classes.header}>
+        {t('administration.harvests.title')} {version.length > 0 ? "(v"+version+")" : ""}
       </Typography>
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="harvests">
@@ -120,7 +112,7 @@ function AdminForm() {
                 <TableCell align="right">{row.type}</TableCell>
                 <TableCell align="right">
                   {stateToString(row.state)}
-                  {(row.state == "UNPROCESSED" || row.state == "PROCESSING") && <CircularProgress size={15} />}
+                  {(row.state === "UNPROCESSED" || row.state === "PROCESSING") && <CircularProgress size={15} />}
                 </TableCell>
                 <TableCell align="right">{row.entries}</TableCell>
                 <TableCell align="right">
@@ -184,5 +176,3 @@ function AdminForm() {
     </>
   );
 }
-
-export default AdminForm;

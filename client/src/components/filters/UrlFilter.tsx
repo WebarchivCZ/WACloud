@@ -6,7 +6,6 @@ import React, {Dispatch, SetStateAction} from "react";
 import {FilterContent} from "./FilterContent";
 import {useTranslation} from "react-i18next";
 import AddIcon from "@material-ui/icons/Add";
-import {format} from "date-fns";
 
 interface UrlFilterProps<T> {
   operator: T;

@@ -15,11 +15,8 @@ import {useTranslation} from "react-i18next";
 import {DateFilter} from "./filters/DateFilter";
 import {UrlFilter} from "./filters/UrlFilter";
 import {SentimentFilter} from "./filters/SentimentFilter";
-import stopWordsCzech from "../config/stopWords";
-import {IFilter} from "../old/SearchForm";
 import {StopWordsFilter} from "./filters/StopWordsFilter";
 import {EntriesLimitFilter} from "./filters/EntriesLimitFilter";
-import _ from "lodash";
 
 const drawerWidth = 320;
 const useStyles = makeStyles((theme: Theme) =>
@@ -94,6 +91,8 @@ interface FiltersDrawerProps {
   setStopWords: Dispatch<SetStateAction<string[]>>;
   entriesLimit: number;
   setEntriesLimit: Dispatch<SetStateAction<number>>;
+  seed: number|null;
+  setSeed: Dispatch<SetStateAction<number|null>>;
   drawerOpen: boolean;
   setDrawerOpen: Dispatch<SetStateAction<boolean>>;
 }
@@ -101,6 +100,7 @@ interface FiltersDrawerProps {
 export const FiltersDrawer = ({query, setQuery,
                               stopWords, setStopWords,
                               entriesLimit, setEntriesLimit,
+                              seed, setSeed,
                               drawerOpen, setDrawerOpen}: FiltersDrawerProps) => {
   const classes = useStyles();
   const { t } = useTranslation();
@@ -155,7 +155,8 @@ export const FiltersDrawer = ({query, setQuery,
       header: <ListHeader shown={drawerOpen}>{t('filters.settingsSectionHeader')}</ListHeader>,
       filters: [
         <StopWordsFilter value={stopWords} setValue={setStopWords}/>,
-        <EntriesLimitFilter value={entriesLimit} setValue={setEntriesLimit}/>
+        <EntriesLimitFilter value={entriesLimit} setValue={setEntriesLimit}
+                            seed={seed} setSeed={setSeed}/>
       ]
     }
   ];

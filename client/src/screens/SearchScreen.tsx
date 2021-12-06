@@ -8,8 +8,8 @@ import {QueryForm} from "../forms/QueryForm";
 import stopWordsCzech from "../config/stopWords";
 import {addNotification} from "../config/notifications";
 import AnalyticQueriesForm from "../forms/AnalyticQueriesForm";
-import {IQuery} from "../old/SearchForm";
-import {Box, Button, Divider, Fab, Grid} from "@material-ui/core";
+import {Box, Button, Divider} from "@material-ui/core";
+import IQuery from "../interfaces/IQuery";
 
 export const SearchScreen = () => {
   const { t } = useTranslation();
@@ -18,6 +18,7 @@ export const SearchScreen = () => {
   const [query, setQuery] = useState<string>("");
   const [stopWords, setStopWords] = useState<string[]>(stopWordsCzech.sort());
   const [entriesLimit, setEntriesLimit] = useState<number>(1000);
+  const [seed, setSeed] = useState<number|null>(null);
 
   const [queries, setQueries] = useState<IQuery[]>([]);
 
@@ -32,12 +33,14 @@ export const SearchScreen = () => {
         base: {
           filter: (query.length === 0 ? "*:*" : query),
           entries: entriesLimit,
-          stopWords: stopWords.map(v => v.trim())
+          stopWords: stopWords.map(v => v.trim()),
+          randomSeed: seed
         }, queries: queries.map(function(x) {
           return {
             type: x.searchType,
             texts: x.queries,
-            contextSize: (x.context ? x.contextSize : 0)
+            contextSize: (x.context ? x.contextSize : 0),
+            limit: x.limit
           };
         })}),
     })
@@ -60,13 +63,14 @@ export const SearchScreen = () => {
       <>
         <Link to="/search">{t('header.newQuery')}</Link>
         {/*<Link to="/favorite">{t('header.favorite')}</Link>*/}
-        {/*<Link to="/history">{t('header.history')}</Link>*/}
+        {/*<Link to="/history">{t('header.myQueries')}</Link>*/}
         <UserMenu />
       </>
     } drawer={
       <FiltersDrawer query={query} setQuery={setQuery}
                      stopWords={stopWords} setStopWords={setStopWords}
                      entriesLimit={entriesLimit} setEntriesLimit={setEntriesLimit}
+                     seed={seed} setSeed={setSeed}
                      drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen}/>
     }>
       <Box m={2}>

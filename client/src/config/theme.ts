@@ -1,7 +1,7 @@
-import {createTheme} from "@material-ui/core/styles";
+import {createTheme, ThemeOptions} from "@material-ui/core/styles";
 import grey from "@material-ui/core/colors/grey";
 
-export const theme = createTheme({
+export const themeOptions: ThemeOptions = {
   typography: {
     fontFamily: '"Times New Roman", Times, serif',
     h1: {
@@ -117,4 +117,5 @@ export const theme = createTheme({
       }
     }
   }
-});
+};
+export const theme = createTheme(themeOptions);

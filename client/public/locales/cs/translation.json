@@ -4,7 +4,7 @@
     "name": "Přihlasovací jméno",
     "password": "Heslo",
     "button": "Přihlásit se",
-    "text": "Sem morbi consectetur morbi erat purus purus.",
+    "text": "Centralizované rozhraní pro přístup k datům webového archivu",
     "success": "Byl ste úspěšně přihlášen."
   },
   "logout": {
@@ -14,7 +14,7 @@
   "header": {
     "newQuery": "Nový dotaz",
     "favorite": "Oblíbené",
-    "history": "Moje dotazy",
+    "myQueries": "Moje dotazy",
     "user": "Používatel",
     "logout": "Odhlásit se"
   },
@@ -35,7 +35,12 @@
     },
     "url": "URL",
     "sentiment": "Sentiment",
-    "stopWords": "Stop slova",
+    "stopWords": {
+      "title": "Stop slova",
+      "addNext": "Přidat další slovo",
+      "word": "Slovo",
+      "add": "Vložit"
+    },
     "entriesLimit": "Počet záznamu"
   },
   "query": {
@@ -53,7 +58,30 @@
       "title": "Dotaz byl úspěšně dokončen",
       "message": "Výsledky svého dotazu si můžete stáhnout a uložit. "
     },
-    "search": "Vyhledat"
+    "queryIs": "Dotaz je",
+    "valid": "validný",
+    "notValid": "nevalidný",
+    "queryProcesses": "a spracuje se s ním",
+    "entries": "záznamu",
+    "edit": "Upravit",
+    "search": "Vyhledat",
+    "created": "Vytvořeno",
+    "state": "Stav",
+    "name": "Název",
+    "buttons": {
+      "detail": "Zobrazit detail",
+      "repeat": "Zopakovat dotaz",
+      "download": "Stáhnout",
+      "addToFavorites": "Přidát do oblíbených",
+      "removeFromFavorites": "Odebrat z oblíbených"
+    },
+    "favorites": {
+      "popUpHeader": "Přidání mezi oblíbené",
+      "setNameFirst": "Pro přidání dotazu mezi oblíbené je ho teprve nutno poměnovat.  ",
+      "insertName": "Zadejte název dotazu",
+      "save": "Uložit",
+      "close": "Zavřít"
+    }
   },
   "analytics": {
     "title": "Analytické dotazy",
@@ -64,5 +92,81 @@
     "wordInput": "Zadejte text pro vyhledávaní",
     "context": "Přidat kontext",
     "contextLength": "Počet slov kontextu:"
+  },
+  "seed": {
+    "randomEntries": "Náhodné záznamy?",
+    "ownSeed": "Semínko pro náhodnost"
+  },
+  "harvests": {
+    "title": "Sklízně",
+    "name": "Název sklízně",
+    "size": "Velikost",
+    "WARCs": "Počet WARCu",
+    "date": "Datum spuštění"
+  },
+  "process": {
+    "state": "Stav procesu",
+    "indexing": "Indexácia",
+    "Finished": "Hotovo",
+    "done": "Splněno",
+    "Stop": "Zastavit"
+  },
+  "administration": {
+    "queries": {
+      "menu": "Dotazy",
+      "title": "Administrace dotazů",
+      "columns": {
+        "startedBy": "Spustil"
+      },
+      "actions": {
+        "stopAllQueries": "Zastavit vše dotazy"
+      }
+    },
+    "harvests": {
+      "menu": "Sklízne",
+      "title": "Administrace sklízní",
+      "columns": {
+        "id": "ID sklízně",
+        "type": "Typ",
+        "numberOfRecords": "Počet záznamů"
+      },
+      "actions": {
+        "import": "Importovat",
+        "delete": "Smazat"
+      },
+      "states": {
+        "UNPROCESSED": "Čeká se na spracování",
+        "PROCESSING": "Spracováva se",
+        "INDEXED": "Importované",
+        "CLEARED": "Smazané z indexu",
+        "ERROR": "Chyba pri importu",
+        "UNKNOWN": "Nezmáný"
+      }
+    },
+    "users": {
+      "menu": "Uživatelé",
+      "title": "Administrace uživatelů",
+      "columns": {
+        "email": "Email",
+        "name": "Jméno",
+        "role": "Role",
+        "state": "Stav",
+        "accessToken": "Access token"
+      },
+      "actions": {
+        "changePassword": "Změna hesla",
+        "generateAccessToken": "Vygenerování access tokenu",
+        "delete": "Smazat uživatele"
+      },
+      "states": {
+        "ACTIVE": "Aktívní",
+        "DEACTIVATED": "Neaktívní",
+        "UNKNOWN": "Nezmáný"
+      },
+      "roles": {
+        "USER": "Uživatel",
+        "ADMIN": "Administrátor"
+      }
+    }
   }
 }

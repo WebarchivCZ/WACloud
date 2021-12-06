@@ -55,8 +55,9 @@ public class SearchServiceImpl implements SearchService {
                 SolrQuery solrQuery = new SolrQuery();
                 solrQuery.set("q", query.getFilter().trim().isEmpty() ? "*:*" : query.getFilter());
                 solrQuery.setRows(query.getEntries());
+                solrQuery.setSort("random_"+query.getRandomSeed(), SolrQuery.ORDER.asc);
                 solrQuery.setFields("id");
-                ids = (String[])solrBase.query(solrQuery).getResults().stream().map(a -> a.getFieldValue("id")).toArray();
+                ids = solrBase.query(solrQuery).getResults().stream().map(a -> (String)a.getFieldValue("id")).toArray(String[]::new);
             }
             log.info("Ids fetched: " + ids.length);
 
@@ -137,8 +138,8 @@ public class SearchServiceImpl implements SearchService {
         try {
             Object result = null;
             switch (query.getType()) {
-                case COLLOCATION: result = queryCollocation(query.getTexts(), query.getContextSize()); break;
-                case RAW: result = queryRaw(query.getTexts()); break;
+                case COLLOCATION: result = queryCollocation(query); break;
+                case RAW: result = queryRaw(query); break;
                 default:
                     log.warn("Unknown type of query: "+ query.getType().toString());
             }
@@ -150,13 +151,13 @@ public class SearchServiceImpl implements SearchService {
         }
     }
 
-    private Map<String, Map<String, List<String>>> queryCollocation(List<String> texts, int contextSize) {
+    private Map<String, Map<String, List<String>>> queryCollocation(QueryRequest query) {
         try {
             Locale locale = new Locale("cz");
             List<String> stopWords = getStopWords();
             //url -> word -> contexts
             Map<String, Map<String, List<String>>> resultMap = new TreeMap<>();
-            for (String collocationNear : texts) {
+            for (String collocationNear : query.getTexts()) {
                 SolrQuery collocationQuery = new SolrQuery();
                 collocationQuery.setFields("id", "url")
                         .setHighlight(true)
@@ -193,8 +194,8 @@ public class SearchServiceImpl implements SearchService {
                                 ni -= 1;
                             }
                             if (collocation != null && !stopWords.contains(collocation)) {
-                                int start = Math.max(0, i - 1 - contextSize);
-                                int stop = Math.min(words.length, i + contextSize);
+                                int start = Math.max(0, i - 1 - query.getContextSize());
+                                int stop = Math.min(words.length, i + query.getContextSize());
                                 String context = String.join(" ", Arrays.copyOfRange(words, start, stop));
                                 if (!resultForUrl.containsKey(collocation)) {
                                     resultForUrl.put(collocation, new ArrayList<>());
@@ -214,8 +215,8 @@ public class SearchServiceImpl implements SearchService {
                                 i += 1;
                             }
                             if (collocation != null && !stopWords.contains(collocation)) {
-                                int start = Math.max(0, i - contextSize);
-                                int stop = Math.min(words.length, i + 1 + contextSize);
+                                int start = Math.max(0, i - query.getContextSize());
+                                int stop = Math.min(words.length, i + 1 + query.getContextSize());
                                 String context = String.join(" ", Arrays.copyOfRange(words, start, stop));
                                 if (!resultForUrl.containsKey(collocation)) {
                                     resultForUrl.put(collocation, new ArrayList<>());
@@ -233,10 +234,10 @@ public class SearchServiceImpl implements SearchService {
         }
     }
 
-    private List<SolrQueryEntry> queryRaw(List<String> texts) {
+    private List<SolrQueryEntry> queryRaw(QueryRequest query) {
         try {
             StringBuilder queryString = new StringBuilder();
-            for (String collocationNear : texts) {
+            for (String collocationNear : query.getTexts()) {
                 if (queryString.length() > 0) {
                     queryString.append(" OR ");
                 }
@@ -247,6 +248,7 @@ public class SearchServiceImpl implements SearchService {
             }
             SolrQuery collocationQuery = new SolrQuery();
             collocationQuery.set("q", queryString.toString());
+            collocationQuery.setRows(query.getLimit());
             QueryResponse response = solrQuery.query(collocationQuery);
 
             SolrDocumentList docList = response.getResults();

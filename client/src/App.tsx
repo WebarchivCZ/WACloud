@@ -12,15 +12,16 @@ import {
 } from "react-router-dom";
 import Spinner from "./components/Spinner";
 import {theme} from "./config/theme";
+import {themeAdmin} from "./config/themeAdmin";
 import {GlobalCss} from "./config/css";
 
 // Use i18n, make it available for all components with useTranslation
 import './config/i18n'
 
 // Screens
-import AdminForm from "./old/AdminForm";
 import {LoginScreen} from "./screens/LoginScreen";
 import {SearchScreen} from "./screens/SearchScreen";
+import {AdminHarvestsScreen} from "./screens/AdminHarvestsScreen";
 
 function App() {
   return (
@@ -33,7 +34,9 @@ function App() {
             <Router>
               <Switch>
                 <Route path="/admin">
-                  <AdminForm/>
+                  <ThemeProvider theme={themeAdmin}>
+                    <AdminHarvestsScreen/>
+                  </ThemeProvider>
                 </Route>
                 <Route path="/search">
                   <SearchScreen/>

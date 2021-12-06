@@ -26,7 +26,7 @@ export const SentimentFilter = ({value, setValue, append}: ValuableProps<number|
     setValue([-1, 1]);
   }
 
-  const buttonDisabled = (value as number[]).length == 2 && (value as number[])[0] == -1 && (value as number[])[1] == 1;
+  const buttonDisabled = (value as number[]).length === 2 && (value as number[])[0] === -1 && (value as number[])[1] === 1;
 
   return (
     <FilterContent title={t('filters.sentiment')} icon={<SentimentVerySatisfiedIcon/>} buttons={[

@@ -2,6 +2,7 @@
 <schema name="default-config" version="1.6">
     <uniqueKey>id</uniqueKey>
 
+    <fieldType name="random" class="solr.RandomSortField" />
     <fieldType name="string" class="solr.StrField" sortMissingLast="true" docValues="true"/>
     <fieldType name="plong" class="solr.LongPointField" docValues="true"/>
     <fieldType name="plongs" class="solr.LongPointField" docValues="true" multiValued="true"/>
@@ -67,15 +68,16 @@
     <field name="_version_" type="plong" indexed="false" stored="false"/>
 
     <field name="id" type="string"/>
-    <field name="url" type="string" docValues="false" indexed="true" stored="true"/>
-    <field name="date" type="pdate" docValues="false" indexed="true" stored="true"/>
-    <field name="harvestId" type="string" docValues="false" indexed="true" stored="false"/>
-    <field name="harvestType" type="string" docValues="false" indexed="true" stored="true"/>
-    <field name="webType" type="string" docValues="false" indexed="true" stored="true"/>
-    <field name="pageType" type="string" docValues="false" indexed="true" stored="true"/>
-    <field name="topics" type="texts" docValues="false" indexed="true" stored="true"/>
-    <field name="sentiment" type="pdouble" docValues="false" indexed="true" stored="true"/>
+    <field name="url" type="string" docValues="false" indexed="true" stored="false"/>
+    <field name="date" type="pdate" docValues="false" indexed="true" stored="false"/>
+    <field name="harvestId" type="string" docValues="false" indexed="true" stored="true"/>
+    <field name="harvestType" type="string" docValues="false" indexed="true" stored="false"/>
+    <field name="webType" type="string" docValues="false" indexed="true" stored="false"/>
+    <field name="pageType" type="string" docValues="false" indexed="true" stored="false"/>
+    <field name="language" type="string" docValues="false" indexed="true" stored="false"/>
+    <field name="topics" type="texts" docValues="false" indexed="true" stored="false"/>
+    <field name="sentiment" type="pdouble" docValues="false" indexed="true" stored="false"/>
 
+    <dynamicField name="random*" type="random" indexed="true" stored="false"/>
     <dynamicField name="*" type="text_general" docValues="false" indexed="false" stored="false"/>
 </schema>
-

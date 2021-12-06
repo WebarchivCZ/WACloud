@@ -5,6 +5,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
 public class BaseRequest {
+	public static final String DEFAULT_RANDOM_SEED = "NKP";
+
 	@NotBlank(message = "filter is mandatory")
 	private final String filter;
 
@@ -12,15 +14,18 @@ public class BaseRequest {
 
 	private final String[] stopWords;
 
-	@Max(value = 1000, message = "maximal limit for testing is 1000 entries")
+	@Max(value = 10000, message = "maximal limit for testing is 10000 entries")
 	@Min(value = 10, message = "minimal limit for testing is 10 entries")
 	private final Integer entries;
 
-	public BaseRequest(String filter, String[] ids, String[] stopWords, Integer entries) {
+	private final String randomSeed;
+
+	public BaseRequest(String filter, String[] ids, String[] stopWords, Integer entries, String randomSeed) {
 		this.filter = filter;
 		this.ids = ids;
 		this.stopWords = stopWords;
 		this.entries = entries != null ? entries : 10;
+		this.randomSeed = randomSeed;
 	}
 
 	public String getFilter() {
@@ -37,5 +42,12 @@ public class BaseRequest {
 
 	public Integer getEntries() {
 		return entries;
-	}	
+	}
+
+	public String getRandomSeed() {
+		if (randomSeed == null) {
+			return DEFAULT_RANDOM_SEED;
+		}
+		return randomSeed;
+	}
 }

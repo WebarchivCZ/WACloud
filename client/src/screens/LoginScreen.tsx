@@ -9,8 +9,8 @@ export const LoginScreen = () => {
 
   return (
     <Header toolbar={
-      <Link href="#" onClick={() => i18n.changeLanguage(i18n.language == "cs" ? "en" : "cs")}>
-        {i18n.language == "cs" ? "English" : "Czech"}
+      <Link href="#" onClick={() => i18n.changeLanguage(i18n.language === "cs" ? "en" : "cs")}>
+        {i18n.language === "cs" ? "English" : "Czech"}
       </Link>
     }>
       <LoginForm />

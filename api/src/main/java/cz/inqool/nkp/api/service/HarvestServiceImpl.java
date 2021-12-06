@@ -87,6 +87,7 @@ public class HarvestServiceImpl implements HarvestService {
                             .setTopics(topics)
                             .setUrl(url)
                             .setDate(harvest.getDate())
+                            .setHarvestId(harvestId)
                             .setHarvestType(harvest.getType())
                             .setWebType(webType);
                     solr.addBean(entry);

@@ -4,7 +4,7 @@
     "name": "User name",
     "password": "Password",
     "button": "Log in",
-    "text": "Sem morbi consectetur morbi erat purus purus.",
+    "text": "Centralizované rozhraní pro přístup k datům webového archivu",
     "success": "You were successfully logged in."
   },
   "logout": {
@@ -14,7 +14,7 @@
   "header": {
     "newQuery": "New query",
     "favorite": "Favorite",
-    "history": "My queries",
+    "myQueries": "My queries",
     "user": "User",
     "logout": "Log out"
   },
@@ -35,14 +35,19 @@
     },
     "url": "URL",
     "sentiment": "Sentiment",
-    "stopWords": "Stop words",
+    "stopWords": {
+      "title": "Stop words",
+      "addNext": "Add next word",
+      "word": "Word",
+      "add": "Add"
+    },
     "entriesLimit": "Number of entries"
   },
   "query": {
     "header": "Query",
     "operators": "Logical operators:",
     "error": {
-      "title": "An error occured",
+      "title": "An error occurred",
       "message": "An unexpected error occurred. Try again later."
     },
     "start": {
@@ -53,7 +58,30 @@
       "title": "Query was successfully finished",
       "message": "You can download and save results of your query."
     },
-    "search": "Search"
+    "queryIs": "Query is",
+    "valid": "valid",
+    "notValid": "not valid",
+    "queryProcesses": "and it processes",
+    "entries": "entries",
+    "edit": "Edit",
+    "search": "Search",
+    "created": "Created",
+    "state": "State",
+    "name": "Name",
+    "buttons": {
+      "detail": "Show detail",
+      "repeat": "Repeat query",
+      "download": "Download",
+      "addToFavorites": "Add to favorites",
+      "removeFromFavorites": "Remove from favorites"
+    },
+    "favorites": {
+      "popUpHeader": "Adding to favorites",
+      "setNameFirst": "Set a name before to add a query to favorites",
+      "insertName": "Set a name for the query",
+      "save": "Save",
+      "close": "Close"
+    }
   },
   "analytics": {
     "title": "Analytic queries",
@@ -64,5 +92,81 @@
     "wordInput": "Insert text for search",
     "context": "Add context",
     "contextLength": "Number of words in context:"
+  },
+  "seed": {
+    "randomEntries": "Random records?",
+    "ownSeed": "Seed for randomness"
+  },
+  "harvests": {
+    "title": "Harvests",
+    "name": "Harvest's name",
+    "size": "Size",
+    "WARCs": "Number of WARCs",
+    "date": "Date of start"
+  },
+  "process": {
+    "state": "State of process",
+    "indexing": "Indexing",
+    "finished": "Finished",
+    "done": "Done",
+    "stop": "Stop"
+  },
+  "administration": {
+    "queries": {
+      "menu": "Queries",
+      "title": "Queries administration",
+      "columns": {
+        "startedBy": "Started by"
+      },
+      "actions": {
+        "stopAllQueries": "Stop all queries"
+      }
+    },
+    "harvests": {
+      "menu": "Harvests",
+      "title": "Harvests administration",
+      "columns": {
+        "id": "ID of harvest",
+        "type": "Type",
+        "numberOfRecords": "Number of records"
+      },
+      "actions": {
+        "import": "Import",
+        "delete": "Delete"
+      },
+      "states": {
+        "UNPROCESSED": "Waiting for processing",
+        "PROCESSING": "In progress",
+        "INDEXED": "Indexed",
+        "CLEARED": "Cleared from index",
+        "ERROR": "An error during indexing",
+        "UNKNOWN": "Unknown"
+      }
+    },
+    "users": {
+      "menu": "Users",
+      "title": "Users administration",
+      "columns": {
+        "email": "Email",
+        "name": "Name",
+        "role": "Role",
+        "state": "State",
+        "accessToken": "Access token"
+      },
+      "actions": {
+        "changePassword": "Change password",
+        "generateAccessToken": "Generate access token",
+        "delete": "Delete user"
+      },
+      "states": {
+        "ACTIVE": "Active",
+        "DEACTIVATED": "Deactivated",
+        "UNKNOWN": "Nezmáný"
+      },
+      "roles": {
+        "USER": "User",
+        "ADMIN": "Administrator"
+      }
+    }
   }
 }

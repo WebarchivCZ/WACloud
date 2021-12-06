@@ -17,6 +17,9 @@ public class SolrBaseEntry {
     Date date;
 
     @Field
+    String harvestId;
+
+    @Field
     String harvestType;
 
     @Field
@@ -35,10 +38,11 @@ public class SolrBaseEntry {
 
     }
 
-    public SolrBaseEntry(String id, String url, Date date, String harvestType, String webType, String pageType, List<String> topics, Double sentiment) {
+    public SolrBaseEntry(String id, String url, Date date, String harvestId, String harvestType, String webType, String pageType, List<String> topics, Double sentiment) {
         this.id = id;
         this.url = url;
         this.date = date;
+        this.harvestId = harvestId;
         this.harvestType = harvestType;
         this.webType = webType;
         this.pageType = pageType;
@@ -74,6 +78,15 @@ public class SolrBaseEntry {
     }
     public SolrBaseEntry setDate(LocalDate date) {
         this.date = java.sql.Date.valueOf(date);
+        return this;
+    }
+
+    public String getHarvestId() {
+        return harvestId;
+    }
+
+    public SolrBaseEntry setHarvestId(String harvestId) {
+        this.harvestId = harvestId;
         return this;
     }
 

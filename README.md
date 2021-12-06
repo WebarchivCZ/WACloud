@@ -48,6 +48,12 @@ The application is running on the application node. To deploy a new version from
 git repository it is possible to use GitLab CI on the branch test (merge changes from `master`
 to `test` branch and manually run pipeline's job `deploy-test`)
 
+### Changes in Solr schemas
+
+If schemas configs are changes, solr container has to be stopped and removed together with volumes
+connected to it (`app_solr_cores_data, app_solr_data`). Then start Solr with command 
+`docker-compose up -d --build solr`.
+
 ## Dedication
 
 Výstup vznikl za podpory projektu Vývoj centralizovaného rozhraní pro vytěžování velkých dat z webových archivů (identifikační kód projektu DG18P02OVV016), který je financován prostřednictvím dotačního programu MK ČR NAKI.

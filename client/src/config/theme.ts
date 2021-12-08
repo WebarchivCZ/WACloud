@@ -49,8 +49,11 @@ export const themeOptions: ThemeOptions = {
     },
     MuiButton: {
       contained: {
+        padding: '10px 18px',
+        fontWeight: 700,
         borderRadius: 0,
-        textTransform: 'none',
+        fontSize: '16px',
+        lineHeight: '18px',
         boxShadow: '0px 3px 3.5px rgba(0, 0, 0, 0.14), 0px 1px 7px rgba(0, 0, 0, 0.12), 0px 1.5px 4px rgba(0, 0, 0, 0.2)',
       },
       sizeLarge: {
@@ -59,6 +62,12 @@ export const themeOptions: ThemeOptions = {
         lineHeight: '21px',
         padding: '13px 51px'
       },
+      root: {
+        textTransform: 'none',
+        fontSize: '16px',
+        padding: '4px 6px',
+        lineHeight: 1
+      }
       // TODO FIX, NOT WORKING
       // disabled: {
       //   backgroundColor: '#EFEFEF'
@@ -114,6 +123,25 @@ export const themeOptions: ThemeOptions = {
       },
       multiline: {
         borderRadius: '0px'
+      }
+    },
+    MuiTableCell: {
+      head: {
+        backgroundColor: 'rgba(112,112,112, 0.05)',
+        color: '#0000ff',
+        fontWeight: 700,
+        fontSize: '16px',
+        lineHeight: '18px',
+        textTransform: 'uppercase'
+      },
+      body: {
+        fontSize: '18px',
+        lineHeight: '23px'
+      },
+    },
+    MuiTableRow: {
+      hover: {
+        backgroundColor: 'rgba(112,112,112, 0.03)',
       }
     }
   }

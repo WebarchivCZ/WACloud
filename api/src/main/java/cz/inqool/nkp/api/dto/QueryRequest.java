@@ -1,19 +1,17 @@
 package cz.inqool.nkp.api.dto;
 
-import cz.inqool.nkp.api.model.FulltextSearch;
+import cz.inqool.nkp.api.model.AnalyticQuery;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
-import static cz.inqool.nkp.api.dto.BaseRequest.DEFAULT_RANDOM_SEED;
-
 public class QueryRequest {
     public static final int MAX_LIMIT = 1000;
 
     @NotBlank(message = "type of query is mandatory")
-    private final FulltextSearch.Type type;
+    private final AnalyticQuery.Type type;
 
     @NotBlank(message = "at least one text in query is mandatory")
     private final List<String> texts;
@@ -26,14 +24,14 @@ public class QueryRequest {
     @Min(value = 1, message = "minimal limit is 1")
     private final Integer limit;
 
-    public QueryRequest(FulltextSearch.Type type, List<String> texts, Integer contextSize, Integer limit) {
+    public QueryRequest(AnalyticQuery.Type type, List<String> texts, Integer contextSize, Integer limit) {
         this.type = type;
         this.texts = texts;
         this.contextSize = contextSize;
         this.limit = limit;
     }
 
-    public FulltextSearch.Type getType() {
+    public AnalyticQuery.Type getType() {
         return type;
     }
 

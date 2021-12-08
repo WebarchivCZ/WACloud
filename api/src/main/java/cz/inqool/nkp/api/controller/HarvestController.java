@@ -4,6 +4,7 @@ import cz.inqool.nkp.api.model.Harvest;
 import cz.inqool.nkp.api.repository.HarvestRepository;
 import cz.inqool.nkp.api.service.HarvestService;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,7 +25,7 @@ public class HarvestController {
 
 	@GetMapping("/api/harvest")
 	public List<Harvest> getAll() {
-		return harvestRepository.findAll();
+		return harvestRepository.findAll(Sort.by(Sort.Order.desc("date")));
 	}
 
 	@PostMapping("/api/harvest/index")

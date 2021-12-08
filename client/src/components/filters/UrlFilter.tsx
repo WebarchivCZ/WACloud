@@ -13,9 +13,10 @@ interface UrlFilterProps<T> {
   url: T;
   setUrl: Dispatch<SetStateAction<T>>;
   append?: (appendValue: string) => void;
+  disabled?: boolean;
 }
 
-export const UrlFilter = ({operator, setOperator, url, setUrl, append}: UrlFilterProps<string|null>) => {
+export const UrlFilter = ({operator, setOperator, url, setUrl, append, disabled}: UrlFilterProps<string|null>) => {
   const { t } = useTranslation();
   const buttonClick = () => {
     if (append) {
@@ -37,7 +38,7 @@ export const UrlFilter = ({operator, setOperator, url, setUrl, append}: UrlFilte
   }
   return (
     <FilterContent title={t('filters.url')} icon={<HttpIcon/>} buttons={[
-      <Button variant="contained" color={'primary'} disabled={!operator || !url} size="small" onClick={buttonClick}>
+      <Button variant="contained" color={'primary'} disabled={disabled || !operator || !url} size="small" onClick={buttonClick}>
         <AddIcon fontSize="small"/>
       </Button>
     ]}>
@@ -46,6 +47,7 @@ export const UrlFilter = ({operator, setOperator, url, setUrl, append}: UrlFilte
         fullWidth
         label={t('filters.operator.label')}
         value={operator}
+        disabled={disabled}
         onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
           setOperator(event.target.value as string);
         }}
@@ -59,6 +61,7 @@ export const UrlFilter = ({operator, setOperator, url, setUrl, append}: UrlFilte
       <TextField
         label={t('filters.url')}
         value={url}
+        disabled={disabled}
         fullWidth
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
           setUrl(event.target.value);

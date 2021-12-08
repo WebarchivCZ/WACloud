@@ -16,7 +16,7 @@ const ColoredSlider = withStyles(theme => ({
   },
 }))(Slider);
 
-export const SentimentFilter = ({value, setValue, append}: ValuableProps<number|number[]>) => {
+export const SentimentFilter = ({value, setValue, append, disabled}: ValuableProps<number|number[]>) => {
   const { t } = useTranslation();
 
   const buttonClick = (positive: boolean) => () => {
@@ -30,8 +30,8 @@ export const SentimentFilter = ({value, setValue, append}: ValuableProps<number|
 
   return (
     <FilterContent title={t('filters.sentiment')} icon={<SentimentVerySatisfiedIcon/>} buttons={[
-      <Button variant="contained" color={'primary'} disabled={buttonDisabled} size="small" onClick={buttonClick(true)}>=</Button>,
-      <Button variant="contained" color={'primary'} disabled={buttonDisabled} size="small" onClick={buttonClick(false)}>≠</Button>
+      <Button variant="contained" color={'primary'} disabled={disabled || buttonDisabled} size="small" onClick={buttonClick(true)}>=</Button>,
+      <Button variant="contained" color={'primary'} disabled={disabled || buttonDisabled} size="small" onClick={buttonClick(false)}>≠</Button>
     ]}>
       <InputLabel>
         {t('filters.sentiment')}
@@ -44,6 +44,7 @@ export const SentimentFilter = ({value, setValue, append}: ValuableProps<number|
         color="secondary"
         valueLabelDisplay="auto"
         value={value}
+        disabled={disabled}
         onChange={(_event: any, newValue: number | number[]) => {
           setValue(newValue);
         }}

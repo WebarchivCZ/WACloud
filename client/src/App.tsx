@@ -1,5 +1,5 @@
 import React, { Suspense }  from 'react';
-import { CssBaseline } from '@material-ui/core';
+import {CssBaseline, Grid} from '@material-ui/core';
 import {
   ThemeProvider,
 } from '@material-ui/core/styles';
@@ -22,11 +22,27 @@ import './config/i18n'
 import {LoginScreen} from "./screens/LoginScreen";
 import {SearchScreen} from "./screens/SearchScreen";
 import {AdminHarvestsScreen} from "./screens/AdminHarvestsScreen";
+import {HistoryScreen} from "./screens/HistoryScreen";
+
+const Loader = () => (
+  <Grid
+    container
+    spacing={0}
+    direction="column"
+    alignItems="center"
+    justifyContent="center"
+    style={{ minHeight: '100vh' }}
+  >
+    <Grid item xs={3}>
+      <Spinner />
+    </Grid>
+  </Grid>
+)
 
 function App() {
   return (
     <Suspense fallback="">
-      <Suspense fallback={<Spinner />}>
+      <Suspense fallback={<Loader/>}>
         <ThemeProvider theme={theme}>
           <MuiPickersUtilsProvider utils={DateFnsUtils}>
             <CssBaseline/>
@@ -40,6 +56,9 @@ function App() {
                 </Route>
                 <Route path="/search">
                   <SearchScreen/>
+                </Route>
+                <Route path="/history">
+                  <HistoryScreen/>
                 </Route>
                 <Route path="/">
                   <LoginScreen/>

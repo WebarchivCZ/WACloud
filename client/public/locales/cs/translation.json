@@ -63,6 +63,7 @@
     "notValid": "nevalidný",
     "queryProcesses": "a spracuje se s ním",
     "entries": "záznamu",
+    "continue": "Pokračovat",
     "edit": "Upravit",
     "search": "Vyhledat",
     "created": "Vytvořeno",
@@ -107,9 +108,9 @@
   "process": {
     "state": "Stav procesu",
     "indexing": "Indexácia",
-    "Finished": "Hotovo",
+    "finished": "Hotovo",
     "done": "Splněno",
-    "Stop": "Zastavit"
+    "stop": "Zastavit"
   },
   "administration": {
     "queries": {
@@ -132,7 +133,8 @@
       },
       "actions": {
         "import": "Importovat",
-        "delete": "Smazat"
+        "delete": "Smazat",
+        "deleteAll": "Smazat vše"
       },
       "states": {
         "UNPROCESSED": "Čeká se na spracování",
@@ -141,6 +143,50 @@
         "CLEARED": "Smazané z indexu",
         "ERROR": "Chyba pri importu",
         "UNKNOWN": "Nezmáný"
+      },
+      "notifications": {
+        "import": {
+          "start": {
+            "title": "Import",
+            "message": "Operace spustěna"
+          },
+          "success": {
+            "title": "Import",
+            "message": "Operace úspěšně ukončena"
+          },
+          "error": {
+            "title": "Import",
+            "message": "Během operace nastala chyba"
+          }
+        },
+        "delete": {
+          "start": {
+            "title": "Smazání",
+            "message": "Operace spustěna"
+          },
+          "success": {
+            "title": "Smazání",
+            "message": "Operace úspěšně ukončena"
+          },
+          "error": {
+            "title": "Smazání",
+            "message": "Během operace nastala chyba"
+          }
+        },
+        "deleteAll": {
+          "start": {
+            "title": "Smazání",
+            "message": "Operace spustěna"
+          },
+          "success": {
+            "title": "Smazání",
+            "message": "Operace úspěšně ukončena"
+          },
+          "error": {
+            "title": "Smazání",
+            "message": "Během operace nastala chyba"
+          }
+        }
       }
     },
     "users": {

@@ -144,20 +144,24 @@ function AnalyticQueriesForm({queries, setQueries}:{queries:IQuery[], setQueries
 
                     {query.searchType === "COLLOCATION" && (
                       <>
-                        <Grid item xs={5}>
+                        <Grid item xs={6}>
                           <FormControlLabel
                             control={<Checkbox color="primary" checked={query.context} onChange={(event) => handleChangeContext(index, event)} />}
                             label={t('analytics.context')}
                           />
                         </Grid>
 
-                        <Grid item xs={7}>
-                          <FormControlLabel
-                            control={<TextField type="number" value={query.contextSize} onChange={(event) => handleChangeContextLength(index, event)} />}
-                            label={t('analytics.contextLength')}
-                            labelPlacement="start"
-                          />
-                        </Grid>
+                        {query.context && (
+                          <Grid item xs={6}>
+                            <TextField
+                              type="number"
+                              fullWidth
+                              label={t('analytics.contextLength')}
+                              value={query.contextSize}
+                              onChange={(event) => handleChangeContextLength(index, event)}
+                            />
+                          </Grid>
+                        )}
                       </>
                     )}
 
@@ -179,7 +183,7 @@ function AnalyticQueriesForm({queries, setQueries}:{queries:IQuery[], setQueries
                 
                 <Grid item xs={12} md={1}>
                   <Button variant="contained" color="primary" onClick={() => { handleAddQueryText(index) }}
-                          style={{width: '40px', height: '40px', margin: '0px'}}>
+                          style={{width: '40px', height: '40px', margin: '0px', padding: '0px', minWidth: '40px'}}>
                     <AddIcon fontSize="small"/>
                   </Button>
                 </Grid>

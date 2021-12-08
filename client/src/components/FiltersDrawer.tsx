@@ -58,19 +58,23 @@ const useStyles = makeStyles((theme: Theme) =>
       fontSize: '16px',
       minHeight: theme.spacing(6)
     },
+    listHeaderDisabled: {
+      backgroundColor: 'rgba(0,0,0,0.05)'
+    },
   }),
 );
 
 type ListHeaderProps = {
   icon?: ReactElement<any, any>|undefined,
   onIconClick?: any,
-  shown: boolean
+  shown: boolean,
+  disabled?: boolean
 }
 
-const ListHeader: FunctionComponent<ListHeaderProps> = ({icon, onIconClick, shown, children}) => {
+const ListHeader: FunctionComponent<ListHeaderProps> = ({icon, onIconClick, shown, disabled, children}) => {
   const classes = useStyles();
   return (
-    <ListSubheader color="primary" className={classes.listHeader}>
+    <ListSubheader color="primary" className={clsx(classes.listHeader, {[classes.listHeaderDisabled]: disabled})}>
       {shown && children}{' '}
       {icon && (
         <IconButton
@@ -95,13 +99,15 @@ interface FiltersDrawerProps {
   setSeed: Dispatch<SetStateAction<number|null>>;
   drawerOpen: boolean;
   setDrawerOpen: Dispatch<SetStateAction<boolean>>;
+  disabled?: boolean;
 }
 
 export const FiltersDrawer = ({query, setQuery,
                               stopWords, setStopWords,
                               entriesLimit, setEntriesLimit,
                               seed, setSeed,
-                              drawerOpen, setDrawerOpen}: FiltersDrawerProps) => {
+                              drawerOpen, setDrawerOpen,
+                              disabled}: FiltersDrawerProps) => {
   const classes = useStyles();
   const { t } = useTranslation();
 
@@ -140,23 +146,24 @@ export const FiltersDrawer = ({query, setQuery,
   const lists = [
     {
       header: <ListHeader shown={drawerOpen} icon={drawerOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-                          onIconClick={toggleDrawer}>
+                          onIconClick={toggleDrawer}
+                          disabled={disabled}>
           {t('filters.filtersSectionHeader')}
         </ListHeader>,
       filters: [
-        <ThemeFilter value={theme} setValue={setTheme} options={topics} append={appendQuery}/>,
-        <PageTypeFilter value={pageType} setValue={setPageType} options={webTypes} append={appendQuery}/>,
-        <DateFilter from={dateFrom} setFrom={setDateFrom} to={dateTo} setTo={setDateTo} append={appendQuery}/>,
-        <UrlFilter operator={urlSelect} setOperator={setUrlSelect} url={url} setUrl={setUrl} append={appendQuery}/>,
-        <SentimentFilter value={sentiment} setValue={setSentiment} append={appendQuery}/>
+        <ThemeFilter value={theme} setValue={setTheme} options={topics} append={appendQuery} disabled={disabled}/>,
+        <PageTypeFilter value={pageType} setValue={setPageType} options={webTypes} append={appendQuery} disabled={disabled}/>,
+        <DateFilter from={dateFrom} setFrom={setDateFrom} to={dateTo} setTo={setDateTo} append={appendQuery} disabled={disabled}/>,
+        <UrlFilter operator={urlSelect} setOperator={setUrlSelect} url={url} setUrl={setUrl} append={appendQuery} disabled={disabled}/>,
+        <SentimentFilter value={sentiment} setValue={setSentiment} append={appendQuery} disabled={disabled}/>
       ]
     },
     {
-      header: <ListHeader shown={drawerOpen}>{t('filters.settingsSectionHeader')}</ListHeader>,
+      header: <ListHeader shown={drawerOpen} disabled={disabled}>{t('filters.settingsSectionHeader')}</ListHeader>,
       filters: [
-        <StopWordsFilter value={stopWords} setValue={setStopWords}/>,
+        <StopWordsFilter value={stopWords} setValue={setStopWords} disabled={disabled}/>,
         <EntriesLimitFilter value={entriesLimit} setValue={setEntriesLimit}
-                            seed={seed} setSeed={setSeed}/>
+                            seed={seed} setSeed={setSeed} disabled={disabled}/>
       ]
     }
   ];

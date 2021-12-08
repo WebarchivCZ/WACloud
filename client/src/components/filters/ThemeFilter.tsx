@@ -9,7 +9,7 @@ import {FilterContent} from "./FilterContent";
 import {useTranslation} from "react-i18next";
 import {ValuableOptionalsProps} from "../../interfaces/ValuableOptionalsProps";
 
-export const ThemeFilter = ({options, value, setValue, append}: ValuableOptionalsProps<string|null>) => {
+export const ThemeFilter = ({options, value, setValue, append, disabled}: ValuableOptionalsProps<string|null>) => {
   const { t } = useTranslation();
   const [input, setInput] = useState<string|undefined>("");
 
@@ -22,11 +22,12 @@ export const ThemeFilter = ({options, value, setValue, append}: ValuableOptional
 
   return (
     <FilterContent title={t('filters.theme')} icon={<ClassIcon/>} buttons={[
-      <Button variant="contained" color={'primary'} disabled={value === ''} size="small" onClick={buttonClick(true)}>=</Button>,
-      <Button variant="contained" color={'primary'} disabled={value === ''} size="small" onClick={buttonClick(false)}>≠</Button>
+      <Button variant="contained" color={'primary'} disabled={disabled || value === ''} size="small" onClick={buttonClick(true)}>=</Button>,
+      <Button variant="contained" color={'primary'} disabled={disabled || value === ''} size="small" onClick={buttonClick(false)}>≠</Button>
     ]}>
       <Autocomplete
         value={value}
+        disabled={disabled}
         onChange={(event, newValue) => {
           setValue(newValue);
         }}

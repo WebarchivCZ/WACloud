@@ -1,7 +1,6 @@
 package cz.inqool.nkp.api.model;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 import javax.persistence.*;
 
@@ -24,7 +23,6 @@ public class Harvest extends AuditModel {
     @Column(columnDefinition = "text")
     private String type;
 
-//    @Temporal(TemporalType.TIMESTAMP)
     @Column(columnDefinition = "date", nullable = false)
     private LocalDate date;
 

@@ -56,13 +56,14 @@
     },
     "success": {
       "title": "Query was successfully finished",
-      "message": "You can download and save results of your query."
+      "message": "You can download and save the results of your query."
     },
     "queryIs": "Query is",
     "valid": "valid",
     "notValid": "not valid",
     "queryProcesses": "and it processes",
     "entries": "entries",
+    "continue": "Continue",
     "edit": "Edit",
     "search": "Search",
     "created": "Created",
@@ -77,7 +78,7 @@
     },
     "favorites": {
       "popUpHeader": "Adding to favorites",
-      "setNameFirst": "Set a name before to add a query to favorites",
+      "setNameFirst": "Set a name and  add a query to favorites",
       "insertName": "Set a name for the query",
       "save": "Save",
       "close": "Close"
@@ -95,7 +96,7 @@
   },
   "seed": {
     "randomEntries": "Random records?",
-    "ownSeed": "Seed for randomness"
+    "ownSeed": "Random seed"
   },
   "harvests": {
     "title": "Harvests",
@@ -126,21 +127,66 @@
       "menu": "Harvests",
       "title": "Harvests administration",
       "columns": {
-        "id": "ID of harvest",
+        "id": "Harvest ID",
         "type": "Type",
         "numberOfRecords": "Number of records"
       },
       "actions": {
         "import": "Import",
-        "delete": "Delete"
+        "delete": "Delete",
+        "deleteAll": "Delete all"
       },
       "states": {
         "UNPROCESSED": "Waiting for processing",
         "PROCESSING": "In progress",
         "INDEXED": "Indexed",
         "CLEARED": "Cleared from index",
-        "ERROR": "An error during indexing",
+        "ERROR": "An error during index creation",
         "UNKNOWN": "Unknown"
+      },
+      "notifications": {
+        "import": {
+          "start": {
+            "title": "Import",
+            "message": "Operation started"
+          },
+          "success": {
+            "title": "Import",
+            "message": "Operation successfully ended"
+          },
+          "error": {
+            "title": "Import",
+            "message": "An error occurred during operation"
+          }
+        },
+        "delete": {
+          "start": {
+            "title": "Delete",
+            "message": "Operation started"
+          },
+          "success": {
+            "title": "Delete",
+            "message": "Operation successfully ended"
+          },
+          "error": {
+            "title": "Delete",
+            "message": "An error occurred during operation"
+          }
+        },
+        "deleteAll": {
+          "start": {
+            "title": "Delete all",
+            "message": "Operation started"
+          },
+          "success": {
+            "title": "Delete all",
+            "message": "Operation successfully ended"
+          },
+          "error": {
+            "title": "Delete all",
+            "message": "An error occurred during operation"
+          }
+        }
       }
     },
     "users": {
@@ -161,7 +207,7 @@
       "states": {
         "ACTIVE": "Active",
         "DEACTIVATED": "Deactivated",
-        "UNKNOWN": "Nezmáný"
+        "UNKNOWN": "Unknown"
       },
       "roles": {
         "USER": "User",

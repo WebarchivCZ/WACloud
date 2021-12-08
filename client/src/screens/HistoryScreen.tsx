@@ -3,21 +3,23 @@ import {useTranslation} from "react-i18next";
 import {Header} from "../components/Header";
 import {Link} from "react-router-dom";
 import {UserMenu} from "../components/UserMenu";
-import {AdminHarvestsForm} from "../forms/AdminHarvestsForm";
 import {Container} from "@material-ui/core";
+import {HistoryForm} from "../forms/HistoryForm";
 
-export const AdminHarvestsScreen = () => {
+export const HistoryScreen = () => {
   const { t } = useTranslation();
 
   return (
     <Header toolbar={
       <>
-        <Link to="/admin" style={{color: '#0000ff'}}>{t('administration.harvests.menu')}</Link>
+        <Link to="/search">{t('header.newQuery')}</Link>
+        {/*<Link to="/favorite">{t('header.favorite')}</Link>*/}
+        <Link to="/history" style={{color: '#0000ff'}}>{t('header.myQueries')}</Link>
         <UserMenu />
       </>
     }>
       <Container>
-        <AdminHarvestsForm/>
+        <HistoryForm/>
       </Container>
     </Header>
   );

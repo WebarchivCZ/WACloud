@@ -7,7 +7,7 @@ import {FilterContent} from "./FilterContent";
 import {useTranslation} from "react-i18next";
 import {ValuableOptionalsProps} from "../../interfaces/ValuableOptionalsProps";
 
-export const PageTypeFilter = ({options, value, setValue, append}: ValuableOptionalsProps<string|undefined>) => {
+export const PageTypeFilter = ({options, value, setValue, append, disabled}: ValuableOptionalsProps<string|undefined>) => {
   const { t } = useTranslation();
 
   const buttonClick = (positive: boolean) => () => {
@@ -19,14 +19,15 @@ export const PageTypeFilter = ({options, value, setValue, append}: ValuableOptio
 
   return (
     <FilterContent title={t('filters.pageType')} icon={<DvrIcon/>} buttons={[
-      <Button variant="contained" color={'primary'} disabled={value === ''} size="small" onClick={buttonClick(true)}>=</Button>,
-      <Button variant="contained" color={'primary'} disabled={value === ''} size="small" onClick={buttonClick(false)}>≠</Button>
+      <Button variant="contained" color={'primary'} disabled={disabled || value === ''} size="small" onClick={buttonClick(true)}>=</Button>,
+      <Button variant="contained" color={'primary'} disabled={disabled || value === ''} size="small" onClick={buttonClick(false)}>≠</Button>
     ]}>
       <TextField
         select
         fullWidth
         label={t('filters.pageType')}
         value={value}
+        disabled={disabled}
         onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
           setValue(event.target.value as string);
         }}

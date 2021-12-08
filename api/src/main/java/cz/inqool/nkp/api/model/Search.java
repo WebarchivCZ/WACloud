@@ -1,68 +1,84 @@
 package cz.inqool.nkp.api.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
+
 import javax.persistence.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "search")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Search extends AuditModel {
+	public enum State {
+		WAITING,
+		INDEXING,
+		PROCESSING,
+		ERROR,
+		DONE
+	}
+
 	@Id
-    @GeneratedValue(generator = "question_generator")
+    @GeneratedValue(generator = "query_generator")
     @SequenceGenerator(
-            name = "question_generator",
-            sequenceName = "question_sequence",
-            initialValue = 1
+            name = "query_generator",
+            sequenceName = "query_sequence"
     )
     private Long id;
 
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy="search")
+	@OrderBy("id")
+	private Set<AnalyticQuery> queries;
+
+	@Enumerated(EnumType.STRING)
+	private State state = State.WAITING;
+
     @Column(columnDefinition = "text")
     private String name;
-    
-    @Column(columnDefinition = "integer")
-    private Long filterRandomSize;
+
+	@Column(columnDefinition = "integer")
+	@NonNull
+	private Integer entries;
+
+	@Column(columnDefinition = "integer")
+	@NonNull
+	private Integer indexed = 0;
+
+	@Column(columnDefinition = "integer")
+	private Integer toIndex;
+
+	@Column(columnDefinition = "text")
+	private String randomSeed;
+
+	@ElementCollection
+	@CollectionTable(name = "search_stop_word", joinColumns = @JoinColumn(name = "id"))
+	@Column(name = "word")
+	private List<String> stopWords;
+
+	@ElementCollection
+	@CollectionTable(name = "search_entries", joinColumns = @JoinColumn(name = "id"))
+	@Column(name = "entry_id")
+	private List<String> ids;
+
+	@ElementCollection
+	@CollectionTable(name = "search_harvests", joinColumns = @JoinColumn(name = "id"))
+	@Column(name = "harvest")
+	private List<String> harvests;
 
     @Column(columnDefinition = "text")
-    private String filterIdsList;
+	private String filter;
 
-    @Column(columnDefinition = "text")
-    private String filter;
-    
-	public Long getId() {
-		return id;
-	}
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "started_at")
+	private Date startedAt;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Long getFilterRandomSize() {
-		return filterRandomSize;
-	}
-
-	public void setFilterRandomSize(Long filterRandomSize) {
-		this.filterRandomSize = filterRandomSize;
-	}
-
-	public String getFilterIdsList() {
-		return filterIdsList;
-	}
-
-	public void setFilterIdsList(String filterIdsList) {
-		this.filterIdsList = filterIdsList;
-	}
-
-	public String getFilter() {
-		return filter;
-	}
-
-	public void setFilter(String filter) {
-		this.filter = filter;
-	}
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "finished_at")
+	private Date finishedAt;
 }

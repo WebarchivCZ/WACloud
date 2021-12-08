@@ -16,7 +16,7 @@ type SeedProps<T> = {
   seed: T;
 };
 
-export const EntriesLimitFilter = ({value, setValue, seed, setSeed}: ValuableProps<number> & SeedProps<number|null>) => {
+export const EntriesLimitFilter = ({value, setValue, seed, setSeed, disabled}: ValuableProps<number> & SeedProps<number|null>) => {
   const { t } = useTranslation();
   return (
     <FilterContent title={t('filters.entriesLimit')} icon={<FormatListNumberedIcon/>}>
@@ -27,11 +27,12 @@ export const EntriesLimitFilter = ({value, setValue, seed, setSeed}: ValuablePro
         fullWidth
         inputProps={{min: 10, max: 10000}}
         value={value}
+        disabled={disabled}
         onChange={(event) => setValue(parseInt(event.target.value))}/>
       </Box>
       <Box my={2}>
       <FormControlLabel
-        control={<Checkbox color="primary" checked={seed != null} onChange={(event) =>
+        control={<Checkbox color="primary" checked={seed != null} disabled={disabled} onChange={(event) =>
           setSeed(event.target.checked as boolean ? Math.floor(Math.random()*MAX_SEED) : null)
         } />}
         label={t('seed.randomEntries')}
@@ -43,6 +44,7 @@ export const EntriesLimitFilter = ({value, setValue, seed, setSeed}: ValuablePro
                      label={t('seed.ownSeed')}
                      fullWidth
                      value={seed}
+                     disabled={disabled}
                      inputProps={{min: 0, max: MAX_SEED-1}}
                      onChange={(event) => setSeed(parseInt(event.target.value))}
           />

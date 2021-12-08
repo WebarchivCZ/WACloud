@@ -24,7 +24,7 @@ interface LogicalButtonProps {
   appendValue: string
 }
 
-export const QueryForm = ({value, setValue}: ValuableProps<string>) => {
+export const QueryForm = ({value, setValue, disabled}: ValuableProps<string>) => {
   const classes = useStyles();
   const { t } = useTranslation();
 
@@ -37,6 +37,7 @@ export const QueryForm = ({value, setValue}: ValuableProps<string>) => {
       <Button size="small"
               variant="contained"
               className={classes.button}
+              disabled={disabled}
               onClick={() => setValue(value+appendValue)}>
         {label}
       </Button>
@@ -57,6 +58,7 @@ export const QueryForm = ({value, setValue}: ValuableProps<string>) => {
                      variant="outlined"
                      fullWidth
                      value={value}
+                     disabled={disabled}
                      onChange={handleChangeFilter}/>
         </Grid>
 

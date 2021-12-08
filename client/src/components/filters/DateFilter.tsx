@@ -15,9 +15,10 @@ interface DateFilterProps<T> {
   to: T;
   setTo: Dispatch<SetStateAction<T>>;
   append?: (appendValue: string) => void;
+  disabled?: boolean|undefined;
 }
 
-export const DateFilter = ({from, setFrom, to, setTo, append}: DateFilterProps<Date|null>) => {
+export const DateFilter = ({from, setFrom, to, setTo, append, disabled}: DateFilterProps<Date|null>) => {
   const { t } = useTranslation();
   const buttonClick = () => {
     if (append) {
@@ -28,7 +29,7 @@ export const DateFilter = ({from, setFrom, to, setTo, append}: DateFilterProps<D
   }
   return (
     <FilterContent title={t('filters.date')} icon={<DateRangeIcon/>} buttons={[
-      <Button variant="contained" color={'primary'} disabled={!from && !to} size="small" onClick={buttonClick}>
+      <Button variant="contained" color={'primary'} disabled={disabled || (!from && !to)} size="small" onClick={buttonClick}>
         <AddIcon fontSize="small"/>
       </Button>
     ]}>
@@ -40,6 +41,7 @@ export const DateFilter = ({from, setFrom, to, setTo, append}: DateFilterProps<D
         autoOk={true}
         label={t('filters.dateFrom')}
         value={from}
+        disabled={disabled}
         style={{margin: 0}}
         onChange={(date: Date | null) => {
           setFrom(date);
@@ -54,6 +56,7 @@ export const DateFilter = ({from, setFrom, to, setTo, append}: DateFilterProps<D
         autoOk={true}
         label={t('filters.dateTo')}
         value={to}
+        disabled={disabled}
         style={{margin: 0}}
         onChange={(date: Date | null) => {
           setTo(date);

@@ -2,9 +2,11 @@ package cz.inqool.nkp.api.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import cz.inqool.nkp.api.dto.BaseRequest;
-import cz.inqool.nkp.api.dto.QueryRequest;
 import cz.inqool.nkp.api.dto.SolrQueryEntry;
+import cz.inqool.nkp.api.model.AnalyticQuery;
+import cz.inqool.nkp.api.model.Search;
+import cz.inqool.nkp.api.repository.AnalyticQueryRepository;
+import cz.inqool.nkp.api.repository.SearchRepository;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -23,65 +25,115 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SearchServiceImpl implements SearchService {
     private static final Logger log = LoggerFactory.getLogger(SearchService.class);
 
+    public static final String DEFAULT_RANDOM_SEED = "NKP";
     public static final String STRIP_CHARS = ",<.>/?;:'\"[{]}\\|=+-_)(*&^%$#@!~`";
     private static final String STOP_WORDS_RESOURCE = "czech";
 
     private final HBaseService hbase;
+    private final SearchRepository searchRepository;
+    private final AnalyticQueryRepository analyticQueryRepository;
     private final HttpSolrClient solrBase;
     private final HttpSolrClient solrQuery;
     private final String solrQueryHost;
     private final ObjectMapper mapper;
 
-    public SearchServiceImpl(@Value("${solr.base.host.query}") String solrBaseHost, @Value("${solr.query.host.query}") String solrQueryHost, HBaseService hbase) {
+    public SearchServiceImpl(@Value("${solr.base.host.query}") String solrBaseHost, @Value("${solr.query.host.query}") String solrQueryHost, HBaseService hbase, SearchRepository searchRepository, AnalyticQueryRepository analyticQueryRepository) {
         this.hbase = hbase;
         this.solrBase = new HttpSolrClient.Builder(solrBaseHost.trim()).build();
+        this.searchRepository = searchRepository;
+        this.analyticQueryRepository = analyticQueryRepository;
         this.solrBase.setParser(new XMLResponseParser());
         this.solrQuery = new HttpSolrClient.Builder(solrQueryHost.trim()).build();
         this.solrQueryHost = solrQueryHost;
         this.mapper = new ObjectMapper();
     }
 
+    private SolrQuery prepareQueryForIndex(Search query) {
+        String seed = query.getRandomSeed();
+        if (seed == null || seed.equals("")) {
+            seed = DEFAULT_RANDOM_SEED;
+        }
+
+        SolrQuery solrQuery = new SolrQuery();
+        List<String> queriesArray = new ArrayList<>();
+        queriesArray.add(query.getFilter().trim());
+        if (query.getHarvests() != null && !query.getHarvests().isEmpty()) {
+            queriesArray.add("harvestId: ("+
+                    query.getHarvests().stream().map(h -> "\""+h+"\"")
+                            .collect(Collectors.joining(" OR "))+
+                    ")"
+            );
+        }
+        queriesArray = queriesArray.stream().filter(a -> a != null && a.length() > 0).collect(Collectors.toList());
+        if (queriesArray.size() > 1) {
+            queriesArray = queriesArray.stream().map(u -> "("+u+")").collect(Collectors.toList());
+        }
+        String localQuery = String.join(" AND ", queriesArray);
+        log.info("QUERY: "+localQuery);
+
+        solrQuery.set("q", localQuery.isEmpty() ? "*:*" : localQuery);
+        solrQuery.setRows(query.getEntries());
+        solrQuery.setSort("random_"+seed, SolrQuery.ORDER.asc);
+        solrQuery.setFields("id");
+        return solrQuery;
+    }
+
     @Override
-    public void index(BaseRequest query) {
+    public long estimate(Search query) {
+        List<String> ids = query.getIds();
+        if (ids != null && !ids.isEmpty()) {
+            return ids.size();
+        }
+        SolrQuery solrQuery = prepareQueryForIndex(query);
+        solrQuery.setRows(0);
         try {
-            String[] ids = query.getIds();
-            if (ids == null || ids.length == 0) {
-                SolrQuery solrQuery = new SolrQuery();
-                solrQuery.set("q", query.getFilter().trim().isEmpty() ? "*:*" : query.getFilter());
-                solrQuery.setRows(query.getEntries());
-                solrQuery.setSort("random_"+query.getRandomSeed(), SolrQuery.ORDER.asc);
-                solrQuery.setFields("id");
-                ids = solrBase.query(solrQuery).getResults().stream().map(a -> (String)a.getFieldValue("id")).toArray(String[]::new);
+            long found = solrBase.query(solrQuery).getResults().getNumFound();
+            return Math.min(found, query.getEntries());
+        }
+        catch (Throwable ex) {
+            log.error("Cannot estimate base query.", ex);
+            return 0;
+        }
+    }
+
+    @Override
+    public void index(Search query) {
+        try {
+            List<String> ids = query.getIds();
+            if (ids == null || ids.isEmpty()) {
+                SolrQuery solrQuery = prepareQueryForIndex(query);
+                ids = solrBase.query(solrQuery).getResults().stream().map(a -> (String)a.getFieldValue("id")).collect(Collectors.toList());
             }
-            log.info("Ids fetched: " + ids.length);
+            log.info("Ids fetched: " + ids.size());
 
             HttpSolrClient solrQuery = new HttpSolrClient.Builder(solrQueryHost.trim()).build();
             solrQuery.deleteByQuery("*:*");
             solrQuery.commit();
             log.info("Index cleared");
 
-            List<String> stopWords = Arrays.asList(query.getStopWords().clone());
             clearStopWords();
-            addStopWords(stopWords);
+            addStopWords(query.getStopWords());
             log.info("Stopwords changed");
 
             List<String> gets = new ArrayList<>();
 
             int groupSize = 10000;
-            int idsSize = ids.length;
+            int idsSize = ids.size();
             for (int totalCount = 0; totalCount < idsSize; ) {
                 int i;
                 for (i = 0; i < groupSize; i++) {
                     if (totalCount + i >= idsSize) {
                         break;
                     }
-                    gets.add(ids[totalCount + i]);
+                    gets.add(ids.get(totalCount + i));
                 }
                 totalCount += i;
 
@@ -124,6 +176,9 @@ public class SearchServiceImpl implements SearchService {
 
                 solrQuery.commit();
                 gets.clear();
+
+                query.setIndexed(totalCount);
+                searchRepository.saveAndFlush(query);
                 log.info("PUMP: imported {}", totalCount);
             }
             log.info("Objects fetched");
@@ -134,7 +189,7 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public byte[] query(QueryRequest query) {
+    public byte[] query(AnalyticQuery query) {
         try {
             Object result = null;
             switch (query.getType()) {
@@ -151,13 +206,13 @@ public class SearchServiceImpl implements SearchService {
         }
     }
 
-    private Map<String, Map<String, List<String>>> queryCollocation(QueryRequest query) {
+    private Map<String, Map<String, List<String>>> queryCollocation(AnalyticQuery query) {
         try {
             Locale locale = new Locale("cz");
             List<String> stopWords = getStopWords();
             //url -> word -> contexts
             Map<String, Map<String, List<String>>> resultMap = new TreeMap<>();
-            for (String collocationNear : query.getTexts()) {
+            for (String collocationNear : query.getExpressions()) {
                 SolrQuery collocationQuery = new SolrQuery();
                 collocationQuery.setFields("id", "url")
                         .setHighlight(true)
@@ -234,10 +289,10 @@ public class SearchServiceImpl implements SearchService {
         }
     }
 
-    private List<SolrQueryEntry> queryRaw(QueryRequest query) {
+    private List<SolrQueryEntry> queryRaw(AnalyticQuery query) {
         try {
             StringBuilder queryString = new StringBuilder();
-            for (String collocationNear : query.getTexts()) {
+            for (String collocationNear : query.getExpressions()) {
                 if (queryString.length() > 0) {
                     queryString.append(" OR ");
                 }
@@ -314,5 +369,48 @@ public class SearchServiceImpl implements SearchService {
     public void changeStopWords(List<String> stopWords) {
         clearStopWords();
         addStopWords(stopWords);
+    }
+
+    @Override
+    @Transactional
+    public void processOneScheduledJob() {
+        List<Search> searches = searchRepository.findByState(Search.State.WAITING);
+        if (searches.isEmpty()) {
+            return;
+        }
+        Search search = searches.get(0);
+        try {
+            search.setState(Search.State.INDEXING);
+            searchRepository.saveAndFlush(search);
+
+            // Index search query
+            index(search);
+
+            search.setState(Search.State.PROCESSING);
+            searchRepository.saveAndFlush(search);
+
+            for (AnalyticQuery analyticQuery : search.getQueries()) {
+                if (!analyticQuery.getState().equals(AnalyticQuery.State.WAITING)) {
+                    continue;
+                }
+                analyticQuery.setState(AnalyticQuery.State.RUNNING);
+                analyticQueryRepository.saveAndFlush(analyticQuery);
+
+                // Process analytic query
+                byte[] data = query(analyticQuery);
+
+                analyticQuery.setData(data);
+                analyticQuery.setState(AnalyticQuery.State.FINISHED);
+                analyticQueryRepository.saveAndFlush(analyticQuery);
+            }
+
+            search.setState(Search.State.DONE);
+            searchRepository.saveAndFlush(search);
+        }
+        catch (Throwable ex) {
+            log.error("Error during processing", ex);
+            search.setState(Search.State.ERROR);
+            searchRepository.saveAndFlush(search);
+        }
     }
 }

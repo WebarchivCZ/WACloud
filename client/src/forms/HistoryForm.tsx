@@ -6,7 +6,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableHead,
+  TableHead, TablePagination,
   TableRow,
   Typography
 } from '@material-ui/core';
@@ -19,6 +19,8 @@ export const HistoryForm = () => {
   const { t, i18n } = useTranslation();
 
   const [queries, setQueries] = useState<ISearch[]>([]);
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   const stateToString = (state: string) => {
     switch (state) {
@@ -44,6 +46,15 @@ export const HistoryForm = () => {
       );
   };
 
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
   useEffect(() => {
     refreshSearches();
 
@@ -53,6 +64,47 @@ export const HistoryForm = () => {
 
   return (
     <>
+      {queries.filter(v => !['DONE','ERROR'].includes(v.state)).length > 0 && (
+        <>
+          <Typography variant="h1">
+            {t('header.currentQueries')}
+          </Typography>
+          <Card variant="outlined">
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>{t('query.header')}</TableCell>
+                    <TableCell>{t('query.created')}</TableCell>
+                    <TableCell>{t('query.state')}</TableCell>
+                    <TableCell/>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {queries.filter(v => !['DONE','ERROR'].includes(v.state)).map((row) => (
+                    <TableRow hover key={row.id}>
+                      <TableCell><span aria-label={row.filter}>{
+                        row.filter.length > 60 ?
+                          row.filter.substring(0, 60 - 3) + "..." :
+                          row.filter
+                      }</span></TableCell>
+                      <TableCell>{(new Date(row.createdAt)).toLocaleString(i18n.language)}</TableCell>
+                      <TableCell>
+                        {stateToString(row.state)}
+                      </TableCell>
+                      <TableCell>
+                        <CircularProgress size={15} />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Card>
+          <br/>
+        </>
+      )}
+
       <Typography variant="h1">
         {t('header.myQueries')}
       </Typography>
@@ -68,7 +120,7 @@ export const HistoryForm = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {queries.map((row) => (
+              {queries.filter(v => ['DONE','ERROR'].includes(v.state)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                 <TableRow hover key={row.id}>
                   <TableCell><span aria-label={row.filter}>{
                     row.filter.length > 60 ?
@@ -109,6 +161,19 @@ export const HistoryForm = () => {
             </TableBody>
           </Table>
         </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={queries.filter(v => ['DONE','ERROR'].includes(v.state)).length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage={t('pagination.rowsPerPage')}
+          labelDisplayedRows={({ from, to, count }) => {
+            return '' + from + '-' + to + ' ' + t('pagination.from') + ' ' + count
+          }}
+        />
       </Card>
     </>
   );

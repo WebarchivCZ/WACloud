@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-RUN apk add --update maven openjdk8 \
+RUN apk add --update maven openjdk11 \
     && rm -rf /var/cache/apk/*
 
 ADD pom.xml /root/pom.xml

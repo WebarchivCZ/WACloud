@@ -16,7 +16,8 @@
     "favorite": "Oblíbené",
     "myQueries": "Moje dotazy",
     "user": "Používatel",
-    "logout": "Odhlásit se"
+    "logout": "Odhlásit se",
+    "currentQueries": "Poslední dotazy"
   },
   "filters": {
     "filtersSectionHeader": "Filtre",
@@ -83,6 +84,10 @@
       "save": "Uložit",
       "close": "Zavřít"
     }
+  },
+  "pagination": {
+    "rowsPerPage": "Řádky na stránku:",
+    "from": "ze"
   },
   "analytics": {
     "title": "Analytické dotazy",

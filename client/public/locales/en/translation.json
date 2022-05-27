@@ -4,7 +4,7 @@
     "name": "User name",
     "password": "Password",
     "button": "Log in",
-    "text": "Centralizované rozhraní pro přístup k datům webového archivu",
+    "text": "Centralized interface for extracting big data from web archives",
     "success": "You were successfully logged in."
   },
   "logout": {
@@ -16,7 +16,8 @@
     "favorite": "Favorite",
     "myQueries": "My queries",
     "user": "User",
-    "logout": "Log out"
+    "logout": "Log out",
+    "currentQueries": "Last queries"
   },
   "filters": {
     "filtersSectionHeader": "Filters",
@@ -83,6 +84,10 @@
       "save": "Save",
       "close": "Close"
     }
+  },
+  "pagination": {
+    "rowsPerPage": "Rows per page:",
+    "from": "from"
   },
   "analytics": {
     "title": "Analytic queries",

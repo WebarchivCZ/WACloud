@@ -124,7 +124,7 @@ function AnalyticQueriesForm({queries, setQueries}:{queries:IQuery[], setQueries
                              fullWidth
                              value={query.searchType}
                              onChange={(event) => handleQueryTypeChange(index, event)}>
-                    {/*<MenuItem value="FREQUENCY">Frequency</MenuItem>*/}
+                    <MenuItem value="FREQUENCY">Frequency</MenuItem>
                     <MenuItem value="COLLOCATION">Colocation</MenuItem>
                     {/*<MenuItem value="OCCURENCE">Occurence</MenuItem>*/}
                     <MenuItem value="RAW">Raw</MenuItem>
@@ -165,7 +165,7 @@ function AnalyticQueriesForm({queries, setQueries}:{queries:IQuery[], setQueries
                       </>
                     )}
 
-                    {query.searchType === "RAW" && (
+                    {(query.searchType === "RAW" || query.searchType === "FREQUENCY") && (
                       <>
                         <Grid item xs={6}>
                           <TextField type="number"

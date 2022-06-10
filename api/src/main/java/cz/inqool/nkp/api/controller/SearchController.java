@@ -74,7 +74,6 @@ public class SearchController {
         Search search = new Search();
         search.setFilter(request.getBase().getFilter());
         search.setEntries(request.getBase().getEntries());
-        search.setName("");
         search.setRandomSeed(request.getBase().getRandomSeed());
         search.setStopWords(request.getBase().getStopWords() == null ? new ArrayList<>() : Arrays.asList(request.getBase().getStopWords()));
         search.setIds(request.getBase().getIds() == null ? new ArrayList<>() : Arrays.asList(request.getBase().getIds()));

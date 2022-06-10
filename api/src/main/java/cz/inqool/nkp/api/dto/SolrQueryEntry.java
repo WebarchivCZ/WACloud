@@ -13,6 +13,12 @@ public class SolrQueryEntry {
     String url;
 
     @Field
+    String urlDomain;
+
+    @Field
+    String urlDomainTopLevel;
+
+    @Field
     String title;
 
     @Field
@@ -20,6 +26,9 @@ public class SolrQueryEntry {
 
     @Field
     String plainText;
+
+    @Field
+    Integer year;
 
     @Field
     List<String> headlines;
@@ -52,6 +61,24 @@ public class SolrQueryEntry {
 
     public SolrQueryEntry setUrl(String url) {
         this.url = url;
+        return this;
+    }
+
+    public String getUrlDomain() {
+        return urlDomain;
+    }
+
+    public SolrQueryEntry setUrlDomain(String urlDomain) {
+        this.urlDomain = urlDomain;
+        return this;
+    }
+
+    public String getUrlDomainTopLevel() {
+        return urlDomainTopLevel;
+    }
+
+    public SolrQueryEntry setUrlDomainTopLevel(String urlDomainTopLevel) {
+        this.urlDomainTopLevel = urlDomainTopLevel;
         return this;
     }
 
@@ -115,6 +142,15 @@ public class SolrQueryEntry {
 
     public SolrQueryEntry setSentiment(Double sentiment) {
         this.sentiment = sentiment;
+        return this;
+    }
+
+    public Integer getYear() {
+        return year;
+    }
+
+    public SolrQueryEntry setYear(Integer year) {
+        this.year = year;
         return this;
     }
 }

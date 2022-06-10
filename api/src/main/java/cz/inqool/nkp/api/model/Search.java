@@ -7,15 +7,13 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
-import java.util.Set;
 
 @Entity
-@Table(name = "search")
+@DiscriminatorValue("1")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Search extends AuditModel {
+public class Search extends SearchBase {
 	public enum State {
 		WAITING,
 		INDEXING,
@@ -24,23 +22,8 @@ public class Search extends AuditModel {
 		DONE
 	}
 
-	@Id
-    @GeneratedValue(generator = "query_generator")
-    @SequenceGenerator(
-            name = "query_generator",
-            sequenceName = "query_sequence"
-    )
-    private Long id;
-
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy="search")
-	@OrderBy("id")
-	private Set<AnalyticQuery> queries;
-
 	@Enumerated(EnumType.STRING)
 	private State state = State.WAITING;
-
-    @Column(columnDefinition = "text")
-    private String name;
 
 	@Column(columnDefinition = "integer")
 	@NonNull
@@ -52,27 +35,6 @@ public class Search extends AuditModel {
 
 	@Column(columnDefinition = "integer")
 	private Integer toIndex;
-
-	@Column(columnDefinition = "text")
-	private String randomSeed;
-
-	@ElementCollection
-	@CollectionTable(name = "search_stop_word", joinColumns = @JoinColumn(name = "id"))
-	@Column(name = "word")
-	private List<String> stopWords;
-
-	@ElementCollection
-	@CollectionTable(name = "search_entries", joinColumns = @JoinColumn(name = "id"))
-	@Column(name = "entry_id")
-	private List<String> ids;
-
-	@ElementCollection
-	@CollectionTable(name = "search_harvests", joinColumns = @JoinColumn(name = "id"))
-	@Column(name = "harvest")
-	private List<String> harvests;
-
-    @Column(columnDefinition = "text")
-	private String filter;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "started_at")

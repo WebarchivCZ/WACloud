@@ -4,19 +4,25 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.inqool.nkp.api.dto.SolrQueryEntry;
 import cz.inqool.nkp.api.model.AnalyticQuery;
+import cz.inqool.nkp.api.model.Harvest;
 import cz.inqool.nkp.api.model.Search;
 import cz.inqool.nkp.api.repository.AnalyticQueryRepository;
+import cz.inqool.nkp.api.repository.HarvestRepository;
 import cz.inqool.nkp.api.repository.SearchRepository;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.impl.XMLResponseParser;
+import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.util.NamedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +32,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,16 +48,18 @@ public class SearchServiceImpl implements SearchService {
 
     private final HBaseService hbase;
     private final SearchRepository searchRepository;
+    private final HarvestRepository harvestRepository;
     private final AnalyticQueryRepository analyticQueryRepository;
     private final HttpSolrClient solrBase;
     private final HttpSolrClient solrQuery;
     private final String solrQueryHost;
     private final ObjectMapper mapper;
 
-    public SearchServiceImpl(@Value("${solr.base.host.query}") String solrBaseHost, @Value("${solr.query.host.query}") String solrQueryHost, HBaseService hbase, SearchRepository searchRepository, AnalyticQueryRepository analyticQueryRepository) {
+    public SearchServiceImpl(@Value("${solr.base.host.query}") String solrBaseHost, @Value("${solr.query.host.query}") String solrQueryHost, HBaseService hbase, SearchRepository searchRepository, AnalyticQueryRepository analyticQueryRepository, HarvestRepository harvestRepository) {
         this.hbase = hbase;
         this.solrBase = new HttpSolrClient.Builder(solrBaseHost.trim()).build();
         this.searchRepository = searchRepository;
+        this.harvestRepository = harvestRepository;
         this.analyticQueryRepository = analyticQueryRepository;
         this.solrBase.setParser(new XMLResponseParser());
         this.solrQuery = new HttpSolrClient.Builder(solrQueryHost.trim()).build();
@@ -123,6 +134,10 @@ public class SearchServiceImpl implements SearchService {
             addStopWords(query.getStopWords());
             log.info("Stopwords changed");
 
+            Map<String, LocalDate> harvestToDate = harvestRepository.findAll()
+                    .stream()
+                    .collect(Collectors.toMap(Harvest::getIdentification, Harvest::getDate));
+
             List<String> gets = new ArrayList<>();
 
             int groupSize = 10000;
@@ -161,6 +176,18 @@ public class SearchServiceImpl implements SearchService {
 
                     Double sentiment = hbase.getRowColumnAsDouble(result, "sentiment");
 
+                    // Parse url
+                    String url = hbase.getRowColumnAsString(result, "urlkey");
+                    String domain = url.split("/",2)[0];
+                    String[] domainParts = domain.split("\\.");
+                    String domainTopLevel = domainParts[domainParts.length-1];
+                    if (domainParts.length > 1) {
+                        domainTopLevel = domainParts[domainParts.length-2] + "." + domainParts[domainParts.length-1];
+                    }
+
+                    // Parse date
+                    LocalDate date = harvestToDate.getOrDefault(hbase.getRowColumnAsString(result, "harvest-id"), null);
+
                     SolrQueryEntry entry = new SolrQueryEntry();
                     entry.setId(Bytes.toString(result.getRow()))
                             .setLanguage(hbase.getRowColumnAsString(result, "language"))
@@ -170,7 +197,12 @@ public class SearchServiceImpl implements SearchService {
                             .setSentiment(sentiment)
                             .setHeadlines(headlines)
                             .setLinks(links)
-                            .setUrl(hbase.getRowColumnAsString(result, "urlkey"));
+                            .setUrl(url)
+                            .setUrlDomain(domain.startsWith("www.") ? domain.substring(4) : domain)
+                            .setUrlDomainTopLevel(domainTopLevel);
+                    if (date != null) {
+                        entry.setYear(date.getYear());
+                    }
                     solrQuery.addBean(entry);
                 }
 
@@ -194,6 +226,7 @@ public class SearchServiceImpl implements SearchService {
             Object result = null;
             switch (query.getType()) {
                 case COLLOCATION: result = queryCollocation(query); break;
+                case FREQUENCY: result = queryFrequency(query); break;
                 case RAW: result = queryRaw(query); break;
                 default:
                     log.warn("Unknown type of query: "+ query.getType().toString());
@@ -204,6 +237,69 @@ public class SearchServiceImpl implements SearchService {
         catch (Throwable ex) {
             throw new RuntimeException("Error during processing query.", ex);
         }
+    }
+
+    private Map<String, Map<String, Integer>> queryFrequency(AnalyticQuery query) throws SolrServerException, IOException {
+        StringBuilder queryString = new StringBuilder();
+        for (String collocationNear : query.getExpressions()) {
+            if (queryString.length() > 0) {
+                queryString.append(" OR ");
+            }
+            queryString.append("plainText:\"").append(collocationNear.replace("\"", "\\\"")).append("\"");
+        }
+        if (queryString.length() == 0) {
+            queryString.append("*:*");
+        }
+        Long numFound = null;
+        int start = 0;
+        Map<String, Map<String, Integer>> results = new HashMap<>();
+
+        while (numFound == null || start < numFound) {
+            SolrQuery collocationQuery = new SolrQuery();
+            collocationQuery.setRequestHandler("/tvrh")
+                    .setStart(start)
+                    .setRows(10)
+                    .setFields("id,url")
+                    .set("q", queryString.toString())
+                    .set("tv.tf", "true")
+                    .set("tv.fl", "plainTextTerms");
+            NamedList<Object> response = solrQuery.request(new QueryRequest(collocationQuery));
+            NamedList<NamedList<Object>> termVectors = (NamedList<NamedList<Object>>)response.get("termVectors");
+            SolrDocumentList docs = (SolrDocumentList)response.get("response");
+            numFound = docs.getNumFound();
+            start += docs.size();
+
+            Map<String, String> idToUrl = new HashMap<>();
+            docs.forEach(doc -> {
+                idToUrl.put((String)doc.getFieldValue("id"), (String)doc.getFieldValue("url"));
+            });
+            List<String> stopWords = getStopWords();
+
+            termVectors.forEach(doc -> {
+                List<ImmutablePair<String, Integer>> counts = new ArrayList<>();
+
+                NamedList<NamedList<Integer>> terms = (NamedList<NamedList<Integer>>)doc.getValue().get("plainTextTerms");
+                if (terms != null) {
+                    terms.forEach(term -> {
+                        if (!stopWords.contains(term.getKey())) {
+                            counts.add(new ImmutablePair<>(term.getKey(), term.getValue().get("tf")));
+                        }
+                    });
+                    counts.sort(new Comparator<Map.Entry<String, Integer>>() {
+                        @Override
+                        public int compare(Map.Entry<String, Integer> e1, Map.Entry<String, Integer> e2) {
+                            return e2.getValue().compareTo(e1.getValue());
+                        }
+                    });
+                }
+                LinkedHashMap<String, Integer> docCounts = new LinkedHashMap<>();
+                counts.stream().limit(query.getLimit()).forEachOrdered(e -> docCounts.put(e.getKey(), e.getValue()));
+                results.put(idToUrl.get(doc.getKey()), docCounts);
+            });
+        }
+
+
+        return results;
     }
 
     private Map<String, Map<String, List<String>>> queryCollocation(AnalyticQuery query) {

@@ -4,6 +4,8 @@
 
     <fieldType name="random" class="solr.RandomSortField" />
     <fieldType name="string" class="solr.StrField" sortMissingLast="true" docValues="true"/>
+    <fieldType name="strings" class="solr.StrField" sortMissingLast="true" docValues="true" multiValued="true"/>
+    <fieldType name="pint" class="solr.IntPointField" docValues="true"/>
     <fieldType name="plong" class="solr.LongPointField" docValues="true"/>
     <fieldType name="plongs" class="solr.LongPointField" docValues="true" multiValued="true"/>
     <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true"/>
@@ -45,6 +47,7 @@
             <filter class="solr.LowerCaseFilterFactory"/>
             <filter class="solr.ManagedStopFilterFactory" managed="czech"/>
             <filter class="solr.CzechStemFilterFactory"/>
+            <filter class="solr.ASCIIFoldingFilterFactory"/>
         </analyzer>
     </fieldType>
     <fieldType name="texts_cz" class="solr.TextField" positionIncrementGap="100" multiValued="true">
@@ -53,14 +56,16 @@
             <filter class="solr.LowerCaseFilterFactory"/>
             <filter class="solr.ManagedStopFilterFactory" managed="czech"/>
             <filter class="solr.CzechStemFilterFactory"/>
+            <filter class="solr.ASCIIFoldingFilterFactory"/>
         </analyzer>
     </fieldType>
 
-    <fieldType name="text_cz_my" class="solr.TextField" positionIncrementGap="100">
+    <fieldType name="text_cz_terms" class="solr.TextField" positionIncrementGap="100">
         <analyzer>
             <tokenizer class="solr.StandardTokenizerFactory"/>
             <filter class="solr.LowerCaseFilterFactory"/>
             <filter class="solr.ManagedStopFilterFactory" managed="czech"/>
+            <filter class="solr.ASCIIFoldingFilterFactory"/>
         </analyzer>
     </fieldType>
 
@@ -68,15 +73,21 @@
     <field name="_version_" type="plong" indexed="false" stored="false"/>
 
     <field name="id" type="string"/>
+    <field name="year" type="pint" docValues="true" indexed="true" stored="true"/>
     <field name="url" type="string" docValues="false" indexed="true" stored="true"/>
+    <field name="urlDomain" type="string" docValues="false" indexed="true" stored="true"/>
+    <field name="urlDomainTopLevel" type="string" docValues="false" indexed="true" stored="true"/>
     <field name="title" type="text_cz" docValues="false" indexed="true" stored="true"/>
     <field name="headlines" type="texts_cz" docValues="false" indexed="true" stored="true"/>
-    <field name="links" type="texts" docValues="false" indexed="true" stored="true"/>
+    <field name="links" type="strings" docValues="false" indexed="true" stored="true"/>
     <field name="language" type="string" docValues="false" indexed="true" stored="true"/>
     <field name="plainText" type="text_cz" docValues="false" indexed="true" stored="true"/>
+    <field name="plainTextTerms" type="text_cz_terms" indexed="true" stored="true" termVectors="true" />
 
     <field name="topics" type="texts" docValues="false" indexed="true" stored="true"/>
     <field name="sentiment" type="pdouble" docValues="false" indexed="true" stored="true"/>
+
+    <copyField source="plainText" dest="plainTextTerms" />
 
     <dynamicField name="random*" type="random" indexed="true" stored="false"/>
     <dynamicField name="*" type="text_general" docValues="false" indexed="false" stored="false"/>

@@ -50,7 +50,7 @@ const useStyles = makeStyles(() => ({
 
 interface HarvestsProps {
   harvests: string[];
-  setHarvests: (harvests: string[]) => any;
+  setHarvests: (harvests: string[]) => void;
   minimal: boolean;
 }
 

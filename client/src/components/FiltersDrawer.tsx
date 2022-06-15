@@ -13,7 +13,7 @@ import {
 import React, {
   Dispatch,
   FunctionComponent,
-  ReactElement,
+  ReactNode,
   SetStateAction,
   useEffect,
   useState
@@ -77,11 +77,11 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 type ListHeaderProps = {
-  icon?: ReactElement<any, any> | undefined;
-  onIconClick?: any;
+  icon?: ReactNode;
+  onIconClick?: React.MouseEventHandler<HTMLButtonElement>;
   shown: boolean;
   disabled?: boolean;
-  children?: React.ReactNode;
+  children?: ReactNode;
 };
 
 const ListHeader: FunctionComponent<ListHeaderProps> = ({

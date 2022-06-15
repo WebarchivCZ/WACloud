@@ -41,7 +41,7 @@ function AnalyticQueriesForm({
   setQueries
 }: {
   queries: IQuery[];
-  setQueries: (queries: IQuery[]) => any;
+  setQueries: (queries: IQuery[]) => void;
 }) {
   const { t } = useTranslation();
   const classes = useStyles();

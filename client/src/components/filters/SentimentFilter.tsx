@@ -76,7 +76,11 @@ export const SentimentFilter = ({
         valueLabelDisplay="auto"
         value={value}
         disabled={disabled}
-        onChange={(_event: any, newValue: number | number[]) => {
+        onChange={(
+          _event: React.ChangeEvent<Record<string, unknown>>,
+          newValue: number | number[]
+        ) => {
+          console.log(_event);
           setValue(newValue);
         }}
       />

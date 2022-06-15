@@ -1,4 +1,4 @@
-import React, { FunctionComponent, ReactElement } from 'react';
+import React, { FunctionComponent, ReactNode } from 'react';
 import { AppBar, makeStyles, Theme, createStyles, Toolbar } from '@material-ui/core';
 
 import HeaderLogos from '../components/HeaderLogos';
@@ -42,9 +42,9 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 type HeaderProps = {
-  toolbar: ReactElement<any, any>;
-  drawer?: ReactElement<any, any>;
-  children?: React.ReactNode;
+  toolbar: ReactNode;
+  drawer?: ReactNode;
+  children?: ReactNode;
 };
 
 export const Header: FunctionComponent<HeaderProps> = ({ toolbar, drawer, children }) => {

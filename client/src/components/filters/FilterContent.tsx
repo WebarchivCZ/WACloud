@@ -9,12 +9,12 @@ import {
   Theme,
   Typography
 } from '@material-ui/core';
-import React, { FunctionComponent, ReactElement } from 'react';
+import React, { FunctionComponent, ReactNode } from 'react';
 
 type FilterContentProps = {
   title: string;
-  icon: ReactElement<any, any>;
-  buttons?: ReactElement<any, any>[];
+  icon: ReactNode;
+  buttons?: ReactNode[];
 };
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -32,9 +32,12 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export const FilterContent: FunctionComponent<
-  FilterContentProps & { children: React.ReactNode }
-> = ({ title, icon, children, buttons }) => {
+export const FilterContent: FunctionComponent<FilterContentProps & { children: ReactNode }> = ({
+  title,
+  icon,
+  children,
+  buttons
+}) => {
   const classes = useStyles();
   return (
     <ListItem>

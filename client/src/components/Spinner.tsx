@@ -1,21 +1,16 @@
-import React  from 'react';
-import {
-  makeStyles,
-  Theme,
-  createStyles,
-  CircularProgress
-} from '@material-ui/core';
+import React from 'react';
+import { makeStyles, Theme, createStyles, CircularProgress } from '@material-ui/core';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      display: 'flex',
+      display: 'flex'
     },
     content: {
       flexGrow: 1,
-      padding: theme.spacing(3),
-    },
-  }),
+      padding: theme.spacing(3)
+    }
+  })
 );
 
 function Spinner() {

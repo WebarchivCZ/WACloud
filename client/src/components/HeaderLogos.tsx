@@ -1,27 +1,28 @@
-import {createStyles, Link, makeStyles, Theme} from "@material-ui/core";
-import logoNk from "../images/nk-logo.svg";
-import logoWebArchive from "../images/webarchiv-logo.svg";
-import React from "react";
+import { createStyles, Link, makeStyles, Theme } from '@material-ui/core';
+import React from 'react';
+
+import logoNk from '../images/nk-logo.svg';
+import logoWebArchive from '../images/webarchiv-logo.svg';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     grow: {
-      flexGrow: 1,
+      flexGrow: 1
     },
     logoNK: {
       '& > img': {
-        maxHeight: theme.spacing(3),
+        maxHeight: theme.spacing(3)
       },
       margin: '0 !important'
     },
     logoWA: {
       '& > img': {
         maxHeight: theme.spacing(3),
-        marginLeft: theme.spacing(2),
+        marginLeft: theme.spacing(2)
       },
       margin: '0 !important'
-    },
-  }),
+    }
+  })
 );
 
 function HeaderLogos() {
@@ -37,7 +38,7 @@ function HeaderLogos() {
       </Link>
       <div className={classes.grow} />
     </>
-  )
+  );
 }
 
 export default HeaderLogos;

@@ -1,18 +1,21 @@
 import {
-  Box, createStyles,
+  Box,
+  createStyles,
   ListItem,
   ListItemIcon,
   ListItemSecondaryAction,
-  ListItemText, makeStyles, Theme,
+  ListItemText,
+  makeStyles,
+  Theme,
   Typography
-} from "@material-ui/core";
-import React, {FunctionComponent, ReactElement} from "react";
+} from '@material-ui/core';
+import React, { FunctionComponent, ReactElement } from 'react';
 
 type FilterContentProps = {
-  title: string,
-  icon: ReactElement<any, any>
-  buttons?: ReactElement<any, any>[]
-}
+  title: string;
+  icon: ReactElement<any, any>;
+  buttons?: ReactElement<any, any>[];
+};
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -26,31 +29,28 @@ const useStyles = makeStyles((theme: Theme) =>
         fontWeight: 600
       }
     }
-  }),
+  })
 );
 
-export const FilterContent : FunctionComponent<FilterContentProps> = ({title, icon, children, buttons}) => {
+export const FilterContent: FunctionComponent<
+  FilterContentProps & { children: React.ReactNode }
+> = ({ title, icon, children, buttons }) => {
   const classes = useStyles();
   return (
     <ListItem>
-      <ListItemIcon>
-        {icon}
-      </ListItemIcon>
+      <ListItemIcon>{icon}</ListItemIcon>
       <ListItemText>
-        <Typography variant="subtitle2">
-          {title}
-        </Typography>
-        <Box className={classes.box}>
-          {children}
-        </Box>
+        <Typography variant="subtitle2">{title}</Typography>
+        <Box className={classes.box}>{children}</Box>
       </ListItemText>
       <ListItemSecondaryAction className={classes.buttons}>
-        {buttons && buttons.map((button, index) => (
-          <Box m={1} key={index}>
-            {button}
-          </Box>
-        ))}
+        {buttons &&
+          buttons.map((button, index) => (
+            <Box m={1} key={index}>
+              {button}
+            </Box>
+          ))}
       </ListItemSecondaryAction>
     </ListItem>
-  )
-}
+  );
+};

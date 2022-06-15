@@ -1,5 +1,5 @@
-import {ValuableProps} from "./ValuableProps";
+import { ValuableProps } from './ValuableProps';
 
 export type ValuableOptionalsProps<T> = ValuableProps<T> & {
   options: string[];
-}
+};

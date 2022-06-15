@@ -1,4 +1,4 @@
-import withStyles from "@material-ui/core/styles/withStyles";
+import withStyles from '@material-ui/core/styles/withStyles';
 
 export const GlobalCss = withStyles({
   '@global': {
@@ -9,5 +9,5 @@ export const GlobalCss = withStyles({
     '.MuiOutlinedInput-notchedOutline': {
       borderColor: 'rgba(0, 0, 255)'
     }
-  },
+  }
 })(() => null);

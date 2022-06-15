@@ -1,5 +1,5 @@
-import {createTheme, ThemeOptions} from "@material-ui/core/styles";
-import grey from "@material-ui/core/colors/grey";
+import { createTheme, ThemeOptions } from '@material-ui/core/styles';
+import grey from '@material-ui/core/colors/grey';
 
 export const themeOptions: ThemeOptions = {
   typography: {
@@ -8,7 +8,7 @@ export const themeOptions: ThemeOptions = {
       fontWeight: 700,
       fontSize: '44px',
       lineHeight: '55px',
-      padding: '8px 0',
+      padding: '8px 0'
     },
     h2: {
       fontWeight: 700,
@@ -32,7 +32,7 @@ export const themeOptions: ThemeOptions = {
       default: '#ffffff'
     },
     primary: {
-      main: '#0000ff',
+      main: '#0000ff'
     },
     secondary: {
       main: '#E64949'
@@ -41,10 +41,11 @@ export const themeOptions: ThemeOptions = {
   overrides: {
     MuiAppBar: {
       colorDefault: {
-        backgroundColor: grey["100"]
+        backgroundColor: grey['100']
       },
       root: {
-        boxShadow: '0px 1px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.04),0px 1px 1px 0px rgba(0,0,0,0.04)'
+        boxShadow:
+          '0px 1px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.04),0px 1px 1px 0px rgba(0,0,0,0.04)'
       }
     },
     MuiButton: {
@@ -54,7 +55,8 @@ export const themeOptions: ThemeOptions = {
         borderRadius: 0,
         fontSize: '16px',
         lineHeight: '18px',
-        boxShadow: '0px 3px 3.5px rgba(0, 0, 0, 0.14), 0px 1px 7px rgba(0, 0, 0, 0.12), 0px 1.5px 4px rgba(0, 0, 0, 0.2)',
+        boxShadow:
+          '0px 3px 3.5px rgba(0, 0, 0, 0.14), 0px 1px 7px rgba(0, 0, 0, 0.12), 0px 1.5px 4px rgba(0, 0, 0, 0.2)'
       },
       sizeLarge: {
         fontWeight: 700,
@@ -81,7 +83,8 @@ export const themeOptions: ThemeOptions = {
         border: '2px solid #DFDFDF'
       },
       elevation8: {
-        boxShadow: '0px 1px 1px -3px rgba(0,0,0,0.05),0px 1px 1px 1px rgba(0,0,0,0.05),0px 1px 1px 2px rgba(0,0,0,0.05)',
+        boxShadow:
+          '0px 1px 1px -3px rgba(0,0,0,0.05),0px 1px 1px 1px rgba(0,0,0,0.05),0px 1px 1px 2px rgba(0,0,0,0.05)'
       }
     },
     MuiListItem: {
@@ -95,7 +98,7 @@ export const themeOptions: ThemeOptions = {
       }
     },
     MuiListItemIcon: {
-      root:{
+      root: {
         minWidth: '36px',
         color: '#000000',
         margin: '4px 0',
@@ -114,7 +117,7 @@ export const themeOptions: ThemeOptions = {
           height: '40px',
           borderRadius: 0,
           padding: 0
-        },
+        }
       }
     },
     MuiFilledInput: {
@@ -137,11 +140,11 @@ export const themeOptions: ThemeOptions = {
       body: {
         fontSize: '18px',
         lineHeight: '23px'
-      },
+      }
     },
     MuiTableRow: {
       hover: {
-        backgroundColor: 'rgba(112,112,112, 0.03)',
+        backgroundColor: 'rgba(112,112,112, 0.03)'
       }
     }
   }

@@ -1,7 +1,16 @@
-import {Button, createStyles, Grid, makeStyles, TextField, Theme, Typography} from "@material-ui/core";
-import React from "react";
-import {useTranslation} from "react-i18next";
-import {ValuableProps} from "../interfaces/ValuableProps";
+import {
+  Button,
+  createStyles,
+  Grid,
+  makeStyles,
+  TextField,
+  Theme,
+  Typography
+} from '@material-ui/core';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { ValuableProps } from '../interfaces/ValuableProps';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -15,16 +24,16 @@ const useStyles = makeStyles((theme: Theme) =>
       color: theme.palette.primary.main,
       fontSize: '12px',
       fontWeight: 700
-    },
-  }),
+    }
+  })
 );
 
 interface LogicalButtonProps {
-  label: string,
-  appendValue: string
+  label: string;
+  appendValue: string;
 }
 
-export const QueryForm = ({value, setValue, disabled}: ValuableProps<string>) => {
+export const QueryForm = ({ value, setValue, disabled }: ValuableProps<string>) => {
   const classes = useStyles();
   const { t } = useTranslation();
 
@@ -32,52 +41,50 @@ export const QueryForm = ({value, setValue, disabled}: ValuableProps<string>) =>
     setValue(event.target.value);
   };
 
-  const LogicalButton = ({label, appendValue}: LogicalButtonProps) => (
+  const LogicalButton = ({ label, appendValue }: LogicalButtonProps) => (
     <Grid item>
-      <Button size="small"
-              variant="contained"
-              className={classes.button}
-              disabled={disabled}
-              onClick={() => setValue(value+appendValue)}>
+      <Button
+        size="small"
+        variant="contained"
+        className={classes.button}
+        disabled={disabled}
+        onClick={() => setValue(value + appendValue)}>
         {label}
       </Button>
     </Grid>
-  )
+  );
 
   return (
     <>
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <Typography variant="h2">
-            {t('query.header')}
-          </Typography>
+          <Typography variant="h2">{t<string>('query.header')}</Typography>
         </Grid>
         <Grid item xs={12}>
-          <TextField multiline
-                     rows={3}
-                     variant="outlined"
-                     fullWidth
-                     value={value}
-                     disabled={disabled}
-                     onChange={handleChangeFilter}/>
+          <TextField
+            multiline
+            rows={3}
+            variant="outlined"
+            fullWidth
+            value={value}
+            disabled={disabled}
+            onChange={handleChangeFilter}
+          />
         </Grid>
 
         <Grid item xs={12}>
           <Grid container justifyContent="flex-end" alignItems="center" spacing={1}>
             <Grid item>
-              <Typography variant="body2">
-                {t('query.operators')}
-              </Typography>
+              <Typography variant="body2">{t<string>('query.operators')}</Typography>
             </Grid>
-            <LogicalButton label="AND" appendValue=" AND "/>
-            <LogicalButton label="OR" appendValue=" OR "/>
-            <LogicalButton label="NOT" appendValue=" NOT "/>
-            <LogicalButton label="(" appendValue="("/>
-            <LogicalButton label=")" appendValue=")"/>
-
+            <LogicalButton label="AND" appendValue=" AND " />
+            <LogicalButton label="OR" appendValue=" OR " />
+            <LogicalButton label="NOT" appendValue=" NOT " />
+            <LogicalButton label="(" appendValue="(" />
+            <LogicalButton label=")" appendValue=")" />
           </Grid>
         </Grid>
       </Grid>
     </>
   );
-}
+};

@@ -1,28 +1,23 @@
-import React, {FunctionComponent, ReactElement} from 'react';
-import {
-  AppBar,
-  makeStyles,
-  Theme,
-  createStyles,
-  Toolbar
-} from '@material-ui/core';
-import HeaderLogos from "../components/HeaderLogos";
+import React, { FunctionComponent, ReactElement } from 'react';
+import { AppBar, makeStyles, Theme, createStyles, Toolbar } from '@material-ui/core';
+
+import HeaderLogos from '../components/HeaderLogos';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      display: 'flex',
+      display: 'flex'
     },
     appBar: {
       zIndex: theme.zIndex.drawer + 1,
       transition: theme.transitions.create(['width', 'margin'], {
         easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-      }),
+        duration: theme.transitions.duration.leavingScreen
+      })
     },
     content: {
       flexGrow: 1,
-      padding: theme.spacing(3),
+      padding: theme.spacing(3)
     },
     toolbar: {
       padding: theme.spacing(0, 5, 0, 2),
@@ -38,18 +33,19 @@ const useStyles = makeStyles((theme: Theme) =>
       },
       '& > a.active': {
         color: '#0000ff'
-      },
+      }
     },
     toolbarContent: {
-      ...theme.mixins.toolbar,
-    },
-  }),
+      ...theme.mixins.toolbar
+    }
+  })
 );
 
 type HeaderProps = {
-  toolbar: ReactElement<any, any>,
-  drawer?: ReactElement<any, any>
-}
+  toolbar: ReactElement<any, any>;
+  drawer?: ReactElement<any, any>;
+  children?: React.ReactNode;
+};
 
 export const Header: FunctionComponent<HeaderProps> = ({ toolbar, drawer, children }) => {
   const classes = useStyles();
@@ -57,13 +53,9 @@ export const Header: FunctionComponent<HeaderProps> = ({ toolbar, drawer, childr
   return (
     <>
       <div className={classes.root}>
-        <AppBar
-          position="fixed"
-          color="default"
-          className={classes.appBar}
-        >
+        <AppBar position="fixed" color="default" className={classes.appBar}>
           <Toolbar className={classes.toolbar}>
-            <HeaderLogos/>
+            <HeaderLogos />
             {toolbar}
           </Toolbar>
         </AppBar>
@@ -77,4 +69,4 @@ export const Header: FunctionComponent<HeaderProps> = ({ toolbar, drawer, childr
       </div>
     </>
   );
-}
+};

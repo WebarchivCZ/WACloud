@@ -15,7 +15,7 @@
     "newQuery": "Nový dotaz",
     "favorite": "Oblíbené",
     "myQueries": "Moje dotazy",
-    "user": "Používatel",
+    "user": "Uživatel",
     "logout": "Odhlásit se",
     "currentQueries": "Poslední dotazy"
   },
@@ -24,7 +24,7 @@
     "settingsSectionHeader": "Nastavení limitů",
     "theme": "Téma",
     "pageType": "Typ stránky",
-    "date": "Dátum sklízne",
+    "date": "Datum sklizně",
     "dateFrom": "Od",
     "dateTo": "Do",
     "operator": {
@@ -42,7 +42,7 @@
       "word": "Slovo",
       "add": "Vložit"
     },
-    "entriesLimit": "Počet záznamu"
+    "entriesLimit": "Počet záznamů"
   },
   "query": {
     "header": "Dotaz",
@@ -62,7 +62,7 @@
     "queryIs": "Dotaz je",
     "valid": "validný",
     "notValid": "nevalidný",
-    "queryProcesses": "a spracuje se s ním",
+    "queryProcesses": "a zpracuje se s ním",
     "entries": "záznamu",
     "continue": "Pokračovat",
     "edit": "Upravit",
@@ -104,8 +104,8 @@
     "ownSeed": "Semínko pro náhodnost"
   },
   "harvests": {
-    "title": "Sklízně",
-    "name": "Název sklízně",
+    "title": "Sklizně",
+    "name": "Název sklizně",
     "size": "Velikost",
     "WARCs": "Počet WARCu",
     "date": "Datum spuštění"

@@ -48,7 +48,7 @@ export const HistoryForm = () => {
         (result) => {
           setQueries(result);
         },
-        (_error) => {
+        () => {
           setQueries([]);
         }
       );
@@ -163,7 +163,7 @@ export const HistoryForm = () => {
                                   'success'
                                 );
                               })
-                              .catch((_error) =>
+                              .catch(() =>
                                 addNotification(
                                   t('query.error.title'),
                                   t('query.error.message'),

@@ -125,7 +125,7 @@ export const HarvestsForm = ({ harvests, setHarvests, minimal }: HarvestsProps) 
           // TODO FAKE REMOVE END
           setAllHarvests(harvests);
         },
-        (_error) => {
+        () => {
           setAllHarvests([]);
         }
       );

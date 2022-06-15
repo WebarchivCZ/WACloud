@@ -39,7 +39,7 @@ export const AdminHarvestsForm = () => {
         (result) => {
           setHarvests(result);
         },
-        (_error) => {
+        () => {
           setHarvests([]);
         }
       );

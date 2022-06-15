@@ -154,13 +154,13 @@ export const FiltersDrawer = ({
       .then((res) => res.json())
       .then(
         (result) => setTopics(result),
-        (_error) => setTopics(['ČR'])
+        () => setTopics(['ČR'])
       );
     fetch('/api/webtype')
       .then((res) => res.json())
       .then(
         (result) => setWebTypes(result),
-        (_error) => setWebTypes(['forum'])
+        () => setWebTypes(['forum'])
       );
   }, []);
 

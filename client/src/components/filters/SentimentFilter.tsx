@@ -80,7 +80,6 @@ export const SentimentFilter = ({
           _event: React.ChangeEvent<Record<string, unknown>>,
           newValue: number | number[]
         ) => {
-          console.log(_event);
           setValue(newValue);
         }}
       />

@@ -4,17 +4,22 @@ import {
   Button,
   Typography,
   Box,
+  Grid,
   Chip,
   makeStyles,
   TextField,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle
+  DialogTitle,
+  Tooltip
 } from '@material-ui/core';
 import SpellcheckIcon from '@material-ui/icons/Spellcheck';
 import EditIcon from '@material-ui/icons/Edit';
 import AddIcon from '@material-ui/icons/Add';
+import GetAppIcon from '@material-ui/icons/GetApp';
+import PublishIcon from '@material-ui/icons/Publish';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 import { ValuableProps } from '../../interfaces/ValuableProps';
 
@@ -33,6 +38,13 @@ const useStyles = makeStyles((theme) => ({
     listStyle: 'none',
     padding: theme.spacing(0.5),
     margin: 0
+  },
+  button: {
+    width: 'auto',
+    height: '40px',
+    margin: '0px',
+    padding: '0.5rem',
+    minWidth: '40px'
   }
 }));
 
@@ -65,6 +77,23 @@ export const StopWordsFilter = ({ value, setValue, disabled }: ValuableProps<str
     setStopWords(newStopWords);
   };
 
+  const loadStopWords = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    e.preventDefault();
+    const stopWords = await e.target.files?.[0].text();
+    setStopWords(stopWords.split('\n'));
+  };
+
+  const exportStopWords = () => {
+    const blob = new Blob([stopWords.join('\n')], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'stopwords.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <>
       <FilterContent
@@ -85,37 +114,86 @@ export const StopWordsFilter = ({ value, setValue, disabled }: ValuableProps<str
           {value.slice(0, 8).join(', ') + (value.length > 8 ? ',...' : '')}
         </Typography>
       </FilterContent>
-      <Dialog open={open} onClose={handleClose} maxWidth="lg">
+      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="lg">
         <DialogTitle>
           <Typography variant="h2">{t<string>('filters.stopWords.title')}</Typography>
         </DialogTitle>
         <DialogContent>
-          <Box display="flex">
-            <TextField
-              label={t<string>('filters.stopWords.addNext')}
-              value={currentStopWord}
-              onChange={(event) => setCurrentStopWord(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') handleAddStopWord(currentStopWord);
-              }}
-              style={{ marginBottom: 16 }}
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                handleAddStopWord(currentStopWord);
-              }}
-              style={{
-                width: '40px',
-                height: '40px',
-                margin: '0px',
-                padding: '0px',
-                minWidth: '40px'
-              }}>
-              <AddIcon fontSize="small" />
-            </Button>
-          </Box>
+          <Grid container>
+            <Grid item xs={3}>
+              <Box display="flex" gridGap={8}>
+                <TextField
+                  label={t<string>('filters.stopWords.addNext')}
+                  value={currentStopWord}
+                  onChange={(event) => setCurrentStopWord(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      setCurrentStopWord('');
+                      handleAddStopWord(currentStopWord);
+                    }
+                  }}
+                  style={{ marginBottom: 16 }}
+                />
+                <Tooltip title={t<string>('filters.stopWords.add')} aria-label="add">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => {
+                      setCurrentStopWord('');
+                      handleAddStopWord(currentStopWord);
+                    }}
+                    className={classes.button}>
+                    <AddIcon fontSize="small" />
+                  </Button>
+                </Tooltip>
+                <Tooltip title={t<string>('filters.stopWords.deleteAll')} aria-label="delete">
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => {
+                      setCurrentStopWord('');
+                      setStopWords([]);
+                    }}
+                    className={classes.button}>
+                    <DeleteIcon fontSize="small" />
+                  </Button>
+                </Tooltip>
+              </Box>
+            </Grid>
+            <Grid item xs={9}>
+              <Grid
+                container
+                spacing={2}
+                direction="row"
+                justifyContent="flex-end"
+                alignItems="center">
+                <Grid item>
+                  <Button
+                    startIcon={<GetAppIcon />}
+                    variant="contained"
+                    component="label"
+                    className={classes.button}>
+                    {t<string>('filters.stopWords.import')}
+                    <input
+                      type="file"
+                      hidden
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => loadStopWords(e)}
+                    />
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button
+                    startIcon={<PublishIcon />}
+                    variant="contained"
+                    component="label"
+                    className={classes.button}
+                    onClick={exportStopWords}>
+                    {t<string>('filters.stopWords.export')}
+                  </Button>
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
           <Typography variant="body1">{t<string>('filters.stopWords.list')}</Typography>
           <Box component="ul" className={classes.chipRoot}>
             {stopWords.map((q, ind) => (

@@ -43,7 +43,10 @@
       "word": "Slovo",
       "add": "Vložit",
       "save": "Uložit",
-      "cancel": "Zrušit"
+      "cancel": "Zrušit",
+      "import": "Importovat",
+      "export": "Exportovat",
+      "deleteAll": "Smazat vše"
     },
     "entriesLimit": "Počet záznamu"
   },

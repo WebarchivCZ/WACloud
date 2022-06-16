@@ -43,7 +43,10 @@
       "word": "Word",
       "add": "Add",
       "save": "Save",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "import": "Import",
+      "export": "Export",
+      "deleteAll": "Delete all"
     },
     "entriesLimit": "Number of entries"
   },

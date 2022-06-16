@@ -39,8 +39,11 @@
     "stopWords": {
       "title": "Stop words",
       "addNext": "Add next word",
+      "list": "List of stop words",
       "word": "Word",
-      "add": "Add"
+      "add": "Add",
+      "save": "Save",
+      "cancel": "Cancel"
     },
     "entriesLimit": "Number of entries"
   },

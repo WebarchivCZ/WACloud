@@ -79,7 +79,7 @@
     },
     "favorites": {
       "popUpHeader": "Adding to favorites",
-      "setNameFirst": "Set a name and  add a query to favorites",
+      "setNameFirst": "Set a name and add a query to favorites",
       "insertName": "Set a name for the query",
       "save": "Save",
       "close": "Close"

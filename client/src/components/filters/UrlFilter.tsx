@@ -13,6 +13,7 @@ interface UrlFilterProps<T> {
   setUrl: Dispatch<SetStateAction<T>>;
   append?: (appendValue: string) => void;
   disabled?: boolean;
+  query: string;
 }
 
 export const UrlFilter = ({
@@ -21,23 +22,32 @@ export const UrlFilter = ({
   url,
   setUrl,
   append,
-  disabled
+  disabled,
+  query
 }: UrlFilterProps<string | null>) => {
   const { t } = useTranslation();
   const buttonClick = () => {
+    const prefix =
+      query.length > 0
+        ? !query.trim().endsWith('AND') &&
+          !query.trim().endsWith('OR') &&
+          !query.trim().endsWith('NOT')
+          ? ' AND '
+          : ''
+        : '';
     if (append) {
       switch (operator) {
         case 'contain':
-          append('url:/.*' + url + '.*/');
+          append(prefix + 'url:/.*' + url + '.*/');
           break;
         case 'contain-not':
-          append('NOT url:/.*' + url + '.*/');
+          append(prefix + 'NOT url:/.*' + url + '.*/');
           break;
         case 'equal-not':
-          append('NOT url:"' + url + '"');
+          append(prefix + 'NOT url:"' + url + '"');
           break;
         default:
-          append('url:"' + url + '"');
+          append(prefix + 'url:"' + url + '"');
       }
     }
     setUrl('');

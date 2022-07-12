@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Button,
   Card,
@@ -10,11 +10,18 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  Typography
+  Typography,
+  IconButton
 } from '@material-ui/core';
 import PublishIcon from '@material-ui/icons/Publish';
+import MoreVertOutlined from '@material-ui/icons/MoreVertOutlined';
 import { useTranslation } from 'react-i18next';
+import Visibility from '@material-ui/icons/Visibility';
+import StarIcon from '@material-ui/icons/Star';
+import ReplayIcon from '@material-ui/icons/Replay';
+import GetAppIcon from '@material-ui/icons/GetApp';
 
+import ActionsMenu from '../components/ActionsMenu';
 import { addNotification } from '../config/notifications';
 import ISearch from '../interfaces/ISearch';
 
@@ -25,6 +32,29 @@ export const HistoryForm = () => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
+  const actions = useCallback(
+    (r: ISearch) => [
+      {
+        icon: <Visibility color="primary" />,
+        title: t('query.buttons.detail')
+      },
+      {
+        icon: <StarIcon color="primary" />,
+        title: t('query.buttons.addToFavorites')
+      },
+      {
+        icon: <ReplayIcon color="primary" />,
+        title: t('query.buttons.repeat')
+      },
+      {
+        icon: <GetAppIcon color="primary" />,
+        title: t('query.buttons.download')
+      }
+    ],
+    []
+  );
+
+  console.log(queries);
   const stateToString = (state: string) => {
     switch (state) {
       case 'WAITING':
@@ -124,6 +154,7 @@ export const HistoryForm = () => {
                 <TableCell>{t<string>('query.header')}</TableCell>
                 <TableCell>{t<string>('query.created')}</TableCell>
                 <TableCell>{t<string>('query.state')}</TableCell>
+                <TableCell></TableCell>
                 <TableCell />
               </TableRow>
             </TableHead>
@@ -176,6 +207,9 @@ export const HistoryForm = () => {
                         </Button>
                       )}
                       {!['DONE', 'ERROR'].includes(row.state) && <CircularProgress size={15} />}
+                    </TableCell>
+                    <TableCell>
+                      <ActionsMenu actions={actions?.(row) ?? []} hideEmpty />
                     </TableCell>
                   </TableRow>
                 ))}

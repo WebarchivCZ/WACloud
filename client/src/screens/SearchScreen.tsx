@@ -65,7 +65,7 @@ export const SearchScreen = () => {
           };
         })
       })
-    }).then(() => setRedirect(true));
+    }).then((res) => console.log(res));
     return;
   };
 

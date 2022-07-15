@@ -16,6 +16,8 @@ import { LoginScreen } from './screens/LoginScreen';
 import { SearchScreen } from './screens/SearchScreen';
 import { AdminHarvestsScreen } from './screens/AdminHarvestsScreen';
 import { HistoryScreen } from './screens/HistoryScreen';
+import { Dialog } from './components/dialog/Dialog';
+import { DialogProvider } from './components/dialog/Dialog.context';
 
 const Loader = () => (
   <Grid
@@ -36,28 +38,31 @@ function App() {
     <Suspense fallback="">
       <Suspense fallback={<Loader />}>
         <ThemeProvider theme={theme}>
-          <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <CssBaseline />
-            <GlobalCss />
-            <Router>
-              <Switch>
-                <Route path="/admin">
-                  <ThemeProvider theme={themeAdmin}>
-                    <AdminHarvestsScreen />
-                  </ThemeProvider>
-                </Route>
-                <Route path="/search">
-                  <SearchScreen />
-                </Route>
-                <Route path="/history">
-                  <HistoryScreen />
-                </Route>
-                <Route path="/">
-                  <LoginScreen />
-                </Route>
-              </Switch>
-            </Router>
-          </MuiPickersUtilsProvider>
+          <DialogProvider>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <CssBaseline />
+              <GlobalCss />
+              <Router>
+                <Switch>
+                  <Route path="/admin">
+                    <ThemeProvider theme={themeAdmin}>
+                      <AdminHarvestsScreen />
+                    </ThemeProvider>
+                  </Route>
+                  <Route path="/search">
+                    <SearchScreen />
+                  </Route>
+                  <Route path="/history">
+                    <HistoryScreen />
+                  </Route>
+                  <Route path="/">
+                    <LoginScreen />
+                  </Route>
+                </Switch>
+              </Router>
+            </MuiPickersUtilsProvider>
+            <Dialog />
+          </DialogProvider>
         </ThemeProvider>
       </Suspense>
     </Suspense>

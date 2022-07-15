@@ -21,7 +21,8 @@
     "react-notifications-component": "^3.1.0",
     "react-router-dom": "^5.3.0",
     "react-scripts": "^5.0.1",
-    "typescript": "^3.7.7"
+    "typescript": "^3.7.7",
+    "uuid": "^8.3.2"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -47,7 +48,7 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:8080",
+  "proxy": "http://10.3.1.64:5000/",
   "devDependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
@@ -59,6 +60,7 @@
     "@types/react-dom": "^18.0.5",
     "@types/react-notifications-component": "^3.1.1",
     "@types/react-router-dom": "^5.1.8",
+    "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
     "eslint": "^8.17.0",

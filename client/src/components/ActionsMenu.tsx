@@ -17,7 +17,6 @@ export type MenuAction = {
 
 type Props = {
   actions: MenuAction[];
-  // expand?: MenuExpandDirection;
   icon?: ReactNode;
   hideEmpty?: boolean;
 };

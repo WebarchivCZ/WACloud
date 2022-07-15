@@ -7,51 +7,40 @@ export type MenuRefHandle = {
 
 type Props = {
   control: (handleMenu: (event: MouseEvent<HTMLElement>) => void, isOpen: boolean) => ReactNode;
-  // expand?: MenuExpandDirection;
 } & Omit<MenuProps, 'anchorEl' | 'open' | 'onClose' | 'getContentAnchorEl'>;
 
-const Menu = forwardRef<MenuRefHandle, Props>(
-  (
-    {
-      control,
-      children,
-      // expand = 'below-right',
-      ...props
-    },
-    ref
-  ) => {
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const isOpen = Boolean(anchorEl);
+const Menu = forwardRef<MenuRefHandle, Props>(({ control, children, ...props }, ref) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const isOpen = Boolean(anchorEl);
 
-    const handleClick = (event: MouseEvent<HTMLElement>) => {
-      event.stopPropagation();
-      setAnchorEl(event.currentTarget);
-    };
+  const handleClick = (event: MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+  };
 
-    const handleClose = () => {
-      setAnchorEl(null);
-    };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
-    useImperativeHandle(ref, () => ({
-      handleClose
-    }));
+  useImperativeHandle(ref, () => ({
+    handleClose
+  }));
 
-    return (
-      <div>
-        {control(handleClick, isOpen)}
-        <MuiMenu
-          anchorEl={anchorEl}
-          keepMounted
-          open={isOpen}
-          onClose={handleClose}
-          // {...getMenuExpandProps(expand)}
-          {...props}>
-          {children}
-        </MuiMenu>
-      </div>
-    );
-  }
-);
+  return (
+    <div>
+      {control(handleClick, isOpen)}
+      <MuiMenu
+        anchorEl={anchorEl}
+        keepMounted
+        open={isOpen}
+        onClose={handleClose}
+        // {...getMenuExpandProps(expand)}
+        {...props}>
+        {children}
+      </MuiMenu>
+    </div>
+  );
+});
 
 Menu.displayName = 'Menu';
 

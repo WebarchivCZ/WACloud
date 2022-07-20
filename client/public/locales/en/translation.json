@@ -112,8 +112,12 @@
   },
   "process": {
     "state": "State of process",
+    "waiting": "Waiting",
     "indexing": "Indexing",
+    "processing": "Processing",
+    "statisticalQueries": "Statistical queries",
     "finished": "Finished",
+    "error": "Error",
     "done": "Done",
     "stop": "Stop"
   },

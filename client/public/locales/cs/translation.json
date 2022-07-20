@@ -112,8 +112,12 @@
   },
   "process": {
     "state": "Stav procesu",
+    "waiting": "Čeká se",
     "indexing": "Indexácia",
+    "processing": "Probíhá",
+    "statisticalQueries": "Statistické dotazy",
     "finished": "Hotovo",
+    "error": "Chyba",
     "done": "Splněno",
     "stop": "Zastavit"
   },

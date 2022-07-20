@@ -127,7 +127,7 @@ const QueryDetailDialog = ({
         <TextField multiline rows={3} variant="outlined" fullWidth value={filter} disabled />
       </Grid>
       <Grid item xs={12}>
-        <Typography variant="h2">Analytické dotazy</Typography>
+        <Typography variant="h2">{t<string>('analytics.title')}</Typography>
       </Grid>
       <Grid item xs={12}>
         {queries &&

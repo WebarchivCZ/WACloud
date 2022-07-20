@@ -1,6 +1,7 @@
 import { Box, Typography, Grid, Paper, makeStyles } from '@material-ui/core';
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
+import CheckIcon from '@material-ui/icons/Check';
 
 import { SearchState } from '../interfaces/ISearch';
 
@@ -44,7 +45,11 @@ const ProcessStatus: FC<Props> = ({ state }) => {
                 display="flex"
                 justifyContent="center"
                 alignItems="center">
-                <Typography className={classes.textBold}>1</Typography>
+                {state === 'PROCESSING' || state === 'DONE' ? (
+                  <CheckIcon />
+                ) : (
+                  <Typography className={classes.textBold}>1</Typography>
+                )}
               </Box>
               <Box>
                 <Typography className={classes.textBold}>
@@ -52,11 +57,11 @@ const ProcessStatus: FC<Props> = ({ state }) => {
                 </Typography>
                 <Typography>
                   {state === 'WAITING'
-                    ? 'Čeká se'
+                    ? t<string>('process.waiting')
                     : state === 'INDEXING'
-                    ? 'Probíhá'
+                    ? t<string>('process.processing')
                     : state === 'ERROR'
-                    ? 'Chyba'
+                    ? t<string>('process.error')
                     : '100%'}
                 </Typography>
               </Box>
@@ -72,17 +77,23 @@ const ProcessStatus: FC<Props> = ({ state }) => {
                 display="flex"
                 justifyContent="center"
                 alignItems="center">
-                <Typography className={classes.textBold}>2</Typography>
+                {state === 'DONE' ? (
+                  <CheckIcon />
+                ) : (
+                  <Typography className={classes.textBold}>2</Typography>
+                )}
               </Box>
               <Box>
-                <Typography className={classes.textBold}>Statistické dotazy</Typography>
+                <Typography className={classes.textBold}>
+                  {t<string>('process.statisticalQueries')}
+                </Typography>
                 <Typography>
                   {state === 'WAITING' || state === 'INDEXING'
-                    ? 'Čeká se'
+                    ? t<string>('process.waiting')
                     : state === 'PROCESSING'
-                    ? 'Probíhá'
+                    ? t<string>('process.processing')
                     : state === 'ERROR'
-                    ? 'Chyba'
+                    ? t<string>('process.error')
                     : '100%'}
                 </Typography>
               </Box>
@@ -98,10 +109,16 @@ const ProcessStatus: FC<Props> = ({ state }) => {
                 display="flex"
                 justifyContent="center"
                 alignItems="center">
-                <Typography className={classes.textBold}>3</Typography>
+                {state === 'DONE' ? (
+                  <CheckIcon />
+                ) : (
+                  <Typography className={classes.textBold}>3</Typography>
+                )}
               </Box>
               <Box>
-                <Typography className={classes.textBold}>Hotovo</Typography>
+                <Typography className={classes.textBold}>
+                  {t<string>('process.finished')}
+                </Typography>
               </Box>
             </Box>
           </Box>

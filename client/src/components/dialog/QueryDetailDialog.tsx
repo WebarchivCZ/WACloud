@@ -22,6 +22,7 @@ import ReplayIcon from '@material-ui/icons/Replay';
 
 import ISearch from '../../interfaces/ISearch';
 import { addNotification } from '../../config/notifications';
+import ProcessStatus from '../ProcessStatus';
 
 import { DialogContentProps } from './types';
 
@@ -219,7 +220,7 @@ const QueryDetailDialog = ({
             </Box>
           ))}
       </Grid>
-
+      <ProcessStatus state={state} />
       <Grid item xs={12}>
         <Grid container justifyContent="flex-start" spacing={2}>
           <Grid item>

@@ -82,7 +82,7 @@ export const HistoryForm = () => {
     []
   );
 
-  console.log(queries);
+  // console.log(queries);
   const stateToString = (state: string) => {
     switch (state) {
       case 'WAITING':
@@ -100,6 +100,7 @@ export const HistoryForm = () => {
   };
 
   const refreshSearches = () => {
+    console.log('refresh');
     fetch('/api/search')
       .then((res) => res.json())
       .then(
@@ -123,7 +124,7 @@ export const HistoryForm = () => {
 
   useEffect(() => {
     refreshSearches();
-
+    console.log('effect');
     const interval = setInterval(refreshSearches, 2500);
     return () => clearInterval(interval);
   }, []);

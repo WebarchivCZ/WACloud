@@ -114,7 +114,6 @@ const QueryDetailDialog = ({
   //   }).then((res) => console.log(res));
   //   return;
   // };
-
   return (
     <Grid container spacing={2} className={classes.dialog}>
       <Grid item xs={12} justifyContent="space-between">

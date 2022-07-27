@@ -1,19 +1,14 @@
 import React, { useState } from 'react';
 import { Link, Menu, MenuItem } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
-import { Redirect } from 'react-router-dom';
 
-import { addNotification } from '../config/notifications';
+import { useAuth } from '../services/useAuth';
 
 export const UserMenu = () => {
   const { t, i18n } = useTranslation();
+  const auth = useAuth();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [logout, setLogout] = useState(false);
-
-  if (logout) {
-    return <Redirect push to="/" />;
-  }
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -28,8 +23,7 @@ export const UserMenu = () => {
   };
 
   const handleLogout = () => {
-    setLogout(true);
-    addNotification(t('logout.header'), t('logout.success'), 'success');
+    auth?.signOut();
   };
 
   return (
@@ -50,6 +44,7 @@ export const UserMenu = () => {
         }}
         open={Boolean(anchorEl)}
         onClose={handleClose}>
+        <MenuItem>{auth?.user?.username}</MenuItem>
         <MenuItem onClick={handleChangeLanguage}>
           {i18n.language === 'cs' ? 'English' : 'Czech'}
         </MenuItem>

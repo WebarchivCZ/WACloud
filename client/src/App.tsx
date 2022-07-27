@@ -1,9 +1,10 @@
-import React, { Suspense } from 'react';
+import React, { FunctionComponent, ReactNode, Suspense } from 'react';
 import { CssBaseline, Grid } from '@material-ui/core';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
+import { RouteProps } from 'react-router';
 
 import Spinner from './components/Spinner';
 import { theme } from './config/theme';
@@ -18,6 +19,7 @@ import { AdminHarvestsScreen } from './screens/AdminHarvestsScreen';
 import { HistoryScreen } from './screens/HistoryScreen';
 import { Dialog } from './components/dialog/Dialog';
 import { DialogProvider } from './components/dialog/Dialog.context';
+import { ProvideAuth, useAuth } from './services/useAuth';
 
 const Loader = () => (
   <Grid
@@ -33,6 +35,30 @@ const Loader = () => (
   </Grid>
 );
 
+const PrivateRoute: FunctionComponent<{ children: ReactNode; path?: string | string[] }> = ({
+  children,
+  path
+}) => {
+  const auth = useAuth();
+  return (
+    <Route
+      path={path}
+      render={({ location }) =>
+        auth?.user ? (
+          children
+        ) : (
+          <Redirect
+            to={{
+              pathname: '/',
+              state: { from: location }
+            }}
+          />
+        )
+      }
+    />
+  );
+};
+
 function App() {
   return (
     <Suspense fallback="">
@@ -42,24 +68,26 @@ function App() {
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
               <CssBaseline />
               <GlobalCss />
-              <Router>
-                <Switch>
-                  <Route path="/admin">
-                    <ThemeProvider theme={themeAdmin}>
-                      <AdminHarvestsScreen />
-                    </ThemeProvider>
-                  </Route>
-                  <Route path="/search">
-                    <SearchScreen />
-                  </Route>
-                  <Route path="/history">
-                    <HistoryScreen />
-                  </Route>
-                  <Route path="/">
-                    <LoginScreen />
-                  </Route>
-                </Switch>
-              </Router>
+              <ProvideAuth>
+                <Router>
+                  <Switch>
+                    <PrivateRoute path="/admin">
+                      <ThemeProvider theme={themeAdmin}>
+                        <AdminHarvestsScreen />
+                      </ThemeProvider>
+                    </PrivateRoute>
+                    <PrivateRoute path="/search">
+                      <SearchScreen />
+                    </PrivateRoute>
+                    <PrivateRoute path="/history">
+                      <HistoryScreen />
+                    </PrivateRoute>
+                    <Route path="/">
+                      <LoginScreen />
+                    </Route>
+                  </Switch>
+                </Router>
+              </ProvideAuth>
             </MuiPickersUtilsProvider>
             <Dialog />
           </DialogProvider>

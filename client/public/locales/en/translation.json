@@ -5,7 +5,8 @@
     "password": "Password",
     "button": "Log in",
     "text": "Centralized interface for extracting big data from web archives",
-    "success": "You were successfully logged in."
+    "success": "You were successfully logged in.",
+    "error": "Login was not successful."
   },
   "logout": {
     "header": "Log out",

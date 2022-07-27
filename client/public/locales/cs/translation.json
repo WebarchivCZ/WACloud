@@ -5,7 +5,8 @@
     "password": "Heslo",
     "button": "Přihlásit se",
     "text": "Centralizované rozhraní pro přístup k datům webového archivu",
-    "success": "Byl ste úspěšně přihlášen."
+    "success": "Byl ste úspěšně přihlášen.",
+    "error": "Přihlášení nebylo úspěšné."
   },
   "logout": {
     "header": "Přihlášení",

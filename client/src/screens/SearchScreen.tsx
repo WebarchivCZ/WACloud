@@ -92,7 +92,7 @@ export const SearchScreen = () => {
         if (searchState === 'DONE') {
           clearInterval(interval);
         }
-      }, 200);
+      }, 1500);
       if (searchState === 'DONE') {
         clearInterval(interval);
       }

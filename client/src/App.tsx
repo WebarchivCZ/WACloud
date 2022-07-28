@@ -15,11 +15,13 @@ import './config/i18n';
 // Screens
 import { LoginScreen } from './screens/LoginScreen';
 import { SearchScreen } from './screens/SearchScreen';
-import { AdminHarvestsScreen } from './screens/AdminHarvestsScreen';
+import { AdminHarvestsScreen } from './screens/admin/AdminHarvestsScreen';
 import { HistoryScreen } from './screens/HistoryScreen';
 import { Dialog } from './components/dialog/Dialog';
 import { DialogProvider } from './components/dialog/Dialog.context';
 import { ProvideAuth, useAuth } from './services/useAuth';
+import { AdminUsersScreen } from './screens/admin/AdminUsersScreen';
+import { AdminQueriesScreen } from './screens/admin/AdminQueriesScreen';
 
 const Loader = () => (
   <Grid
@@ -35,16 +37,17 @@ const Loader = () => (
   </Grid>
 );
 
-const PrivateRoute: FunctionComponent<{ children: ReactNode; path?: string | string[] }> = ({
-  children,
-  path
-}) => {
+const PrivateRoute: FunctionComponent<{
+  children: ReactNode;
+  path?: string | string[];
+  role?: string;
+}> = ({ children, path, role }) => {
   const auth = useAuth();
   return (
     <Route
       path={path}
       render={({ location }) =>
-        auth?.user ? (
+        auth?.user && (!role || auth.user.role === role) ? (
           children
         ) : (
           <Redirect
@@ -71,9 +74,19 @@ function App() {
               <ProvideAuth>
                 <Router>
                   <Switch>
-                    <PrivateRoute path="/admin">
+                    <PrivateRoute path="/admin/queries" role="ADMIN">
+                      <ThemeProvider theme={themeAdmin}>
+                        <AdminQueriesScreen />
+                      </ThemeProvider>
+                    </PrivateRoute>
+                    <PrivateRoute path="/admin/harvests" role="ADMIN">
                       <ThemeProvider theme={themeAdmin}>
                         <AdminHarvestsScreen />
+                      </ThemeProvider>
+                    </PrivateRoute>
+                    <PrivateRoute path="/admin/users" role="ADMIN">
+                      <ThemeProvider theme={themeAdmin}>
+                        <AdminUsersScreen />
                       </ThemeProvider>
                     </PrivateRoute>
                     <PrivateRoute path="/search">

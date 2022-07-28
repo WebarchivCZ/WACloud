@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -19,6 +20,8 @@ public interface UserRepository extends JpaRepository<AppUser, Long> {
     AppUser findByUsername(String username);
 
     List<AppUser> findByName(String name);
+
+    Optional<AppUser> findByAccessToken(String token);
 
     @Query("UPDATE AppUser u SET u.lastLogin=:lastLogin WHERE u.username = ?#{ principal?.username }")
     @Modifying

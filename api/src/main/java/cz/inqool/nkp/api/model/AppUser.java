@@ -35,6 +35,7 @@ public class AppUser {
     private String username;
 
     @JsonIgnore
+    @Column(unique = true)
     private String accessToken;
 
     @JsonIgnore
@@ -42,7 +43,6 @@ public class AppUser {
 
     private Date lastLogin;
 
-    @JsonIgnore
     private boolean enabled = true;
 
     private Role role = Role.USER;
@@ -51,5 +51,9 @@ public class AppUser {
         this.username = username;
         this.name = name;
         this.password = password;
+    }
+
+    public boolean isAccessTokenGenerated() {
+        return accessToken != null && !accessToken.isEmpty();
     }
 }

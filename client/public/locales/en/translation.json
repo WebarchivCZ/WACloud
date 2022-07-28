@@ -18,7 +18,12 @@
     "myQueries": "My queries",
     "user": "User",
     "logout": "Log out",
-    "currentQueries": "Last queries"
+    "currentQueries": "Last queries",
+    "adminZone": "Administration",
+    "clientZone": "Client zone",
+    "queriesAdmin": "Queries administration",
+    "harvestsAdmin": "Harvests administration",
+    "usersAdmin": "Users administration"
   },
   "filters": {
     "filtersSectionHeader": "Filters",
@@ -212,6 +217,7 @@
       "actions": {
         "changePassword": "Change password",
         "generateAccessToken": "Generate access token",
+        "deleteAccessToken": "Delete access token",
         "delete": "Delete user"
       },
       "states": {
@@ -222,6 +228,11 @@
       "roles": {
         "USER": "User",
         "ADMIN": "Administrator"
+      },
+      "token": {
+        "GENERATED": "Generated",
+        "NOT_GENERATED": "-",
+        "UNKNOWN": "Unknown"
       }
     }
   }

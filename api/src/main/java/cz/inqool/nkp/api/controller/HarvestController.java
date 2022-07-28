@@ -30,19 +30,19 @@ public class HarvestController {
 		return harvestRepository.findAll(Sort.by(Sort.Order.desc("date")));
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@PostMapping("/api/harvest/index")
 	public void index(String harvestId) {
 		harvestService.asyncIndex(harvestId);
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@PostMapping("/api/harvest/clear-all")
 	public void clearAll() throws IOException, SolrServerException {
 		harvestService.clearAll();
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@PostMapping("/api/harvest/clear")
 	public void clearOne(String harvestId) throws IOException, SolrServerException {
 		harvestService.clear(harvestId);

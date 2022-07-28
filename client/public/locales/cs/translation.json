@@ -18,7 +18,12 @@
     "myQueries": "Moje dotazy",
     "user": "Používatel",
     "logout": "Odhlásit se",
-    "currentQueries": "Poslední dotazy"
+    "currentQueries": "Poslední dotazy",
+    "adminZone": "Administrace",
+    "clientZone": "Klientská zóna",
+    "queriesAdmin": "Administrace dotazů",
+    "harvestsAdmin": "Administrace sklízní",
+    "usersAdmin": "Administrace uživatelů"
   },
   "filters": {
     "filtersSectionHeader": "Filtre",
@@ -212,6 +217,7 @@
       "actions": {
         "changePassword": "Změna hesla",
         "generateAccessToken": "Vygenerování access tokenu",
+        "deleteAccessToken": "Smazání access tokenu",
         "delete": "Smazat uživatele"
       },
       "states": {
@@ -222,6 +228,11 @@
       "roles": {
         "USER": "Uživatel",
         "ADMIN": "Administrátor"
+      },
+      "token": {
+        "GENERATED": "Vygenerován",
+        "NOT_GENERATED": "-",
+        "UNKNOWN": "Nezmáný"
       }
     }
   }

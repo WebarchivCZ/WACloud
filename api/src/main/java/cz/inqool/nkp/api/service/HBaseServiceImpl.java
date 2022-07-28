@@ -120,6 +120,16 @@ public class HBaseServiceImpl implements HBaseService {
         }
     }
 
+    @Override
+    public Result getOne(String tableName, String id) {
+        try {
+            return table(tableName).get(new Get(id.getBytes()));
+        }
+        catch (IOException exception) {
+            log.error("An error occurs while getting one id from HBase table `"+tableName+"`.", exception);
+            throw new RuntimeException("An internal error occurs.");
+        }
+    }
 
     @Override
     public Result[] get(String tableName, List<String> ids) {

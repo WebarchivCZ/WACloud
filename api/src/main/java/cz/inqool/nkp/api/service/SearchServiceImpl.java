@@ -161,31 +161,44 @@ public class SearchServiceImpl implements SearchService {
                 totalCount += i;
 
                 for (Result result : hbase.get("main", gets)) {
-                    String topicsJson = hbase.getRowColumnAsString(result, "topics");
+                    Result baseResult = result;
+                    String refersTo = hbase.getRowColumnAsString(result, "refers-to");
+                    if (!refersTo.isEmpty()) {
+                        // TODO recursive search
+                        // TODO how to merge results
+                        String uuid = refersTo.substring(9);
+                        log.info("Looking for refersTo "+uuid);
+                        Result tempResult = hbase.getOne("main", uuid);
+                        if (tempResult != null) {
+                            baseResult = tempResult;
+                        }
+                    }
+
+                    String topicsJson = hbase.getRowColumnAsString(baseResult, "topics");
                     List<String> topics = null;
                     if (!topicsJson.equals("")) {
                         topics = mapper.readValue(topicsJson, new TypeReference<List<String>>() {
                         });
                     }
 
-                    String headlinesJson = hbase.getRowColumnAsString(result, "headlines");
+                    String headlinesJson = hbase.getRowColumnAsString(baseResult, "headlines");
                     List<String> headlines = null;
                     if (!headlinesJson.equals("")) {
                         headlines = mapper.readValue(headlinesJson, new TypeReference<List<String>>() {
                         });
                     }
 
-                    String linksJson = hbase.getRowColumnAsString(result, "links");
+                    String linksJson = hbase.getRowColumnAsString(baseResult, "links");
                     List<String> links = null;
                     if (!linksJson.equals("")) {
                         links = mapper.readValue(linksJson, new TypeReference<List<String>>() {
                         });
                     }
 
-                    Double sentiment = hbase.getRowColumnAsDouble(result, "sentiment");
+                    Double sentiment = hbase.getRowColumnAsDouble(baseResult, "sentiment");
 
                     // Parse url
-                    String url = hbase.getRowColumnAsString(result, "urlkey");
+                    String url = hbase.getRowColumnAsString(baseResult, "urlkey");
                     String domain = url.split("/",2)[0];
                     String[] domainParts = domain.split("\\.");
                     String domainTopLevel = domainParts[domainParts.length-1];
@@ -194,13 +207,13 @@ public class SearchServiceImpl implements SearchService {
                     }
 
                     // Parse date
-                    LocalDate date = harvestToDate.getOrDefault(hbase.getRowColumnAsString(result, "harvest-id"), null);
+                    LocalDate date = harvestToDate.getOrDefault(hbase.getRowColumnAsString(baseResult, "harvest-id"), null);
 
                     SolrQueryEntry entry = new SolrQueryEntry();
-                    entry.setId(Bytes.toString(result.getRow()))
-                            .setLanguage(hbase.getRowColumnAsString(result, "language"))
-                            .setPlainText(hbase.getRowColumnAsString(result, "plain-text"))
-                            .setTitle(hbase.getRowColumnAsString(result, "title"))
+                    entry.setId(Bytes.toString(baseResult.getRow()))
+                            .setLanguage(hbase.getRowColumnAsString(baseResult, "language"))
+                            .setPlainText(hbase.getRowColumnAsString(baseResult, "plain-text"))
+                            .setTitle(hbase.getRowColumnAsString(baseResult, "title"))
                             .setTopics(topics)
                             .setSentiment(sentiment)
                             .setHeadlines(headlines)

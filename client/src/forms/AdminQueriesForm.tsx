@@ -178,7 +178,7 @@ export const AdminQueriesForm = () => {
                 <TableCell>{t<string>('administration.queries.columns.startedBy')}</TableCell>
                 <TableCell>{t<string>('query.created')}</TableCell>
                 <TableCell>{t<string>('query.state')}</TableCell>
-                <TableCell/>
+                <TableCell />
               </TableRow>
             </TableHead>
             <TableBody>

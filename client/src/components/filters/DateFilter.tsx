@@ -15,6 +15,7 @@ interface DateFilterProps<T> {
   setTo: Dispatch<SetStateAction<T>>;
   append?: (appendValue: string) => void;
   disabled?: boolean | undefined;
+  query: string;
 }
 
 export const DateFilter = ({
@@ -23,13 +24,21 @@ export const DateFilter = ({
   to,
   setTo,
   append,
-  disabled
+  disabled,
+  query
 }: DateFilterProps<Date | null>) => {
   const { t } = useTranslation();
   const buttonClick = () => {
     if (append) {
       append(
-        'date:[' +
+        (query.length > 0
+          ? !query.trim().endsWith('AND') &&
+            !query.trim().endsWith('OR') &&
+            !query.trim().endsWith('NOT')
+            ? ' AND '
+            : ''
+          : '') +
+          'date:[' +
           format(from ? from : 0, 'yyyy-MM-dd') +
           'T00:00:00Z TO ' +
           format(to ? to : 0, 'yyyy-MM-dd') +

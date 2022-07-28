@@ -45,8 +45,14 @@
     "stopWords": {
       "title": "Stop words",
       "addNext": "Add next word",
+      "list": "List of stop words",
       "word": "Word",
-      "add": "Add"
+      "add": "Add",
+      "save": "Save",
+      "cancel": "Cancel",
+      "import": "Import",
+      "export": "Export",
+      "deleteAll": "Delete all"
     },
     "entriesLimit": "Number of entries"
   },

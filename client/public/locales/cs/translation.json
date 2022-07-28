@@ -45,8 +45,14 @@
     "stopWords": {
       "title": "Stop slova",
       "addNext": "Přidat další slovo",
+      "list": "Seznam stop slov",
       "word": "Slovo",
-      "add": "Vložit"
+      "add": "Vložit",
+      "save": "Uložit",
+      "cancel": "Zrušit",
+      "import": "Importovat",
+      "export": "Exportovat",
+      "deleteAll": "Smazat vše"
     },
     "entriesLimit": "Počet záznamu"
   },

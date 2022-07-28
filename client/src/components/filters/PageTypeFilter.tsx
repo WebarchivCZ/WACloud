@@ -12,13 +12,26 @@ export const PageTypeFilter = ({
   value,
   setValue,
   append,
-  disabled
-}: ValuableOptionalsProps<string | undefined>) => {
+  disabled,
+  query
+}: ValuableOptionalsProps<string | undefined> & { query: string }) => {
   const { t } = useTranslation();
 
   const buttonClick = (positive: boolean) => () => {
     if (append) {
-      append((!positive ? 'NOT ' : '') + 'webType:"' + value + '"');
+      append(
+        (query.length > 0
+          ? !query.trim().endsWith('AND') &&
+            !query.trim().endsWith('OR') &&
+            !query.trim().endsWith('NOT')
+            ? ' AND '
+            : ''
+          : '') +
+          (!positive ? 'NOT ' : '') +
+          'webType:"' +
+          value +
+          '"'
+      );
     }
     setValue('');
   };

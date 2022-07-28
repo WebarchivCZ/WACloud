@@ -16,6 +16,9 @@ import { Redirect } from 'react-router-dom';
 import logoWebArchive from '../images/webarchiv-logo.svg';
 import Spinner from '../components/Spinner';
 import { addNotification } from '../config/notifications';
+import { useAuth } from '../services/useAuth';
+
+// import IHarvest from "../interfaces/IHarvest";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -36,23 +39,53 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function LoginForm() {
   const classes = useStyles();
+  const auth = useAuth();
   const { t } = useTranslation();
 
-  const [redirect, setRedirect] = useState(false);
   const [logging, setLogging] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
-  if (redirect) {
+  const handleChangeUsername = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setUsername(event.target.value);
+  };
+  const handleChangePassword = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(event.target.value);
+  };
+
+  if (auth?.user) {
     return <Redirect push to="/search" />;
   }
 
   const formHandle = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLogging(true);
-    setTimeout(() => {
-      setLogging(false);
-      setRedirect(true);
-      addNotification(t('login.header'), t('login.success'), 'success');
-    }, 200);
+
+    const formData = new FormData();
+    formData.append('username', username);
+    formData.append('password', password);
+
+    fetch('/api/login', {
+      method: 'POST',
+      body: formData
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error();
+      })
+      .then((response) => {
+        setLogging(false);
+        setUsername('');
+        setPassword('');
+        auth?.signIn(response);
+        addNotification(t('login.header'), t('login.success'), 'success');
+      })
+      .catch(() => {
+        setLogging(false);
+        addNotification(t('login.header'), t('login.error'), 'danger');
+      });
   };
 
   return (
@@ -85,6 +118,8 @@ function LoginForm() {
                 label={t<string>('login.name')}
                 variant="outlined"
                 autoFocus
+                value={username}
+                onChange={handleChangeUsername}
                 className={classes.fullWidth}
               />
             </Box>
@@ -94,6 +129,8 @@ function LoginForm() {
                 label={t<string>('login.password')}
                 type="password"
                 variant="outlined"
+                value={password}
+                onChange={handleChangePassword}
                 className={classes.fullWidth}
               />
             </Box>

@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
 import { Link, Menu, MenuItem } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
-import { Redirect } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
-import { addNotification } from '../config/notifications';
+import { useAuth } from '../services/useAuth';
 
 export const UserMenu = () => {
   const { t, i18n } = useTranslation();
+  const auth = useAuth();
+  const history = useHistory();
+  const location = useLocation();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [logout, setLogout] = useState(false);
-
-  if (logout) {
-    return <Redirect push to="/" />;
-  }
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -27,9 +25,16 @@ export const UserMenu = () => {
     i18n.changeLanguage(i18n.language === 'cs' ? 'en' : 'cs').finally(handleClose);
   };
 
+  const handleGoToAdmin = () => {
+    history.push('/admin/queries');
+  };
+
+  const handleGoToSearch = () => {
+    history.push('/search');
+  };
+
   const handleLogout = () => {
-    setLogout(true);
-    addNotification(t('logout.header'), t('logout.success'), 'success');
+    auth?.signOut();
   };
 
   return (
@@ -50,6 +55,13 @@ export const UserMenu = () => {
         }}
         open={Boolean(anchorEl)}
         onClose={handleClose}>
+        {/*{auth?.user && <MenuItem>{auth?.user?.username}</MenuItem>}*/}
+        {auth?.user?.role === 'ADMIN' && !location.pathname.startsWith('/admin') && (
+          <MenuItem onClick={handleGoToAdmin}>{t<string>('header.adminZone')}</MenuItem>
+        )}
+        {auth?.user?.role === 'ADMIN' && location.pathname.startsWith('/admin') && (
+          <MenuItem onClick={handleGoToSearch}>{t<string>('header.clientZone')}</MenuItem>
+        )}
         <MenuItem onClick={handleChangeLanguage}>
           {i18n.language === 'cs' ? 'English' : 'Czech'}
         </MenuItem>

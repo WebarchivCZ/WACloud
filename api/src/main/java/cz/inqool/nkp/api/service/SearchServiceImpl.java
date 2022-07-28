@@ -28,14 +28,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import javax.transaction.Transactional;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceContext;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,6 +57,9 @@ public class SearchServiceImpl implements SearchService {
     private final HttpSolrClient solrQuery;
     private final String solrQueryHost;
     private final ObjectMapper mapper;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public SearchServiceImpl(@Value("${solr.base.host.query}") String solrBaseHost, @Value("${solr.query.host.query}") String solrQueryHost, HBaseService hbase, SearchRepository searchRepository, AnalyticQueryRepository analyticQueryRepository, HarvestRepository harvestRepository) {
         this.hbase = hbase;
@@ -116,7 +122,9 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public void index(Search query) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void index(Search s) {
+        Search query = searchRepository.findById(s.getId()).get();
         try {
             List<String> ids = query.getIds();
             if (ids == null || ids.isEmpty()) {
@@ -140,7 +148,7 @@ public class SearchServiceImpl implements SearchService {
 
             List<String> gets = new ArrayList<>();
 
-            int groupSize = 10000;
+            int groupSize = 1000;
             int idsSize = ids.size();
             for (int totalCount = 0; totalCount < idsSize; ) {
                 int i;
@@ -209,8 +217,7 @@ public class SearchServiceImpl implements SearchService {
                 solrQuery.commit();
                 gets.clear();
 
-                query.setIndexed(totalCount);
-                searchRepository.saveAndFlush(query);
+                setIndexed(query, totalCount);
                 log.info("PUMP: imported {}", totalCount);
             }
             log.info("Objects fetched");
@@ -467,46 +474,90 @@ public class SearchServiceImpl implements SearchService {
         addStopWords(stopWords);
     }
 
-    @Override
-    @Transactional
-    public void processOneScheduledJob() {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Search findFirstWaitingSearch() {
         List<Search> searches = searchRepository.findByState(Search.State.WAITING);
         if (searches.isEmpty()) {
+            return null;
+        }
+        return searches.get(0);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void setIndexed(Search s, int totalCount) {
+        Search search = searchRepository.findById(s.getId()).get();
+        search.setIndexed(totalCount);
+        searchRepository.saveAndFlush(search);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void startIndexing(Search s) {
+        Search search = searchRepository.findById(s.getId()).get();
+        search.setState(Search.State.INDEXING);
+        search.setStartedAt(new Date());
+        searchRepository.saveAndFlush(search);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void startProcessing(Search s) {
+        Search search = searchRepository.findById(s.getId()).get();
+        search.setState(Search.State.PROCESSING);
+        searchRepository.saveAndFlush(search);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void startProcessingQuery(AnalyticQuery s) {
+        AnalyticQuery analyticQuery = analyticQueryRepository.findById(s.getId()).get();
+        analyticQuery.setState(AnalyticQuery.State.RUNNING);
+        analyticQuery.setStartedAt(new Date());
+        analyticQueryRepository.saveAndFlush(analyticQuery);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void finishProcessingQuery(AnalyticQuery s, byte[] data) {
+        AnalyticQuery analyticQuery = analyticQueryRepository.findById(s.getId()).get();
+        analyticQuery.setData(data);
+        analyticQuery.setState(AnalyticQuery.State.FINISHED);
+        analyticQuery.setFinishedAt(new Date());
+        analyticQueryRepository.saveAndFlush(analyticQuery);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void finishProcessing(Search s, Search.State state) {
+        Search search = searchRepository.findById(s.getId()).get();
+        search.setState(state);
+        search.setFinishedAt(new Date());
+        searchRepository.saveAndFlush(search);
+    }
+
+    @Override
+//    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void processOneScheduledJob() {
+        Search search = findFirstWaitingSearch();
+        if (search == null) {
             return;
         }
-        Search search = searches.get(0);
+
         try {
-            search.setState(Search.State.INDEXING);
-            searchRepository.saveAndFlush(search);
-
-            // Index search query
+            startIndexing(search);
             index(search);
-
-            search.setState(Search.State.PROCESSING);
-            searchRepository.saveAndFlush(search);
+            startProcessing(search);
 
             for (AnalyticQuery analyticQuery : search.getQueries()) {
                 if (!analyticQuery.getState().equals(AnalyticQuery.State.WAITING)) {
                     continue;
                 }
-                analyticQuery.setState(AnalyticQuery.State.RUNNING);
-                analyticQueryRepository.saveAndFlush(analyticQuery);
-
+                startProcessingQuery(analyticQuery);
                 // Process analytic query
                 byte[] data = query(analyticQuery);
-
-                analyticQuery.setData(data);
-                analyticQuery.setState(AnalyticQuery.State.FINISHED);
-                analyticQueryRepository.saveAndFlush(analyticQuery);
+                finishProcessingQuery(analyticQuery, data);
             }
 
-            search.setState(Search.State.DONE);
-            searchRepository.saveAndFlush(search);
+            finishProcessing(search, Search.State.DONE);
         }
         catch (Throwable ex) {
             log.error("Error during processing", ex);
-            search.setState(Search.State.ERROR);
-            searchRepository.saveAndFlush(search);
+            finishProcessing(search, Search.State.ERROR);
         }
     }
 }

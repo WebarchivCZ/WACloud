@@ -49,6 +49,13 @@ export const themeOptions: ThemeOptions = {
       }
     },
     MuiButton: {
+      text: {
+        padding: '10px 18px',
+        fontWeight: 700,
+        borderRadius: 0,
+        fontSize: '16px',
+        lineHeight: '18px'
+      },
       contained: {
         padding: '10px 18px',
         fontWeight: 700,
@@ -57,6 +64,14 @@ export const themeOptions: ThemeOptions = {
         lineHeight: '18px',
         boxShadow:
           '0px 3px 3.5px rgba(0, 0, 0, 0.14), 0px 1px 7px rgba(0, 0, 0, 0.12), 0px 1.5px 4px rgba(0, 0, 0, 0.2)'
+      },
+      outlined: {
+        padding: '10px 18px',
+        fontWeight: 700,
+        borderRadius: 0,
+        borderColor: '#0000ff',
+        fontSize: '16px',
+        lineHeight: '18px'
       },
       sizeLarge: {
         fontWeight: 700,

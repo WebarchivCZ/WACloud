@@ -13,14 +13,27 @@ export const ThemeFilter = ({
   value,
   setValue,
   append,
-  disabled
-}: ValuableOptionalsProps<string | null>) => {
+  disabled,
+  query
+}: ValuableOptionalsProps<string | null> & { query: string }) => {
   const { t } = useTranslation();
   const [input, setInput] = useState<string | undefined>('');
 
   const buttonClick = (positive: boolean) => () => {
     if (append) {
-      append((!positive ? 'NOT ' : '') + 'topics:"' + value + '"');
+      append(
+        (query.length > 0
+          ? !query.trim().endsWith('AND') &&
+            !query.trim().endsWith('OR') &&
+            !query.trim().endsWith('NOT')
+            ? ' AND '
+            : ''
+          : '') +
+          (!positive ? 'NOT ' : '') +
+          'topics:"' +
+          value +
+          '"'
+      );
     }
     setValue('');
   };

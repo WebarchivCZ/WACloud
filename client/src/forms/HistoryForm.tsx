@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
-  Button,
   Card,
   CircularProgress,
   Table,
@@ -12,19 +11,78 @@ import {
   TableRow,
   Typography
 } from '@material-ui/core';
-import PublishIcon from '@material-ui/icons/Publish';
 import { useTranslation } from 'react-i18next';
+import Visibility from '@material-ui/icons/Visibility';
+import StarIcon from '@material-ui/icons/Star';
+import ReplayIcon from '@material-ui/icons/Replay';
+import GetAppIcon from '@material-ui/icons/GetApp';
 
+import ActionsMenu from '../components/ActionsMenu';
 import { addNotification } from '../config/notifications';
 import ISearch from '../interfaces/ISearch';
+import { DialogContext } from '../components/dialog/Dialog.context';
+import QueryDetailDialog from '../components/dialog/QueryDetailDialog';
 
 export const HistoryForm = () => {
   const { t, i18n } = useTranslation();
 
   const [queries, setQueries] = useState<ISearch[]>([]);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
+  const dialog = useContext(DialogContext);
+
+  const actions = useCallback(
+    (r: ISearch) => [
+      {
+        icon: <Visibility color="primary" />,
+        title: t('query.buttons.detail'),
+        onClick: () => {
+          dialog.open({
+            size: 'lg',
+            content: QueryDetailDialog,
+            values: r
+          });
+        }
+      },
+      {
+        icon: <StarIcon color="primary" />,
+        title: t('query.buttons.addToFavorites')
+      },
+      {
+        icon: <ReplayIcon color="primary" />,
+        title: t('query.buttons.repeat')
+      },
+      {
+        icon: !['DONE', 'ERROR'].includes(r.state) ? (
+          <CircularProgress size={15} />
+        ) : (
+          <GetAppIcon color="primary" />
+        ),
+        title: t('query.buttons.download'),
+        onClick: () =>
+          ['DONE'].includes(r.state) &&
+          fetch('/api/download/' + r.id)
+            .then((response) => response.blob())
+            .then((blob) => {
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'results.zip';
+              document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
+              a.click();
+              a.remove(); //afterwards we remove the element again
+              addNotification(t('query.success.title'), t('query.success.message'), 'success');
+            })
+            .catch(() =>
+              addNotification(t('query.error.title'), t('query.error.message'), 'danger')
+            )
+      }
+    ],
+    []
+  );
+
+  // console.log(queries);
   const stateToString = (state: string) => {
     switch (state) {
       case 'WAITING':
@@ -42,6 +100,7 @@ export const HistoryForm = () => {
   };
 
   const refreshSearches = () => {
+    console.log('refresh');
     fetch('/api/search')
       .then((res) => res.json())
       .then(
@@ -65,7 +124,7 @@ export const HistoryForm = () => {
 
   useEffect(() => {
     refreshSearches();
-
+    console.log('effect');
     const interval = setInterval(refreshSearches, 2500);
     return () => clearInterval(interval);
   }, []);
@@ -124,7 +183,7 @@ export const HistoryForm = () => {
                 <TableCell>{t<string>('query.header')}</TableCell>
                 <TableCell>{t<string>('query.created')}</TableCell>
                 <TableCell>{t<string>('query.state')}</TableCell>
-                <TableCell />
+                <TableCell></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -143,39 +202,7 @@ export const HistoryForm = () => {
                     <TableCell>{new Date(row.createdAt).toLocaleString(i18n.language)}</TableCell>
                     <TableCell>{stateToString(row.state)}</TableCell>
                     <TableCell>
-                      {['DONE'].includes(row.state) && (
-                        <Button
-                          color="primary"
-                          onClick={() => {
-                            fetch('/api/download/' + row.id)
-                              .then((response) => response.blob())
-                              .then((blob) => {
-                                const url = window.URL.createObjectURL(blob);
-                                const a = document.createElement('a');
-                                a.href = url;
-                                a.download = 'results.zip';
-                                document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
-                                a.click();
-                                a.remove(); //afterwards we remove the element again
-                                addNotification(
-                                  t('query.success.title'),
-                                  t('query.success.message'),
-                                  'success'
-                                );
-                              })
-                              .catch(() =>
-                                addNotification(
-                                  t('query.error.title'),
-                                  t('query.error.message'),
-                                  'danger'
-                                )
-                              );
-                          }}
-                          startIcon={<PublishIcon />}>
-                          {t<string>('query.buttons.download')}
-                        </Button>
-                      )}
-                      {!['DONE', 'ERROR'].includes(row.state) && <CircularProgress size={15} />}
+                      <ActionsMenu actions={actions?.(row) ?? []} hideEmpty />
                     </TableCell>
                   </TableRow>
                 ))}

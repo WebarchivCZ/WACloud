@@ -19,6 +19,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -69,6 +70,7 @@ public class SearchController {
 //        return byteArrayOutputStream.toByteArray();
 //    }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping(value="/api/search")
     public Search search(@Valid @RequestBody RequestDTO request) {
         Search search = new Search();
@@ -94,16 +96,19 @@ public class SearchController {
         return search;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping(value="/api/search")
     public List<Search> getAll() {
         return searchRepository.findAll(Sort.by(Sort.Order.desc("id")));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping(value="/api/search/{id}")
     public Search getOne(@PathVariable Long id) {
         return searchRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping(value="/api/download/{id}", produces="application/zip")
     public byte[] download(@PathVariable Long id) throws IOException {
         Search search = searchRepository.findById(id).orElseThrow(ResourceNotFoundException::new);

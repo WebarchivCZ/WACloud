@@ -20,14 +20,22 @@ export const SentimentFilter = ({
   value,
   setValue,
   append,
-  disabled
-}: ValuableProps<number | number[]>) => {
+  disabled,
+  query
+}: ValuableProps<number | number[]> & { query: string }) => {
   const { t } = useTranslation();
 
   const buttonClick = (positive: boolean) => () => {
     if (append) {
       append(
-        (!positive ? 'NOT ' : '') +
+        (query.length > 0
+          ? !query.trim().endsWith('AND') &&
+            !query.trim().endsWith('OR') &&
+            !query.trim().endsWith('NOT')
+            ? ' AND '
+            : ''
+          : '') +
+          (!positive ? 'NOT ' : '') +
           'sentiment:' +
           ((value as number[])
             ? '[' + (value as number[])[0] + ' TO ' + (value as number[])[1] + ']'

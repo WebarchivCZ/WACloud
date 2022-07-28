@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Container } from '@material-ui/core';
 
-import { Header } from '../components/Header';
-import { UserMenu } from '../components/UserMenu';
-import { AdminHarvestsForm } from '../forms/AdminHarvestsForm';
+import { Header } from '../../components/Header';
+import { UserMenu } from '../../components/UserMenu';
+import { AdminHarvestsForm } from '../../forms/AdminHarvestsForm';
 
 export const AdminHarvestsScreen = () => {
   const { t } = useTranslation();
@@ -14,9 +14,11 @@ export const AdminHarvestsScreen = () => {
     <Header
       toolbar={
         <>
-          <Link to="/admin" style={{ color: '#0000ff' }}>
-            {t<string>('administration.harvests.menu')}
+          <Link to="/admin/queries">{t<string>('header.queriesAdmin')}</Link>
+          <Link to="/admin/harvests" style={{ color: '#0000ff' }}>
+            {t<string>('header.harvestsAdmin')}
           </Link>
+          <Link to="/admin/users">{t<string>('header.usersAdmin')}</Link>
           <UserMenu />
         </>
       }>

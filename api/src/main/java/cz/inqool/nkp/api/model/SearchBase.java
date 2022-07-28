@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -35,16 +37,19 @@ public abstract class SearchBase extends AuditModel {
 	private String randomSeed;
 
 	@ElementCollection
+	@LazyCollection(LazyCollectionOption.FALSE)
 	@CollectionTable(name = "search_stop_word", joinColumns = @JoinColumn(name = "id"))
 	@Column(name = "word")
 	private List<String> stopWords;
 
 	@ElementCollection
+	@LazyCollection(LazyCollectionOption.FALSE)
 	@CollectionTable(name = "search_entries", joinColumns = @JoinColumn(name = "id"))
 	@Column(name = "entry_id")
 	private List<String> ids;
 
 	@ElementCollection
+	@LazyCollection(LazyCollectionOption.FALSE)
 	@CollectionTable(name = "search_harvests", joinColumns = @JoinColumn(name = "id"))
 	@Column(name = "harvest")
 	private List<String> harvests;

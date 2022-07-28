@@ -181,6 +181,7 @@ export const FiltersDrawer = ({
       ),
       filters: [
         <ThemeFilter
+          query={query}
           key="theme"
           value={theme}
           setValue={setTheme}
@@ -189,6 +190,7 @@ export const FiltersDrawer = ({
           disabled={disabled}
         />,
         <PageTypeFilter
+          query={query}
           key="pageType"
           value={pageType}
           setValue={setPageType}
@@ -197,6 +199,7 @@ export const FiltersDrawer = ({
           disabled={disabled}
         />,
         <DateFilter
+          query={query}
           key="dateFilter"
           from={dateFrom}
           setFrom={setDateFrom}
@@ -206,6 +209,7 @@ export const FiltersDrawer = ({
           disabled={disabled}
         />,
         <UrlFilter
+          query={query}
           key="urlFilter"
           operator={urlSelect}
           setOperator={setUrlSelect}
@@ -215,6 +219,7 @@ export const FiltersDrawer = ({
           disabled={disabled}
         />,
         <SentimentFilter
+          query={query}
           key="sentimentFilter"
           value={sentiment}
           setValue={setSentiment}

@@ -5,6 +5,7 @@ import cz.inqool.nkp.api.repository.HarvestRepository;
 import cz.inqool.nkp.api.service.HarvestService;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,21 +24,25 @@ public class HarvestController {
 		this.harvestService = harvestService;
 	}
 
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping("/api/harvest")
 	public List<Harvest> getAll() {
 		return harvestRepository.findAll(Sort.by(Sort.Order.desc("date")));
 	}
 
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@PostMapping("/api/harvest/index")
 	public void index(String harvestId) {
 		harvestService.asyncIndex(harvestId);
 	}
 
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@PostMapping("/api/harvest/clear-all")
 	public void clearAll() throws IOException, SolrServerException {
 		harvestService.clearAll();
 	}
 
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@PostMapping("/api/harvest/clear")
 	public void clearOne(String harvestId) throws IOException, SolrServerException {
 		harvestService.clear(harvestId);

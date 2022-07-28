@@ -5,7 +5,8 @@
     "password": "Heslo",
     "button": "Přihlásit se",
     "text": "Centralizované rozhraní pro přístup k datům webového archivu",
-    "success": "Byl jste úspěšně přihlášen."
+    "success": "Byl jste úspěšně přihlášen.",
+    "error": "Přihlášení nebylo úspěšné."
   },
   "logout": {
     "header": "Přihlášení",
@@ -17,7 +18,12 @@
     "myQueries": "Moje dotazy",
     "user": "Uživatel",
     "logout": "Odhlásit se",
-    "currentQueries": "Poslední dotazy"
+    "currentQueries": "Poslední dotazy",
+    "adminZone": "Administrace",
+    "clientZone": "Klientská zóna",
+    "queriesAdmin": "Administrace dotazů",
+    "harvestsAdmin": "Administrace sklízní",
+    "usersAdmin": "Administrace uživatelů"
   },
   "filters": {
     "filtersSectionHeader": "Filtry",
@@ -39,8 +45,14 @@
     "stopWords": {
       "title": "Stop slova",
       "addNext": "Přidat další slovo",
+      "list": "Seznam stop slov",
       "word": "Slovo",
-      "add": "Vložit"
+      "add": "Vložit",
+      "save": "Uložit",
+      "cancel": "Zrušit",
+      "import": "Importovat",
+      "export": "Exportovat",
+      "deleteAll": "Smazat vše"
     },
     "entriesLimit": "Počet záznamů"
   },
@@ -112,8 +124,12 @@
   },
   "process": {
     "state": "Stav procesu",
+    "waiting": "Čeká se",
     "indexing": "Indexování",
+    "processing": "Probíhá",
+    "statisticalQueries": "Statistické dotazy",
     "finished": "Hotovo",
+    "error": "Chyba",
     "done": "Splněno",
     "stop": "Zastavit"
   },
@@ -207,6 +223,7 @@
       "actions": {
         "changePassword": "Změna hesla",
         "generateAccessToken": "Vygenerování access tokenu",
+        "deleteAccessToken": "Smazání access tokenu",
         "delete": "Smazat uživatele"
       },
       "states": {
@@ -217,6 +234,11 @@
       "roles": {
         "USER": "Uživatel",
         "ADMIN": "Administrátor"
+      },
+      "token": {
+        "GENERATED": "Vygenerován",
+        "NOT_GENERATED": "-",
+        "UNKNOWN": "Nezmáný"
       }
     }
   }

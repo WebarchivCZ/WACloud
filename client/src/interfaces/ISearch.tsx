@@ -1,8 +1,10 @@
 import IAnalyticQuery from './IAnalyticQuery';
 
+export type SearchState = 'WAITING' | 'INDEXING' | 'PROCESSING' | 'ERROR' | 'DONE';
+
 export default interface ISearch {
   id: number;
-  state: string;
+  state: SearchState;
   name: string;
   entries: number;
   indexed: number;

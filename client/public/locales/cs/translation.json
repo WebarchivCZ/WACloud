@@ -1,22 +1,22 @@
 {
   "login": {
     "header": "Přihlášení",
-    "name": "Přihlasovací jméno",
+    "name": "Přihlašovací jméno",
     "password": "Heslo",
     "button": "Přihlásit se",
     "text": "Centralizované rozhraní pro přístup k datům webového archivu",
-    "success": "Byl ste úspěšně přihlášen.",
+    "success": "Byl jste úspěšně přihlášen.",
     "error": "Přihlášení nebylo úspěšné."
   },
   "logout": {
     "header": "Přihlášení",
-    "success": "Byl ste úspěšně odhlášen."
+    "success": "Byl jste úspěšně odhlášen."
   },
   "header": {
     "newQuery": "Nový dotaz",
     "favorite": "Oblíbené",
     "myQueries": "Moje dotazy",
-    "user": "Používatel",
+    "user": "Uživatel",
     "logout": "Odhlásit se",
     "currentQueries": "Poslední dotazy",
     "adminZone": "Administrace",
@@ -26,19 +26,19 @@
     "usersAdmin": "Administrace uživatelů"
   },
   "filters": {
-    "filtersSectionHeader": "Filtre",
+    "filtersSectionHeader": "Filtry",
     "settingsSectionHeader": "Nastavení limitů",
     "theme": "Téma",
     "pageType": "Typ stránky",
-    "date": "Dátum sklízne",
+    "date": "Datum sklizně",
     "dateFrom": "Od",
     "dateTo": "Do",
     "operator": {
-      "label": "Operator",
+      "label": "Operátor",
       "contain": "obsahuje",
       "contain-not": "neobsahuje",
-      "equal": "rovna se",
-      "equal-not": "nerovna se"
+      "equal": "rovná se",
+      "equal-not": "nerovná se"
     },
     "url": "URL",
     "sentiment": "Sentiment",
@@ -54,7 +54,7 @@
       "export": "Exportovat",
       "deleteAll": "Smazat vše"
     },
-    "entriesLimit": "Počet záznamu"
+    "entriesLimit": "Počet záznamů"
   },
   "query": {
     "header": "Dotaz",
@@ -72,10 +72,10 @@
       "message": "Výsledky svého dotazu si můžete stáhnout a uložit. "
     },
     "queryIs": "Dotaz je",
-    "valid": "validný",
-    "notValid": "nevalidný",
-    "queryProcesses": "a spracuje se s ním",
-    "entries": "záznamu",
+    "valid": "validní",
+    "notValid": "nevalidní",
+    "queryProcesses": "a zpracuje se s ním",
+    "entries": "záznamů",
     "continue": "Pokračovat",
     "edit": "Upravit",
     "search": "Vyhledat",
@@ -86,12 +86,12 @@
       "detail": "Zobrazit detail",
       "repeat": "Zopakovat dotaz",
       "download": "Stáhnout",
-      "addToFavorites": "Přidát do oblíbených",
+      "addToFavorites": "Přidat do oblíbených",
       "removeFromFavorites": "Odebrat z oblíbených"
     },
     "favorites": {
       "popUpHeader": "Přidání mezi oblíbené",
-      "setNameFirst": "Pro přidání dotazu mezi oblíbené je ho teprve nutno poměnovat.  ",
+      "setNameFirst": "Nastavte název a přidejte dotaz do oblíbených",
       "insertName": "Zadejte název dotazu",
       "save": "Uložit",
       "close": "Zavřít"
@@ -104,7 +104,7 @@
   "analytics": {
     "title": "Analytické dotazy",
     "queryType": "Typ dotazu",
-    "add": "+ Pridat další dotaz",
+    "add": "+ Přidat další dotaz",
     "delete": "Odstránit",
     "words": "Seznam vyrazů:",
     "wordInput": "Zadejte text pro vyhledávaní",
@@ -116,8 +116,8 @@
     "ownSeed": "Semínko pro náhodnost"
   },
   "harvests": {
-    "title": "Sklízně",
-    "name": "Název sklízně",
+    "title": "Sklizně",
+    "name": "Název sklizně",
     "size": "Velikost",
     "WARCs": "Počet WARCu",
     "date": "Datum spuštění"
@@ -125,7 +125,7 @@
   "process": {
     "state": "Stav procesu",
     "waiting": "Čeká se",
-    "indexing": "Indexácia",
+    "indexing": "Indexování",
     "processing": "Probíhá",
     "statisticalQueries": "Statistické dotazy",
     "finished": "Hotovo",
@@ -141,14 +141,14 @@
         "startedBy": "Spustil"
       },
       "actions": {
-        "stopAllQueries": "Zastavit vše dotazy"
+        "stopAllQueries": "Zastavit všechny dotazy"
       }
     },
     "harvests": {
-      "menu": "Sklízne",
-      "title": "Administrace sklízní",
+      "menu": "Sklizně",
+      "title": "Administrace sklizní",
       "columns": {
-        "id": "ID sklízně",
+        "id": "ID sklizně",
         "type": "Typ",
         "numberOfRecords": "Počet záznamů"
       },
@@ -158,12 +158,12 @@
         "deleteAll": "Smazat vše"
       },
       "states": {
-        "UNPROCESSED": "Čeká se na spracování",
-        "PROCESSING": "Spracováva se",
+        "UNPROCESSED": "Čeká se na zpracování",
+        "PROCESSING": "Zpracovává se",
         "INDEXED": "Importované",
         "CLEARED": "Smazané z indexu",
-        "ERROR": "Chyba pri importu",
-        "UNKNOWN": "Nezmáný"
+        "ERROR": "Chyba při importu",
+        "UNKNOWN": "Neznámý"
       },
       "notifications": {
         "import": {
@@ -227,8 +227,8 @@
         "delete": "Smazat uživatele"
       },
       "states": {
-        "ACTIVE": "Aktívní",
-        "DEACTIVATED": "Neaktívní",
+        "ACTIVE": "Aktivní",
+        "DEACTIVATED": "Neaktivní",
         "UNKNOWN": "Nezmáný"
       },
       "roles": {

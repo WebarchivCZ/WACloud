@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, Redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Box, Button, Divider, Grid } from '@material-ui/core';
 
 import { Header } from '../components/Header';
@@ -39,11 +39,6 @@ export const SearchScreen = () => {
   const [queries, setQueries] = useState<IQuery[]>([
     { queries: [], query: '', context: false, searchText: '', searchType: '', limit: 10 }
   ]);
-
-  const [redirect, setRedirect] = useState(false);
-  if (redirect) {
-    return <Redirect push to="/history" />;
-  }
 
   const refreshSearchState = (id: number) => {
     fetch(`/api/search/${id}`)

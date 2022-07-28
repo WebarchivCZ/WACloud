@@ -67,7 +67,6 @@ public class AnalyticQuery extends AuditModel {
 	@Column(name = "finished_at")
 	private Date finishedAt;
 
-    @Lob
     @Basic(fetch=FetchType.LAZY)
     @JsonIgnore
     private byte[] data;

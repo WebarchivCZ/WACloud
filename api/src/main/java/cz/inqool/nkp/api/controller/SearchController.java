@@ -11,15 +11,18 @@ import java.util.zip.ZipOutputStream;
 import cz.inqool.nkp.api.dto.*;
 import cz.inqool.nkp.api.exception.ResourceNotFoundException;
 import cz.inqool.nkp.api.model.AnalyticQuery;
+import cz.inqool.nkp.api.model.AppUser;
 import cz.inqool.nkp.api.model.Search;
 import cz.inqool.nkp.api.repository.AnalyticQueryRepository;
 import cz.inqool.nkp.api.repository.SearchRepository;
+import cz.inqool.nkp.api.security.AppUserPrincipal;
 import cz.inqool.nkp.api.service.SearchService;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -72,8 +75,11 @@ public class SearchController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping(value="/api/search")
-    public Search search(@Valid @RequestBody RequestDTO request) {
+    public Search search(@Valid @RequestBody RequestDTO request, Authentication authentication) {
+        AppUser user = ((AppUserPrincipal)authentication.getPrincipal()).getAppUser();
+
         Search search = new Search();
+        search.setUser(user);
         search.setFilter(request.getBase().getFilter());
         search.setEntries(request.getBase().getEntries());
         search.setRandomSeed(request.getBase().getRandomSeed());
@@ -98,6 +104,13 @@ public class SearchController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping(value="/api/search")
+    public List<Search> getMy(Authentication authentication) {
+        AppUser user = ((AppUserPrincipal)authentication.getPrincipal()).getAppUser();
+        return searchRepository.findByUserOrderByIdDesc(user);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping(value="/api/search/all")
     public List<Search> getAll() {
         return searchRepository.findAll(Sort.by(Sort.Order.desc("id")));
     }

@@ -5,7 +5,7 @@ import { Container } from '@material-ui/core';
 
 import { Header } from '../../components/Header';
 import { UserMenu } from '../../components/UserMenu';
-import { AdminHarvestsForm } from '../../forms/AdminHarvestsForm';
+import { AdminQueriesForm } from '../../forms/AdminQueriesForm';
 
 export const AdminQueriesScreen = () => {
   const { t } = useTranslation();
@@ -23,7 +23,7 @@ export const AdminQueriesScreen = () => {
         </>
       }>
       <Container>
-        <AdminHarvestsForm />
+        <AdminQueriesForm />
       </Container>
     </Header>
   );

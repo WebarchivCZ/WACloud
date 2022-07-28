@@ -4,4 +4,6 @@ export default interface IUser {
   username: string;
   lastLogin: string;
   role: string;
+  enabled: boolean;
+  accessTokenGenerated: boolean;
 }

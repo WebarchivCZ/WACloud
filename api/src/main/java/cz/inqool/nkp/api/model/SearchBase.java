@@ -29,6 +29,10 @@ public abstract class SearchBase extends AuditModel {
 	)
 	private Long id;
 
+	@ManyToOne
+	@JoinColumn(name = "user_id", nullable = false)
+	private AppUser user;
+
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy="search")
 	@OrderBy("id")
 	private Set<AnalyticQuery> queries;

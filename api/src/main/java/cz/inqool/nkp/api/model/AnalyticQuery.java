@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
 @Table(name = "analytic_query")
@@ -26,6 +28,7 @@ public class AnalyticQuery extends AuditModel {
         FREQUENCY,
         COLLOCATION,
         OCCURENCE,
+        NETWORK,
 		RAW
     }
     
@@ -48,16 +51,27 @@ public class AnalyticQuery extends AuditModel {
     @Enumerated(EnumType.STRING)
     private Type type;
 
-	@ElementCollection(fetch = FetchType.EAGER)
-	@CollectionTable(name = "analytic_query_expression", joinColumns = @JoinColumn(name = "id"))
-	@Column(name = "analytic_query_expression")
-	private List<String> expressions;
+    @ElementCollection
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @CollectionTable(name = "analytic_query_expression", joinColumns = @JoinColumn(name = "id"))
+    @Column(name = "analytic_query_expression")
+    private List<String> expressions;
+
+    @ElementCollection
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @CollectionTable(name = "analytic_query_expression_opposite", joinColumns = @JoinColumn(name = "id"))
+    @Column(name = "analytic_query_expression_opposite")
+    private List<String> expressionsOpposite;
     
     @Column(columnDefinition = "integer")
     private Integer contextSize;
     
     @Column(name = "result_limit", columnDefinition = "integer")
     private Integer limit;
+
+    private boolean useOnlyDomains = false;
+
+    private boolean useOnlyDomainsOpposite = false;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "started_at")

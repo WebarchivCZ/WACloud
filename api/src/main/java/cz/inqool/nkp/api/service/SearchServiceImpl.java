@@ -2,7 +2,7 @@ package cz.inqool.nkp.api.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import cz.inqool.nkp.api.dto.SolrQueryEntry;
+import cz.inqool.nkp.api.dto.*;
 import cz.inqool.nkp.api.model.AnalyticQuery;
 import cz.inqool.nkp.api.model.Harvest;
 import cz.inqool.nkp.api.model.Search;
@@ -19,6 +19,7 @@ import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.impl.XMLResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
+import org.apache.solr.client.solrj.response.PivotField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -189,7 +190,7 @@ public class SearchServiceImpl implements SearchService {
                     }
 
                     String linksJson = hbase.getRowColumnAsString(baseResult, "links");
-                    List<String> links = null;
+                    List<String> links = new ArrayList<>();
                     if (!linksJson.equals("")) {
                         links = mapper.readValue(linksJson, new TypeReference<List<String>>() {
                         });
@@ -206,6 +207,24 @@ public class SearchServiceImpl implements SearchService {
                         domainTopLevel = domainParts[domainParts.length-2] + "." + domainParts[domainParts.length-1];
                     }
 
+                    List<String> linksDomain = links.stream().map(l ->
+                            l.replace("http://","")
+                                    .replace("https://","")
+                                    .split("/",2)[0]
+                    ).collect(Collectors.toList());
+
+                    List<String> linksDomainTopLevel = links.stream().map(l -> {
+                        String ldomain = l.replace("http://","")
+                                        .replace("https://","")
+                                        .split("/",2)[0];
+                        String[] ldomainParts = ldomain.split("\\.");
+                        String ldomainTopLevel = ldomainParts[ldomainParts.length-1];
+                        if (ldomainParts.length > 1) {
+                            ldomainTopLevel = ldomainParts[ldomainParts.length-2] + "." + ldomainParts[ldomainParts.length-1];
+                        }
+                        return ldomainTopLevel;
+                    }).collect(Collectors.toList());
+
                     // Parse date
                     LocalDate date = harvestToDate.getOrDefault(hbase.getRowColumnAsString(baseResult, "harvest-id"), null);
 
@@ -218,6 +237,8 @@ public class SearchServiceImpl implements SearchService {
                             .setSentiment(sentiment)
                             .setHeadlines(headlines)
                             .setLinks(links)
+                            .setLinksDomain(linksDomain)
+                            .setLinksDomainTopLevel(linksDomainTopLevel)
                             .setUrl(url)
                             .setUrlDomain(domain.startsWith("www.") ? domain.substring(4) : domain)
                             .setUrlDomainTopLevel(domainTopLevel);
@@ -247,6 +268,7 @@ public class SearchServiceImpl implements SearchService {
             switch (query.getType()) {
                 case COLLOCATION: result = queryCollocation(query); break;
                 case FREQUENCY: result = queryFrequency(query); break;
+                case NETWORK: result = queryNetwork(query); break;
                 case RAW: result = queryRaw(query); break;
                 default:
                     log.warn("Unknown type of query: "+ query.getType().toString());
@@ -425,6 +447,83 @@ public class SearchServiceImpl implements SearchService {
             SolrDocumentList docList = response.getResults();
             DocumentObjectBinder binder = new DocumentObjectBinder();
             return binder.getBeans(SolrQueryEntry.class, docList);
+        }
+        catch (Throwable ex) {
+            throw new RuntimeException("Error during raw query.", ex);
+        }
+    }
+
+    private List<NetworkSearchYear> queryNetwork(AnalyticQuery query) {
+        try {
+            String urls = query.getExpressions().stream().map(v -> "url:/.*"+v+".*/").collect(Collectors.joining(" OR "));
+            String links = query.getExpressionsOpposite().stream().map(v -> "links:/.*"+v+".*/").collect(Collectors.joining(" OR "));
+
+            if (!urls.isEmpty()) {
+                urls = "("+urls+")";
+            }
+            if (!links.isEmpty()) {
+                links = "("+links+")";
+            }
+
+            String queryString = "";
+            if (!urls.isEmpty() && !links.isEmpty()) {
+                queryString = urls + " AND " + links;
+            }
+            else if (urls.isEmpty() && links.isEmpty()) {
+                queryString = "*:*";
+            }
+            else {
+                queryString = urls + links;
+            }
+
+            String pivot = "year,"+(query.isUseOnlyDomains() ? "urlDomain" : "url") + "," +(query.isUseOnlyDomainsOpposite() ? "linksDomain" : "links");
+
+            SolrQuery collocationQuery = new SolrQuery();
+            collocationQuery.set("q", queryString);
+            collocationQuery.set("facet", "true");
+            collocationQuery.set("facet.limit", -1);
+            collocationQuery.set("facet.pivot", pivot);
+            if (!query.getExpressionsOpposite().isEmpty()) {
+                query.getExpressionsOpposite().forEach(l -> collocationQuery.add("f."+(query.isUseOnlyDomainsOpposite() ? "linksDomain" : "links")+".facet.contains", l));
+            }
+            collocationQuery.setRows(0);
+            QueryResponse response = solrQuery.query(collocationQuery);
+
+            List<NetworkSearchYear> result = new ArrayList<>();
+            List<PivotField> years = response.getFacetPivot().get(pivot);
+            if (years != null) {
+                for (PivotField yearPivot : years) {
+
+                    NetworkSearchYear year = new NetworkSearchYear();
+                    year.setYear((Integer) yearPivot.getValue());
+
+                    if (yearPivot.getPivot() != null) {
+                        for (PivotField urlPivot : yearPivot.getPivot()) {
+
+                            NetworkSearchNode node = new NetworkSearchNode();
+                            node.setName((String) urlPivot.getValue());
+
+                            if (urlPivot.getPivot() != null) {
+                                for (PivotField linkPivot : urlPivot.getPivot()) {
+
+                                    NetworkSearchLinkCount linkCount = new NetworkSearchLinkCount();
+                                    linkCount.setName((String) linkPivot.getValue());
+                                    linkCount.setCount(linkPivot.getCount());
+
+                                    node.getLinks().add(linkCount);
+                                }
+                            }
+
+                            year.getNodes().add(node);
+
+                        }
+                    }
+
+                    result.add(year);
+                }
+            }
+
+            return result;
         }
         catch (Throwable ex) {
             throw new RuntimeException("Error during raw query.", ex);

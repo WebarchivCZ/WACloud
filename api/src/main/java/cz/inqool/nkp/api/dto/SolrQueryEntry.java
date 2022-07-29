@@ -37,6 +37,12 @@ public class SolrQueryEntry {
     List<String> links;
 
     @Field
+    List<String> linksDomain;
+
+    @Field
+    List<String> linksDomainTopLevel;
+
+    @Field
     List<String> topics;
 
     @Field
@@ -122,8 +128,26 @@ public class SolrQueryEntry {
         return links;
     }
 
+    public List<String> getLinksDomain() {
+        return linksDomain;
+    }
+
+    public List<String> getLinksDomainTopLevel() {
+        return linksDomainTopLevel;
+    }
+
     public SolrQueryEntry setLinks(List<String> links) {
         this.links = links;
+        return this;
+    }
+
+    public SolrQueryEntry setLinksDomain(List<String> links) {
+        this.linksDomain = links;
+        return this;
+    }
+
+    public SolrQueryEntry setLinksDomainTopLevel(List<String> links) {
+        this.linksDomainTopLevel = links;
         return this;
     }
 

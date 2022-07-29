@@ -16,6 +16,8 @@ public class QueryRequest {
     @NotBlank(message = "at least one text in query is mandatory")
     private final List<String> texts;
 
+    private final List<String> textsOpposite;
+
     @Max(value = 20, message = "maximal limit for contextSize is 20")
     @Min(value = 0, message = "minimal limit for contextSize is 0")
     private final Integer contextSize;
@@ -24,11 +26,18 @@ public class QueryRequest {
     @Min(value = 1, message = "minimal limit is 1")
     private final Integer limit;
 
-    public QueryRequest(AnalyticQuery.Type type, List<String> texts, Integer contextSize, Integer limit) {
+    private final boolean useOnlyDomains;
+
+    private final boolean useOnlyDomainsOpposite;
+
+    public QueryRequest(AnalyticQuery.Type type, List<String> texts, List<String> textsOpposite, Integer contextSize, Integer limit, boolean useOnlyDomains, boolean useOnlyDomainsOpposite) {
         this.type = type;
         this.texts = texts;
+        this.textsOpposite = textsOpposite;
         this.contextSize = contextSize;
         this.limit = limit;
+        this.useOnlyDomains = useOnlyDomains;
+        this.useOnlyDomainsOpposite = useOnlyDomainsOpposite;
     }
 
     public AnalyticQuery.Type getType() {
@@ -48,5 +57,17 @@ public class QueryRequest {
             return MAX_LIMIT;
         }
         return limit;
+    }
+
+    public boolean isUseOnlyDomains() {
+        return useOnlyDomains;
+    }
+
+    public boolean isUseOnlyDomainsOpposite() {
+        return useOnlyDomainsOpposite;
+    }
+
+    public List<String> getTextsOpposite() {
+        return textsOpposite;
     }
 }

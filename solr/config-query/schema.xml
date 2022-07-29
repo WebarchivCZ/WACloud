@@ -80,6 +80,8 @@
     <field name="title" type="text_cz" docValues="false" indexed="true" stored="true"/>
     <field name="headlines" type="texts_cz" docValues="false" indexed="true" stored="true"/>
     <field name="links" type="strings" docValues="false" indexed="true" stored="true"/>
+    <field name="linksDomain" type="strings" docValues="false" indexed="true" stored="true"/>
+    <field name="linksDomainTopLevel" type="strings" docValues="false" indexed="true" stored="true"/>
     <field name="language" type="string" docValues="false" indexed="true" stored="true"/>
     <field name="plainText" type="text_cz" docValues="false" indexed="true" stored="true"/>
     <field name="plainTextTerms" type="text_cz_terms" indexed="true" stored="true" termVectors="true" />

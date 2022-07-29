@@ -109,7 +109,10 @@
     "words": "Seznam vyrazů:",
     "wordInput": "Zadejte text pro vyhledávaní",
     "context": "Přidat kontext",
-    "contextLength": "Počet slov kontextu:"
+    "contextLength": "Počet slov kontextu:",
+    "inputNodes": "Zdrojové uzly",
+    "outputNodes": "Cílové uzly",
+    "useDomainsOnly": "Seskupit podle domény"
   },
   "seed": {
     "randomEntries": "Náhodné záznamy?",

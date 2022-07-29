@@ -58,9 +58,36 @@ function AnalyticQueriesForm({
     setQueries(q);
   };
 
+  const handleChangeSearchTextOpposite = (
+    index: number,
+    event: React.ChangeEvent<{ value: unknown }>
+  ) => {
+    const q: IQuery[] = _.cloneDeep(queries);
+    q[index].searchTextOpposite = event.target.value as string;
+    setQueries(q);
+  };
+
   const handleChangeContext = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
     const q: IQuery[] = _.cloneDeep(queries);
     q[index].context = event.target.checked as boolean;
+    setQueries(q);
+  };
+
+  const handleChangeUseOnlyDomains = (
+    index: number,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const q: IQuery[] = _.cloneDeep(queries);
+    q[index].useOnlyDomains = event.target.checked as boolean;
+    setQueries(q);
+  };
+
+  const handleChangeUseOnlyDomainsOpposite = (
+    index: number,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const q: IQuery[] = _.cloneDeep(queries);
+    q[index].useOnlyDomainsOpposite = event.target.checked as boolean;
     setQueries(q);
   };
 
@@ -85,6 +112,12 @@ function AnalyticQueriesForm({
     setQueries(q);
   };
 
+  const handleDeleteQueryOppositeText = (index: number, ind: number) => {
+    const q: IQuery[] = _.cloneDeep(queries);
+    q[index].queriesOpposite.splice(ind, 1);
+    setQueries(q);
+  };
+
   const handleAddQueryText = (index: number) => {
     if (queries[index].searchText.length > 0) {
       const q: IQuery[] = _.cloneDeep(queries);
@@ -94,9 +127,29 @@ function AnalyticQueriesForm({
     }
   };
 
+  const handleAddQueryOppositeText = (index: number) => {
+    if (queries[index].searchTextOpposite.length > 0) {
+      const q: IQuery[] = _.cloneDeep(queries);
+      q[index].queriesOpposite.push(q[index].searchTextOpposite);
+      q[index].searchTextOpposite = '';
+      setQueries(q);
+    }
+  };
+
   const handleAddQuery = () => {
     const q: IQuery[] = _.cloneDeep(queries);
-    q.push({ queries: [], query: '', context: false, searchText: '', searchType: '', limit: 10 });
+    q.push({
+      queries: [],
+      queriesOpposite: [],
+      query: '',
+      context: false,
+      searchText: '',
+      searchTextOpposite: '',
+      searchType: '',
+      limit: 10,
+      useOnlyDomains: false,
+      useOnlyDomainsOpposite: false
+    });
     setQueries(q);
   };
 
@@ -137,101 +190,237 @@ function AnalyticQueriesForm({
                     <MenuItem value="FREQUENCY">Frequency</MenuItem>
                     <MenuItem value="COLLOCATION">Colocation</MenuItem>
                     {/*<MenuItem value="OCCURENCE">Occurence</MenuItem>*/}
+                    <MenuItem value="NETWORK">Network</MenuItem>
                     <MenuItem value="RAW">Raw</MenuItem>
                   </TextField>
                 </Grid>
-                <Grid item md={4} xs={12}>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        label={t<string>('analytics.wordInput')}
-                        value={query.searchText}
-                        onChange={(event) => handleChangeSearchText(index, event)}
-                        onKeyDown={(event) => {
-                          if (event.keyCode === 13) handleAddQueryText(index);
-                        }}
-                      />
+
+                {query.searchType !== 'NETWORK' && (
+                  <>
+                    <Grid item md={4} xs={12}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            label={t<string>('analytics.wordInput')}
+                            value={query.searchText}
+                            onChange={(event) => handleChangeSearchText(index, event)}
+                            onKeyDown={(event) => {
+                              if (event.keyCode === 13) handleAddQueryText(index);
+                            }}
+                          />
+                        </Grid>
+
+                        {query.searchType === 'COLLOCATION' && (
+                          <>
+                            <Grid item xs={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    color="primary"
+                                    checked={query.context}
+                                    onChange={(event) => handleChangeContext(index, event)}
+                                  />
+                                }
+                                label={t<string>('analytics.context')}
+                              />
+                            </Grid>
+
+                            {query.context && (
+                              <Grid item xs={6}>
+                                <TextField
+                                  type="number"
+                                  fullWidth
+                                  label={t<string>('analytics.contextLength')}
+                                  value={query.contextSize}
+                                  onChange={(event) => handleChangeContextLength(index, event)}
+                                />
+                              </Grid>
+                            )}
+                          </>
+                        )}
+
+                        {(query.searchType === 'RAW' || query.searchType === 'FREQUENCY') && (
+                          <>
+                            <Grid item xs={6}>
+                              <TextField
+                                type="number"
+                                label={t<string>('filters.entriesLimit')}
+                                fullWidth
+                                value={query.limit}
+                                inputProps={{ min: 1, max: 1000 }}
+                                onChange={(event) => handleChangeLimit(index, event)}
+                              />
+                            </Grid>
+                          </>
+                        )}
+                      </Grid>
                     </Grid>
 
-                    {query.searchType === 'COLLOCATION' && (
-                      <>
-                        <Grid item xs={6}>
+                    <Grid item xs={12} md={1}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => {
+                          handleAddQueryText(index);
+                        }}
+                        style={{
+                          width: '40px',
+                          height: '40px',
+                          margin: '0px',
+                          padding: '0px',
+                          minWidth: '40px'
+                        }}>
+                        <AddIcon fontSize="small" />
+                      </Button>
+                    </Grid>
+
+                    <Grid item xs={12} md={4}>
+                      <Typography variant="body1">{t<string>('analytics.words')}</Typography>
+                      <Box component="ul" className={classes.chipRoot}>
+                        {query.queries.map((q, ind) => (
+                          <li key={ind}>
+                            <Chip
+                              label={q}
+                              onDelete={() => handleDeleteQueryText(index, ind)}
+                              className={classes.chip}
+                            />
+                          </li>
+                        ))}
+                      </Box>
+                    </Grid>
+                  </>
+                )}
+
+                {query.searchType === 'NETWORK' && (
+                  <>
+                    <Grid item xs={12} md={9}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={5} md={5}>
+                          <TextField
+                            fullWidth
+                            label={t<string>('analytics.inputNodes')}
+                            value={query.searchText}
+                            onChange={(event) => handleChangeSearchText(index, event)}
+                            onKeyDown={(event) => {
+                              if (event.keyCode === 13) handleAddQueryText(index);
+                            }}
+                          />
+                        </Grid>
+
+                        <Grid item xs={2} md={2}>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => {
+                              handleAddQueryText(index);
+                            }}
+                            style={{
+                              width: '40px',
+                              height: '40px',
+                              margin: '0px',
+                              padding: '0px',
+                              minWidth: '40px'
+                            }}>
+                            <AddIcon fontSize="small" />
+                          </Button>
+                        </Grid>
+
+                        <Grid item xs={5} md={5}>
+                          <Typography variant="body1">
+                            {t<string>('analytics.inputNodes')}
+                          </Typography>
+                          <Box component="ul" className={classes.chipRoot}>
+                            {query.queries.map((q, ind) => (
+                              <li key={ind}>
+                                <Chip
+                                  label={q}
+                                  onDelete={() => handleDeleteQueryText(index, ind)}
+                                  className={classes.chip}
+                                />
+                              </li>
+                            ))}
+                          </Box>
+                        </Grid>
+
+                        <Grid item xs={12}>
                           <FormControlLabel
                             control={
                               <Checkbox
                                 color="primary"
-                                checked={query.context}
-                                onChange={(event) => handleChangeContext(index, event)}
+                                checked={query.useOnlyDomains}
+                                onChange={(event) => handleChangeUseOnlyDomains(index, event)}
                               />
                             }
-                            label={t<string>('analytics.context')}
+                            label={t<string>('analytics.useDomainsOnly')}
                           />
                         </Grid>
 
-                        {query.context && (
-                          <Grid item xs={6}>
-                            <TextField
-                              type="number"
-                              fullWidth
-                              label={t<string>('analytics.contextLength')}
-                              value={query.contextSize}
-                              onChange={(event) => handleChangeContextLength(index, event)}
-                            />
-                          </Grid>
-                        )}
-                      </>
-                    )}
-
-                    {(query.searchType === 'RAW' || query.searchType === 'FREQUENCY') && (
-                      <>
-                        <Grid item xs={6}>
+                        <Grid item xs={5} md={5}>
                           <TextField
-                            type="number"
-                            label={t<string>('filters.entriesLimit')}
                             fullWidth
-                            value={query.limit}
-                            inputProps={{ min: 1, max: 1000 }}
-                            onChange={(event) => handleChangeLimit(index, event)}
+                            label={t<string>('analytics.outputNodes')}
+                            value={query.searchTextOpposite}
+                            onChange={(event) => handleChangeSearchTextOpposite(index, event)}
+                            onKeyDown={(event) => {
+                              if (event.keyCode === 13) handleAddQueryOppositeText(index);
+                            }}
                           />
                         </Grid>
-                      </>
-                    )}
-                  </Grid>
-                </Grid>
 
-                <Grid item xs={12} md={1}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => {
-                      handleAddQueryText(index);
-                    }}
-                    style={{
-                      width: '40px',
-                      height: '40px',
-                      margin: '0px',
-                      padding: '0px',
-                      minWidth: '40px'
-                    }}>
-                    <AddIcon fontSize="small" />
-                  </Button>
-                </Grid>
+                        <Grid item xs={2} md={2}>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => {
+                              handleAddQueryOppositeText(index);
+                            }}
+                            style={{
+                              width: '40px',
+                              height: '40px',
+                              margin: '0px',
+                              padding: '0px',
+                              minWidth: '40px'
+                            }}>
+                            <AddIcon fontSize="small" />
+                          </Button>
+                        </Grid>
 
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body1">{t<string>('analytics.words')}</Typography>
-                  <Box component="ul" className={classes.chipRoot}>
-                    {query.queries.map((q, ind) => (
-                      <li key={ind}>
-                        <Chip
-                          label={q}
-                          onDelete={() => handleDeleteQueryText(index, ind)}
-                          className={classes.chip}
-                        />
-                      </li>
-                    ))}
-                  </Box>
-                </Grid>
+                        <Grid item xs={5} md={5}>
+                          <Typography variant="body1">
+                            {t<string>('analytics.outputNodes')}
+                          </Typography>
+                          <Box component="ul" className={classes.chipRoot}>
+                            {query.queriesOpposite.map((q, ind) => (
+                              <li key={ind}>
+                                <Chip
+                                  label={q}
+                                  onDelete={() => handleDeleteQueryOppositeText(index, ind)}
+                                  className={classes.chip}
+                                />
+                              </li>
+                            ))}
+                          </Box>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                color="primary"
+                                checked={query.useOnlyDomainsOpposite}
+                                onChange={(event) =>
+                                  handleChangeUseOnlyDomainsOpposite(index, event)
+                                }
+                              />
+                            }
+                            label={t<string>('analytics.useDomainsOnly')}
+                          />
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                  </>
+                )}
 
                 <Grid
                   item

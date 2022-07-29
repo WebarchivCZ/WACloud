@@ -94,6 +94,9 @@ public class SearchController {
             analyticQuery.setSearch(search);
             analyticQuery.setContextSize(queryRequest.getContextSize());
             analyticQuery.setExpressions(queryRequest.getTexts());
+            analyticQuery.setExpressionsOpposite(queryRequest.getTextsOpposite());
+            analyticQuery.setUseOnlyDomains(queryRequest.isUseOnlyDomains());
+            analyticQuery.setUseOnlyDomainsOpposite(queryRequest.isUseOnlyDomainsOpposite());
             analyticQuery.setLimit(queryRequest.getLimit());
             analyticQuery.setType(queryRequest.getType());
             return analyticQuery;

@@ -37,7 +37,18 @@ export const SearchScreen = () => {
   const [queryId, setQueryId] = useState<number>();
 
   const [queries, setQueries] = useState<IQuery[]>([
-    { queries: [], query: '', context: false, searchText: '', searchType: '', limit: 10 }
+    {
+      queries: [],
+      queriesOpposite: [],
+      query: '',
+      context: false,
+      searchText: '',
+      searchTextOpposite: '',
+      searchType: '',
+      limit: 10,
+      useOnlyDomains: false,
+      useOnlyDomainsOpposite: false
+    }
   ]);
 
   const refreshSearchState = (id: number) => {
@@ -65,8 +76,11 @@ export const SearchScreen = () => {
           return {
             type: x.searchType,
             texts: x.queries,
+            textsOpposite: x.queriesOpposite,
             contextSize: x.context ? x.contextSize : 0,
-            limit: x.limit
+            limit: x.limit,
+            useOnlyDomains: x.useOnlyDomains,
+            useOnlyDomainsOpposite: x.useOnlyDomainsOpposite
           };
         })
       })

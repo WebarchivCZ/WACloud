@@ -109,7 +109,10 @@
     "words": "List of words:",
     "wordInput": "Insert text for search",
     "context": "Add context",
-    "contextLength": "Number of words in context:"
+    "contextLength": "Number of words in context:",
+    "inputNodes": "Source nodes",
+    "outputNodes": "Target nodes",
+    "useDomainsOnly": "Group by domains"
   },
   "seed": {
     "randomEntries": "Random records?",

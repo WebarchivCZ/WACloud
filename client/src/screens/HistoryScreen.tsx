@@ -7,7 +7,7 @@ import { Header } from '../components/Header';
 import { UserMenu } from '../components/UserMenu';
 import { HistoryForm } from '../forms/HistoryForm';
 
-export const HistoryScreen = () => {
+const HistoryScreen = () => {
   const { t } = useTranslation();
 
   return (
@@ -15,7 +15,7 @@ export const HistoryScreen = () => {
       toolbar={
         <>
           <Link to="/search">{t<string>('header.newQuery')}</Link>
-          {/*<Link to="/favorite">{t<string>('header.favorite')}</Link>*/}
+          <Link to="/favorite">{t<string>('header.favorite')}</Link>
           <Link to="/history" style={{ color: '#0000ff' }}>
             {t<string>('header.myQueries')}
           </Link>
@@ -28,3 +28,5 @@ export const HistoryScreen = () => {
     </Header>
   );
 };
+
+export default HistoryScreen;

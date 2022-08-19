@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import LoginForm from '../forms/LoginForm';
 import { Header } from '../components/Header';
 
-export const LoginScreen = () => {
+const LoginScreen = () => {
   const { i18n } = useTranslation();
 
   return (
@@ -19,3 +19,5 @@ export const LoginScreen = () => {
     </Header>
   );
 };
+
+export default LoginScreen;

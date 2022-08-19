@@ -22,7 +22,7 @@ enum Stage {
   PROCESS
 }
 
-export const SearchScreen = () => {
+const SearchScreen = () => {
   const { t } = useTranslation();
 
   const [stage, setStage] = useState<Stage>(Stage.QUERY);
@@ -241,7 +241,7 @@ export const SearchScreen = () => {
           <Link to="/search" style={{ color: '#0000ff' }}>
             {t<string>('header.newQuery')}
           </Link>
-          {/*<Link to="/favorite">{t<string>('header.favorite')}</Link>*/}
+          <Link to="/favorite">{t<string>('header.favorite')}</Link>
           <Link to="/history">{t<string>('header.myQueries')}</Link>
           <UserMenu />
         </>
@@ -265,3 +265,5 @@ export const SearchScreen = () => {
     </Header>
   );
 };
+
+export default SearchScreen;

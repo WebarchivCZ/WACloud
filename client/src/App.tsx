@@ -4,24 +4,24 @@ import { ThemeProvider } from '@material-ui/core/styles';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
-import { RouteProps } from 'react-router';
 
 import Spinner from './components/Spinner';
 import { theme } from './config/theme';
 import { themeAdmin } from './config/themeAdmin';
 import { GlobalCss } from './config/css';
+import { ProvideAuth, useAuth } from './services/useAuth';
 // Use i18n, make it available for all components with useTranslation
 import './config/i18n';
 // Screens
-import { LoginScreen } from './screens/LoginScreen';
-import { SearchScreen } from './screens/SearchScreen';
-import { AdminHarvestsScreen } from './screens/admin/AdminHarvestsScreen';
-import { HistoryScreen } from './screens/HistoryScreen';
-import { Dialog } from './components/dialog/Dialog';
-import { DialogProvider } from './components/dialog/Dialog.context';
-import { ProvideAuth, useAuth } from './services/useAuth';
-import { AdminUsersScreen } from './screens/admin/AdminUsersScreen';
-import { AdminQueriesScreen } from './screens/admin/AdminQueriesScreen';
+import LoginScreen from './screens/LoginScreen';
+import SearchScreen from './screens/SearchScreen';
+import AdminHarvestsScreen from './screens/admin/AdminHarvestsScreen';
+import HistoryScreen from './screens/HistoryScreen';
+import Dialog from './components/dialog/Dialog';
+import DialogProvider from './components/dialog/Dialog.context';
+import AdminUsersScreen from './screens/admin/AdminUsersScreen';
+import AdminQueriesScreen from './screens/admin/AdminQueriesScreen';
+import FavoriteScreen from './screens/FavoriteScreen';
 
 const Loader = () => (
   <Grid
@@ -88,6 +88,9 @@ function App() {
                       <ThemeProvider theme={themeAdmin}>
                         <AdminUsersScreen />
                       </ThemeProvider>
+                    </PrivateRoute>
+                    <PrivateRoute path="/favorite">
+                      <FavoriteScreen />
                     </PrivateRoute>
                     <PrivateRoute path="/search">
                       <SearchScreen />

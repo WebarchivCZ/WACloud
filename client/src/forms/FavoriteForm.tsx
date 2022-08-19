@@ -16,7 +16,6 @@ import Visibility from '@material-ui/icons/Visibility';
 import StarIcon from '@material-ui/icons/Star';
 import ReplayIcon from '@material-ui/icons/Replay';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import StarBorderIcon from '@material-ui/icons/StarBorder';
 
 import ActionsMenu from '../components/ActionsMenu';
 import { addNotification } from '../config/notifications';
@@ -24,7 +23,7 @@ import ISearch from '../interfaces/ISearch';
 import { DialogContext } from '../components/dialog/Dialog.context';
 import QueryDetailDialog from '../components/dialog/QueryDetailDialog';
 
-export const HistoryForm = () => {
+export const FavoriteForm = () => {
   const { t, i18n } = useTranslation();
 
   const [queries, setQueries] = useState<ISearch[]>([]);
@@ -100,6 +99,7 @@ export const HistoryForm = () => {
     return '?';
   };
 
+  // TODO: connect to the right endpoint
   const refreshSearches = () => {
     console.log('refresh');
     fetch('/api/search')
@@ -175,13 +175,14 @@ export const HistoryForm = () => {
         </>
       )}
 
-      <Typography variant="h1">{t<string>('header.myQueries')}</Typography>
+      <Typography variant="h1">{t<string>('header.favorite')}</Typography>
       <Card variant="outlined">
         <TableContainer>
           <Table>
             <TableHead>
               <TableRow>
                 <TableCell width="50px"></TableCell>
+                <TableCell>{t<string>('query.name')}</TableCell>
                 <TableCell>{t<string>('query.header')}</TableCell>
                 <TableCell>{t<string>('query.created')}</TableCell>
                 <TableCell>{t<string>('query.state')}</TableCell>
@@ -195,11 +196,10 @@ export const HistoryForm = () => {
                 .map((row) => (
                   <TableRow hover key={row.id}>
                     <TableCell>
-                      {/* TODO: determine which star to show based on if query is favourite or not */}
-                      {/* <StarBorderIcon color="primary" /> */}
                       <StarIcon color="primary" />
                     </TableCell>
 
+                    <TableCell>{row.name}</TableCell>
                     <TableCell>
                       <span aria-label={row.filter}>
                         {row.filter.length > 60

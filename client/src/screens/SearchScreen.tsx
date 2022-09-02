@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Box, Button, Divider, Grid } from '@material-ui/core';
+import { Box, Button, Divider, Grid, CircularProgress, makeStyles } from '@material-ui/core';
+import GetAppIcon from '@material-ui/icons/GetApp';
+import StarIcon from '@material-ui/icons/Star';
 
 import { Header } from '../components/Header';
 import { UserMenu } from '../components/UserMenu';
@@ -22,8 +24,15 @@ enum Stage {
   PROCESS
 }
 
-const SearchScreen = () => {
+const useStyles = makeStyles(() => ({
+  icon: {
+    marginRight: '1rem'
+  }
+}));
+
+export const SearchScreen = () => {
   const { t } = useTranslation();
+  const classes = useStyles();
 
   const [stage, setStage] = useState<Stage>(Stage.QUERY);
 
@@ -91,6 +100,25 @@ const SearchScreen = () => {
         setQueryId(data.id);
       });
     return;
+  };
+
+  const handleDownload = () => {
+    ['DONE'].includes(searchState) &&
+      fetch(`/api/download/${queryId}`).then((response) =>
+        response
+          .blob()
+          .then((blob) => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'results.zip';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            addNotification(t('query.success.title'), t('query.success.message'), 'success');
+          })
+          .catch(() => addNotification(t('query.error.title'), t('query.error.message'), 'danger'))
+      );
   };
 
   useEffect(() => {
@@ -217,18 +245,55 @@ const SearchScreen = () => {
           <Grid item xs={12}>
             <AnalyticQueriesForm queries={queries} setQueries={setQueries} />
           </Grid>
+          <ProcessStatus state={searchState} />
           {queries.length > 0 && (
             <>
               <Divider />
               <Box m={2}>
-                <Button variant="contained" size="large" color="primary">
-                  {/* {t<string>('query.search')} */}
-                  zastavit
-                </Button>
+                {(searchState === 'WAITING' ||
+                  searchState === 'INDEXING' ||
+                  searchState === 'PROCESSING') && (
+                  <BlackButton variant="contained" size="large">
+                    {t<string>('process.stop')}
+                  </BlackButton>
+                )}
               </Box>
             </>
           )}
-          <ProcessStatus state={searchState} />
+          {searchState === 'DONE' && (
+            <Grid item xs={12}>
+              <Grid container justifyContent="flex-start" spacing={2}>
+                <Grid item>
+                  <Button
+                    key="download"
+                    variant="contained"
+                    color={'primary'}
+                    disabled={!['DONE', 'ERROR'].includes(searchState)}
+                    size="medium"
+                    onClick={handleDownload}>
+                    <>
+                      {!['DONE', 'ERROR'].includes(searchState) ? (
+                        <CircularProgress size={15} />
+                      ) : (
+                        <GetAppIcon className={classes.icon} />
+                      )}
+                      {t<string>('query.buttons.download')}
+                    </>
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button key="favourite" variant="text" color={'default'} size="medium">
+                    <>
+                      <StarIcon className={classes.icon} color="primary" />
+                      <span style={{ color: '#0000ff' }}>
+                        {t<string>('query.buttons.addToFavorites')}
+                      </span>
+                    </>
+                  </Button>
+                </Grid>
+              </Grid>
+            </Grid>
+          )}
         </Grid>
       )
     }

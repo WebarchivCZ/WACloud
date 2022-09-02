@@ -3,8 +3,8 @@ package cz.inqool.nkp.api.config;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
-import cz.inqool.nkp.api.security.AuthenticationFailureHandlerImpl;
-import cz.inqool.nkp.api.security.LogoutSuccessHandlerImpl;
+import cz.inqool.nkp.api.repository.UserRepository;
+import cz.inqool.nkp.api.security.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -20,9 +20,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
 import org.springframework.web.context.WebApplicationContext;
-
-import cz.inqool.nkp.api.security.AuthenticationSuccessHandlerImpl;
-import cz.inqool.nkp.api.security.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
@@ -41,6 +38,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private LogoutSuccessHandlerImpl logoutSuccessHandler;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private DataSource dataSource;
@@ -83,6 +83,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutSuccessHandler(logoutSuccessHandler)
                 .permitAll()
                 .and()
+                .addFilter(new TokenAuthorizationFilter(authenticationManager(), userRepository))
                 .csrf()
                 .disable();
     }

@@ -28,6 +28,7 @@ import { useAuth } from '../services/useAuth';
 import UserDetailDialog from '../components/dialog/UserDetailDialog';
 import UserPasswordDialog from '../components/dialog/UserPasswordDialog';
 import CreateUserDialog from '../components/dialog/CreateUserDialog';
+import TokenDialog from '../components/dialog/TokenDialog';
 
 export const UsersForm = () => {
   const { t, i18n } = useTranslation();
@@ -93,8 +94,13 @@ export const UsersForm = () => {
               throw new Error();
             })
             .then((response) => {
-              if (response) {
-                alert(response);
+              if (!r.accessTokenGenerated) {
+                dialog.open({
+                  size: 'sm',
+                  content: TokenDialog,
+                  values: response,
+                  onClose: () => refreshUsers()
+                });
               }
               refreshUsers();
             });

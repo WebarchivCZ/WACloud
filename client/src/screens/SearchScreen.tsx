@@ -308,6 +308,7 @@ export const SearchScreen = () => {
           </Link>
           <Link to="/favorite">{t<string>('header.favorite')}</Link>
           <Link to="/history">{t<string>('header.myQueries')}</Link>
+          <Link to="/faq">FAQ</Link>
           <UserMenu />
         </>
       }

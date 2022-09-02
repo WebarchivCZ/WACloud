@@ -22,6 +22,7 @@ import DialogProvider from './components/dialog/Dialog.context';
 import AdminUsersScreen from './screens/admin/AdminUsersScreen';
 import AdminQueriesScreen from './screens/admin/AdminQueriesScreen';
 import FavoriteScreen from './screens/FavoriteScreen';
+import FaQScreen from './screens/FaQScreen';
 
 const Loader = () => (
   <Grid
@@ -98,6 +99,9 @@ function App() {
                     <PrivateRoute path="/history">
                       <HistoryScreen />
                     </PrivateRoute>
+                    <Route path="/faq">
+                      <FaQScreen />
+                    </Route>
                     <Route path="/">
                       <LoginScreen />
                     </Route>

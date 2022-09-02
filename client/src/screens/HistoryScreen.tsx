@@ -19,6 +19,7 @@ const HistoryScreen = () => {
           <Link to="/history" style={{ color: '#0000ff' }}>
             {t<string>('header.myQueries')}
           </Link>
+          <Link to="/faq">FAQ</Link>
           <UserMenu />
         </>
       }>

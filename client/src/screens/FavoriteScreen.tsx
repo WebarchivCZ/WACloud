@@ -19,6 +19,7 @@ const FavoriteScreen = () => {
             {t<string>('header.favorite')}
           </Link>
           <Link to="/history">{t<string>('header.myQueries')}</Link>
+          <Link to="/faq">FAQ</Link>
           <UserMenu />
         </>
       }>

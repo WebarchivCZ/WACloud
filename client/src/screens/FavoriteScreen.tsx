@@ -1,13 +1,13 @@
+import { Container } from '@material-ui/core';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Container } from '@material-ui/core';
 
 import { Header } from '../components/Header';
 import { UserMenu } from '../components/UserMenu';
-import { HistoryForm } from '../forms/HistoryForm';
+import { FavoriteForm } from '../forms/FavoriteForm';
 
-const HistoryScreen = () => {
+const FavoriteScreen = () => {
   const { t } = useTranslation();
 
   return (
@@ -15,18 +15,18 @@ const HistoryScreen = () => {
       toolbar={
         <>
           <Link to="/search">{t<string>('header.newQuery')}</Link>
-          <Link to="/favorite">{t<string>('header.favorite')}</Link>
-          <Link to="/history" style={{ color: '#0000ff' }}>
-            {t<string>('header.myQueries')}
+          <Link to="/favorite" style={{ color: '#0000ff' }}>
+            {t<string>('header.favorite')}
           </Link>
+          <Link to="/history">{t<string>('header.myQueries')}</Link>
           <UserMenu />
         </>
       }>
       <Container>
-        <HistoryForm />
+        <FavoriteForm />
       </Container>
     </Header>
   );
 };
 
-export default HistoryScreen;
+export default FavoriteScreen;

@@ -7,7 +7,7 @@ import { Header } from '../../components/Header';
 import { UserMenu } from '../../components/UserMenu';
 import { UsersForm } from '../../forms/UsersForm';
 
-export const AdminUsersScreen = () => {
+const AdminUsersScreen = () => {
   const { t } = useTranslation();
 
   return (
@@ -28,3 +28,5 @@ export const AdminUsersScreen = () => {
     </Header>
   );
 };
+
+export default AdminUsersScreen;

@@ -10,7 +10,7 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-export const Dialog: FC = () => {
+const Dialog: FC = () => {
   const { layers } = useContext(DialogContext);
   const classes = useStyles();
 
@@ -25,3 +25,5 @@ export const Dialog: FC = () => {
     null
   );
 };
+
+export default Dialog;

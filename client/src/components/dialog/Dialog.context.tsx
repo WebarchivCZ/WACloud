@@ -9,7 +9,7 @@ type Props = {
   children: ReactNode;
 };
 
-export const DialogProvider: FC<Props> = ({ children }) => {
+const DialogProvider: FC<Props> = ({ children }) => {
   const [layers, setLayers] = useState<DialogContextType['layers']>([]);
 
   const open = useCallback<DialogContextType['open']>((dialog) => {
@@ -34,3 +34,5 @@ export const DialogProvider: FC<Props> = ({ children }) => {
     </DialogContext.Provider>
   );
 };
+
+export default DialogProvider;

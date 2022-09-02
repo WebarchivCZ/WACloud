@@ -87,36 +87,10 @@ const QueryDetailDialog = ({
       );
   };
 
-  // const handleSearch = () => {
-  //   addNotification(t('query.start.title'), t('query.start.message'), 'info');
-  //   fetch('/api/search', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json'
-  //     },
-  //     body: JSON.stringify({
-  //       base: {
-  //         filter: query.length === 0 ? '*:*' : query,
-  //         harvests: harvests,
-  //         entries: entriesLimit,
-  //         stopWords: stopWords.map((v) => v.trim()),
-  //         randomSeed: seed
-  //       },
-  //       queries: queries.map(function (x) {
-  //         return {
-  //           type: x.searchType,
-  //           texts: x.queries,
-  //           contextSize: x.context ? x.contextSize : 0,
-  //           limit: x.limit
-  //         };
-  //       })
-  //     })
-  //   }).then((res) => console.log(res));
-  //   return;
-  // };
   return (
     <Grid container spacing={2} className={classes.dialog}>
       <Grid item xs={12} justifyContent="space-between">
+        {/* TODO: display name instead of header, if query is favorite */}
         <Typography variant="h2">{t<string>('query.header')}</Typography>
         <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
           <CloseIcon />
@@ -244,6 +218,7 @@ const QueryDetailDialog = ({
             <Button key="favourite" variant="text" color={'default'} size="medium">
               <>
                 <StarIcon className={classes.icon} color="primary" />
+                {/* TODO: add option to remove from favourites */}
                 <span style={{ color: '#0000ff' }}>
                   {t<string>('query.buttons.addToFavorites')}
                 </span>

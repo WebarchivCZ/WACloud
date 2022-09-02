@@ -7,7 +7,7 @@ import { Header } from '../../components/Header';
 import { UserMenu } from '../../components/UserMenu';
 import { AdminQueriesForm } from '../../forms/AdminQueriesForm';
 
-export const AdminQueriesScreen = () => {
+const AdminQueriesScreen = () => {
   const { t } = useTranslation();
 
   return (
@@ -28,3 +28,5 @@ export const AdminQueriesScreen = () => {
     </Header>
   );
 };
+
+export default AdminQueriesScreen;

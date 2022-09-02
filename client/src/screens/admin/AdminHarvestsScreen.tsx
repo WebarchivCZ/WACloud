@@ -7,7 +7,7 @@ import { Header } from '../../components/Header';
 import { UserMenu } from '../../components/UserMenu';
 import { AdminHarvestsForm } from '../../forms/AdminHarvestsForm';
 
-export const AdminHarvestsScreen = () => {
+const AdminHarvestsScreen = () => {
   const { t } = useTranslation();
 
   return (
@@ -28,3 +28,5 @@ export const AdminHarvestsScreen = () => {
     </Header>
   );
 };
+
+export default AdminHarvestsScreen;

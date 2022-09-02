@@ -1,7 +1,10 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
+  Box,
+  Button,
   Card,
   CircularProgress,
+  Grid,
   Table,
   TableBody,
   TableCell,
@@ -21,9 +24,14 @@ import ActionsMenu from '../components/ActionsMenu';
 import { addNotification } from '../config/notifications';
 import { DialogContext } from '../components/dialog/Dialog.context';
 import IUser from '../interfaces/IUser';
+import { useAuth } from '../services/useAuth';
+import UserDetailDialog from '../components/dialog/UserDetailDialog';
+import UserPasswordDialog from '../components/dialog/UserPasswordDialog';
+import CreateUserDialog from '../components/dialog/CreateUserDialog';
 
 export const UsersForm = () => {
   const { t, i18n } = useTranslation();
+  const auth = useAuth();
 
   const [users, setUsers] = useState<IUser[]>([]);
   const [page, setPage] = useState(0);
@@ -45,20 +53,28 @@ export const UsersForm = () => {
 
   const actions = useCallback(
     (r: IUser) => [
-      // {
-      //   icon: <Visibility color="primary" />,
-      //   title: t('query.buttons.detail')
-      //   // onClick: () => {
-      //   //   dialog.open({
-      //   //     size: 'lg',
-      //   //     content: QueryDetailDialog,
-      //   //     values: r
-      //   //   });
-      //   // }
-      // },
+      {
+        icon: <Visibility color="primary" />,
+        title: t('query.buttons.detail'),
+        onClick: () => {
+          dialog.open({
+            size: 'md',
+            content: UserDetailDialog,
+            values: r,
+            onClose: () => refreshUsers()
+          });
+        }
+      },
       {
         icon: <LockIcon color="primary" />,
-        title: t('administration.users.actions.changePassword')
+        title: t('administration.users.actions.changePassword'),
+        onClick: () => {
+          dialog.open({
+            size: 'xs',
+            content: UserPasswordDialog,
+            values: r
+          });
+        }
       },
       {
         icon: <TokenIcon color={r.accessTokenGenerated ? 'secondary' : 'primary'} />,
@@ -83,23 +99,24 @@ export const UsersForm = () => {
               refreshUsers();
             });
         }
+      },
+      {
+        icon: <DeleteForeverIcon color="secondary" />,
+        title: t('administration.users.actions.delete'),
+        disabled: r.id == auth?.user?.id,
+        onClick: () => {
+          fetch('/api/user/' + r.id, {
+            method: 'DELETE'
+          })
+            .then((response) => {
+              if (response.ok) {
+                return response.text();
+              }
+              throw new Error();
+            })
+            .then(() => refreshUsers());
+        }
       }
-      // {
-      //   icon: <DeleteForeverIcon color="secondary" />,
-      //   title: t('query.buttons.repeat'),
-      //   onClick: () => {
-      //     fetch('/api/user/' + r.id, {
-      //       method: 'DELETE'
-      //     })
-      //       .then((response) => {
-      //         if (response.ok) {
-      //           return response.text();
-      //         }
-      //         throw new Error();
-      //       })
-      //       .then(() => refreshUsers());
-      //   }
-      // }
     ],
     []
   );
@@ -132,7 +149,32 @@ export const UsersForm = () => {
 
   return (
     <>
-      <Typography variant="h1">{t<string>('header.usersAdmin')}</Typography>
+      <Grid item xs={12}>
+        <Grid container justifyContent="space-between" spacing={2}>
+          <Grid item>
+            <Typography variant="h1">{t<string>('header.usersAdmin')}</Typography>
+          </Grid>
+          <Grid item>
+            <Box my={2}>
+              <Button
+                key="repeat"
+                variant="outlined"
+                color={'primary'}
+                size="medium"
+                onClick={() => {
+                  dialog.open({
+                    size: 'md',
+                    content: CreateUserDialog,
+                    values: {},
+                    onClose: () => refreshUsers()
+                  });
+                }}>
+                <>{t<string>('administration.users.actions.create')}</>
+              </Button>
+            </Box>
+          </Grid>
+        </Grid>
+      </Grid>
       <Card variant="outlined">
         <TableContainer>
           <Table>

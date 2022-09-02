@@ -9,6 +9,7 @@ import Menu from './Menu';
 export type MenuAction = {
   icon: ReactNode;
   title: string;
+  disabled?: boolean;
 } & (
   | { onClick?: DOMAttributes<HTMLElement>['onClick'] }
   | { to?: string }
@@ -21,21 +22,24 @@ type Props = {
   hideEmpty?: boolean;
 };
 
-const ActionNode = forwardRef(({ icon, title, ...p }: MenuAction, ref?: Ref<HTMLLIElement>) => (
-  <MenuItem
-    {...('to' in p
-      ? {
-          component: Link,
-          to: p.to
-        }
-      : {})}
-    onClick={'onClick' in p ? p.onClick : undefined}
-    ref={ref}>
-    <ListItemIcon>{icon}</ListItemIcon>
-    <ListItemText>{title}</ListItemText>
-    {'actions' in p && <KeyboardArrowRight fontSize="small" />}
-  </MenuItem>
-));
+const ActionNode = forwardRef(
+  ({ icon, title, disabled, ...p }: MenuAction, ref?: Ref<HTMLLIElement>) => (
+    <MenuItem
+      {...('to' in p
+        ? {
+            component: Link,
+            to: p.to
+          }
+        : {})}
+      onClick={'onClick' in p ? p.onClick : undefined}
+      disabled={disabled}
+      ref={ref}>
+      <ListItemIcon>{icon}</ListItemIcon>
+      <ListItemText>{title}</ListItemText>
+      {'actions' in p && <KeyboardArrowRight fontSize="small" />}
+    </MenuItem>
+  )
+);
 
 ActionNode.displayName = 'ActionNode';
 

@@ -224,6 +224,7 @@
         "accessToken": "Access token"
       },
       "actions": {
+        "create": "Create new user",
         "changePassword": "Change password",
         "generateAccessToken": "Generate access token",
         "deleteAccessToken": "Delete access token",
@@ -242,6 +243,14 @@
         "GENERATED": "Generated",
         "NOT_GENERATED": "-",
         "UNKNOWN": "Unknown"
+      },
+      "notifications": {
+        "passwordChangedSuccess": "Password successfully changed",
+        "passwordChangedError": "An error occurred during operation",
+        "changedSuccess": "User detail successfully changed",
+        "changedError": "An error occurred during operation",
+        "createSuccess": "Usr successfully created",
+        "createError": "An error occurred during operation"
       }
     }
   }

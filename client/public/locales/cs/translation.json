@@ -224,6 +224,7 @@
         "accessToken": "Access token"
       },
       "actions": {
+        "create": "Založení nového uživatele",
         "changePassword": "Změna hesla",
         "generateAccessToken": "Vygenerování access tokenu",
         "deleteAccessToken": "Smazání access tokenu",
@@ -242,6 +243,14 @@
         "GENERATED": "Vygenerován",
         "NOT_GENERATED": "-",
         "UNKNOWN": "Nezmáný"
+      },
+      "notifications": {
+        "passwordChangedSuccess": "Heslo úspěšně změnene",
+        "passwordChangedError": "Během operace nastala chyba",
+        "changedSuccess": "Uživatel úspěšně změnen",
+        "changedError": "Během operace nastala chyba",
+        "createSuccess": "Uživatel úspěšně založen",
+        "createError": "Během operace nastala chyba"
       }
     }
   }

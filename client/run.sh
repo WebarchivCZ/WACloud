@@ -12,6 +12,10 @@ echo $API_HOST
 cat <<EOT >> /etc/apache2/conf.d/proxy-api.conf
 ProxyPass "/api" "http://$API_HOST:8080/api"
 ProxyPassReverse "/api" "http://$API_HOST:8080/api"
+ProxyPass "/swagger-ui" "http://$API_HOST:8080/swagger-ui"
+ProxyPassReverse "/swagger-ui" "http://$API_HOST:8080/swagger-ui"
+ProxyPass "/v3/" "http://$API_HOST:8080/v3/"
+ProxyPassReverse "/v3/" "http://$API_HOST:8080/v3/"
 EOT
 
 cat <<EOT > /etc/apache2/conf.d/rewrite.conf

@@ -38,7 +38,8 @@ public class Search extends AuditModel {
 	@Column(columnDefinition = "text")
 	private String name;
 
-	private boolean favorite = true;
+	@Column(columnDefinition="BOOLEAN default FALSE")
+	private boolean favorite = false;
 
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)

@@ -17,6 +17,7 @@ import cz.inqool.nkp.api.repository.AnalyticQueryRepository;
 import cz.inqool.nkp.api.repository.SearchRepository;
 import cz.inqool.nkp.api.security.AppUserPrincipal;
 import cz.inqool.nkp.api.service.SearchService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,38 +42,7 @@ public class SearchController {
         this.analyticQueryRepository = analyticQueryRepository;
     }
 
-//    @PostMapping(value="/api/search", produces="application/zip")
-//    public byte[] search(@Valid @RequestBody RequestDTO request) throws IOException {
-//        // Index a base of the query
-//        searchService.index(request.getBase());
-//
-//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
-//        ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
-//
-//        int queryIndex = 1;
-//        for (QueryRequest query : request.getQueries()) {
-//            try {
-//                // Process query
-//                byte[] result = searchService.query(query);
-//                zipOutputStream.putNextEntry(new ZipEntry(queryIndex + "_" + query.getType().toString() + ".json"));
-//                zipOutputStream.write(result);
-//                zipOutputStream.closeEntry();
-//            }
-//            catch (Throwable ex) {
-//                log.error("Cannot process "+queryIndex+" query.", ex);
-//            }
-//            queryIndex++;
-//        }
-//
-//        zipOutputStream.finish();
-//        zipOutputStream.flush();
-//        IOUtils.closeQuietly(zipOutputStream);
-//        IOUtils.closeQuietly(bufferedOutputStream);
-//        IOUtils.closeQuietly(byteArrayOutputStream);
-//        return byteArrayOutputStream.toByteArray();
-//    }
-
+    @Operation(summary = "Create a search request")
     @PreAuthorize("isAuthenticated()")
     @PostMapping(value="/api/search")
     public Search search(@Valid @RequestBody RequestDTO request, Authentication authentication) {
@@ -105,6 +75,7 @@ public class SearchController {
         return search;
     }
 
+    @Operation(summary = "Get my requests")
     @PreAuthorize("isAuthenticated()")
     @GetMapping(value="/api/search")
     public List<Search> getMy(Authentication authentication) {
@@ -112,18 +83,63 @@ public class SearchController {
         return searchRepository.findByUserOrderByIdDesc(user);
     }
 
+    @Operation(summary = "Get all requests (only for admins)")
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping(value="/api/search/all")
     public List<Search> getAll() {
         return searchRepository.findAll(Sort.by(Sort.Order.desc("id")));
     }
 
+    @Operation(summary = "Get a request")
     @PreAuthorize("isAuthenticated()")
     @GetMapping(value="/api/search/{id}")
-    public Search getOne(@PathVariable Long id) {
-        return searchRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+    public Search getOne(@PathVariable Long id, Authentication authentication) {
+        Search search = searchRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        AppUser user = ((AppUserPrincipal)authentication.getPrincipal()).getAppUser();
+        if(user.getId() != search.getUser().getId() && user.getRole().equals(AppUser.Role.ADMIN)) {
+            throw new RuntimeException("You are not allowed to view this saved search.");
+        }
+        return search;
     }
 
+    @Operation(summary = "Get my favorite searches")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping(value="/api/search/favorite")
+    public List<Search> getMySaved(Authentication authentication) {
+        AppUser user = ((AppUserPrincipal)authentication.getPrincipal()).getAppUser();
+        return searchRepository.findByUserOrderByIdDesc(user).stream().filter(Search::isFavorite).collect(Collectors.toList());
+    }
+
+    @Operation(summary = "Save a search as a favorite")
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping(value="/api/search/favorite/{id}")
+    public Search saveOne(@PathVariable Long id, @Valid @RequestBody SaveSearchDTO request, Authentication authentication) {
+        Search search = searchRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        AppUser user = ((AppUserPrincipal)authentication.getPrincipal()).getAppUser();
+        if(user.getId() != search.getUser().getId()) {
+            throw new RuntimeException("You are not allowed to view this saved search.");
+        }
+        search.setName(request.getName());
+        search.setFavorite(true);
+        searchRepository.saveAndFlush(search);
+        return search;
+    }
+
+    @Operation(summary = "Delete a favorite search")
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping(value="/api/search/favorite/{id}")
+    public void deleteSavedOne(@PathVariable Long id, Authentication authentication) {
+        Search search = searchRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        AppUser user = ((AppUserPrincipal)authentication.getPrincipal()).getAppUser();
+        if(user.getId() != search.getUser().getId()) {
+            throw new RuntimeException("You are not allowed to view this saved search.");
+        }
+        search.setName("");
+        search.setFavorite(false);
+        searchRepository.saveAndFlush(search);
+    }
+
+    @Operation(summary = "Download a result")
     @PreAuthorize("isAuthenticated()")
     @GetMapping(value="/api/download/{id}", produces="application/zip")
     public byte[] download(@PathVariable Long id) throws IOException {

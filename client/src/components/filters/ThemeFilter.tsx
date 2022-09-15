@@ -1,10 +1,11 @@
+import React, { useState, useContext } from 'react';
 import { Button, TextField } from '@material-ui/core';
 import ClassIcon from '@material-ui/icons/Class';
-import React, { useState } from 'react';
 import { Autocomplete } from '@material-ui/lab';
 import { useTranslation } from 'react-i18next';
 
 import { ValuableOptionalsProps } from '../../interfaces/ValuableOptionalsProps';
+import { SearchContext } from '../Search.context';
 
 import { FilterContent } from './FilterContent';
 
@@ -19,13 +20,15 @@ export const ThemeFilter = ({
   const { t } = useTranslation();
   const [input, setInput] = useState<string | undefined>('');
 
+  const { state } = useContext(SearchContext);
+
   const buttonClick = (positive: boolean) => () => {
     if (append) {
       append(
-        (query.length > 0
-          ? !query.trim().endsWith('AND') &&
-            !query.trim().endsWith('OR') &&
-            !query.trim().endsWith('NOT')
+        (state.query.length > 0
+          ? !state.query.trim().endsWith('AND') &&
+            !state.query.trim().endsWith('OR') &&
+            !state.query.trim().endsWith('NOT')
             ? ' AND '
             : ''
           : '') +

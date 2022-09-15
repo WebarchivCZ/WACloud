@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Box, Button, Divider, Grid, CircularProgress, makeStyles } from '@material-ui/core';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import StarIcon from '@material-ui/icons/Star';
+import StarBorderIcon from '@material-ui/icons/StarBorder';
 
 import { Header } from '../components/Header';
 import { UserMenu } from '../components/UserMenu';
@@ -16,7 +17,10 @@ import IQuery from '../interfaces/IQuery';
 import { HarvestsForm } from '../forms/HarvestsForm';
 import { BlackButton } from '../components/BlackButton';
 import ProcessStatus from '../components/ProcessStatus';
-import { SearchState } from '../interfaces/ISearch';
+import { SearchContext } from '../components/Search.context';
+import { Types } from '../components/reducers';
+import AddToFavoriteDialog from '../components/dialog/AddToFavoriteDialog';
+import { DialogContext } from '../components/dialog/Dialog.context';
 
 enum Stage {
   QUERY,
@@ -30,20 +34,17 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-export const SearchScreen = () => {
+const SearchScreen = () => {
   const { t } = useTranslation();
   const classes = useStyles();
 
-  const [stage, setStage] = useState<Stage>(Stage.QUERY);
+  const { state, dispatch } = useContext(SearchContext);
+  const dialog = useContext(DialogContext);
 
-  const [drawerOpen, setDrawerOpen] = React.useState(true);
   const [query, setQuery] = useState<string>('');
   const [stopWords, setStopWords] = useState<string[]>(stopWordsCzech.sort());
   const [entriesLimit, setEntriesLimit] = useState<number>(1000);
   const [seed, setSeed] = useState<number | null>(null);
-  const [harvests, setHarvests] = useState<string[]>([]);
-  const [searchState, setSearchState] = useState<SearchState>('WAITING');
-  const [queryId, setQueryId] = useState<number>();
 
   const [queries, setQueries] = useState<IQuery[]>([
     {
@@ -63,7 +64,9 @@ export const SearchScreen = () => {
   const refreshSearchState = (id: number) => {
     fetch(`/api/search/${id}`)
       .then((res) => res.json())
-      .then((data) => setSearchState(data.state));
+      .then((data) => {
+        dispatch({ type: Types.SetState, payload: { ...state, searchState: data.state } });
+      });
   };
 
   const handleSearch = () => {
@@ -75,13 +78,13 @@ export const SearchScreen = () => {
       },
       body: JSON.stringify({
         base: {
-          filter: query.length === 0 ? '*:*' : query,
-          harvests: harvests,
-          entries: entriesLimit,
-          stopWords: stopWords.map((v) => v.trim()),
-          randomSeed: seed
+          filter: state.query.length === 0 ? '*:*' : state.query,
+          harvests: state.harvests,
+          entries: state.entriesLimit,
+          stopWords: state.stopWords.map((v) => v.trim()),
+          randomSeed: state.seed
         },
-        queries: queries.map(function (x) {
+        queries: state.queries.map(function (x) {
           return {
             type: x.searchType,
             texts: x.queries,
@@ -96,48 +99,47 @@ export const SearchScreen = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        setStage(Stage.PROCESS);
-        setQueryId(data.id);
+        dispatch({
+          type: Types.SetState,
+          payload: { ...state, stage: Stage.PROCESS, queryId: data.id }
+        });
       });
     return;
   };
 
-  const handleDownload = () => {
-    ['DONE'].includes(searchState) &&
-      fetch(`/api/download/${queryId}`).then((response) =>
-        response
-          .blob()
-          .then((blob) => {
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'results.zip';
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            addNotification(t('query.success.title'), t('query.success.message'), 'success');
-          })
-          .catch(() => addNotification(t('query.error.title'), t('query.error.message'), 'danger'))
-      );
+  const handleSearchStop = () => {
+    fetch(`/api/search/${state.queryId}/stop`, {
+      method: 'POST'
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        dispatch({
+          type: Types.SetState,
+          payload: {
+            ...state,
+            searchState: data.state
+          }
+        });
+      });
   };
 
   useEffect(() => {
-    if (stage === Stage.PROCESS && queryId) {
-      refreshSearchState(queryId);
+    if (state.stage === Stage.PROCESS && state.queryId) {
+      refreshSearchState(state.queryId);
       const interval = setInterval(() => {
-        refreshSearchState(queryId);
-        if (searchState === 'DONE') {
+        refreshSearchState(state.queryId ?? 0);
+        if (state.searchState === 'DONE') {
           clearInterval(interval);
         }
-      }, 1500);
-      if (searchState === 'DONE') {
+      }, 200);
+      if (state.searchState === 'DONE') {
         clearInterval(interval);
       }
       return () => {
         clearInterval(interval);
       };
     }
-  }, [stage, searchState, queryId]);
+  }, [state.stage, state.searchState, state.queryId]);
 
   const stages = [
     {
@@ -145,10 +147,10 @@ export const SearchScreen = () => {
       content: (
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <QueryForm value={query} setValue={setQuery} />
+            <QueryForm value={state.query} setValue={setQuery} />
           </Grid>
           <Grid item xs={12}>
-            <HarvestsForm harvests={harvests} setHarvests={setHarvests} minimal={false} />
+            <HarvestsForm minimal={false} />
           </Grid>
           <Grid item xs={12}>
             <Grid container justifyContent="flex-end">
@@ -158,8 +160,10 @@ export const SearchScreen = () => {
                   size="large"
                   color="primary"
                   onClick={() => {
-                    setStage(Stage.ANALYTICS);
-                    setDrawerOpen(false);
+                    dispatch({
+                      type: Types.SetState,
+                      payload: { ...state, drawerOpen: false, stage: Stage.ANALYTICS }
+                    });
                   }}>
                   {t<string>('query.continue')}
                 </Button>
@@ -174,20 +178,22 @@ export const SearchScreen = () => {
       content: (
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <QueryForm value={query} setValue={setQuery} disabled={true} />
+            <QueryForm value={state.query} setValue={setQuery} disabled={true} />
           </Grid>
           <Grid item xs={12}>
             <Grid container spacing={2} justifyContent="space-between">
               <Grid item>
-                <HarvestsForm harvests={harvests} setHarvests={setHarvests} minimal={true} />
+                <HarvestsForm minimal={true} />
               </Grid>
               <Grid item>
                 <BlackButton
                   variant="contained"
                   size="large"
                   onClick={() => {
-                    setStage(Stage.QUERY);
-                    setDrawerOpen(true);
+                    dispatch({
+                      type: Types.SetState,
+                      payload: { ...state, drawerOpen: true, stage: Stage.QUERY }
+                    });
                   }}>
                   {t<string>('query.edit')}
                 </BlackButton>
@@ -198,7 +204,7 @@ export const SearchScreen = () => {
             <Divider />
           </Grid>
           <Grid item xs={12}>
-            <AnalyticQueriesForm queries={queries} setQueries={setQueries} />
+            <AnalyticQueriesForm queries={state.queries} setQueries={setQueries} />
           </Grid>
           {queries.length > 0 && (
             <>
@@ -210,7 +216,7 @@ export const SearchScreen = () => {
               </Box>
             </>
           )}
-          {stage === Stage.PROCESS && <ProcessStatus state={searchState} />}
+          {state.stage === Stage.PROCESS && <ProcessStatus state={state.searchState} />}
         </Grid>
       )
     },
@@ -219,20 +225,22 @@ export const SearchScreen = () => {
       content: (
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <QueryForm value={query} setValue={setQuery} disabled={true} />
+            <QueryForm value={state.query} setValue={setQuery} disabled={true} />
           </Grid>
           <Grid item xs={12}>
             <Grid container spacing={2} justifyContent="space-between">
               <Grid item>
-                <HarvestsForm harvests={harvests} setHarvests={setHarvests} minimal={true} />
+                <HarvestsForm minimal={true} />
               </Grid>
               <Grid item>
                 <BlackButton
                   variant="contained"
                   size="large"
                   onClick={() => {
-                    setStage(Stage.QUERY);
-                    setDrawerOpen(true);
+                    dispatch({
+                      type: Types.SetState,
+                      payload: { ...state, stage: Stage.QUERY, drawerOpen: true }
+                    });
                   }}>
                   {t<string>('query.edit')}
                 </BlackButton>
@@ -245,54 +253,145 @@ export const SearchScreen = () => {
           <Grid item xs={12}>
             <AnalyticQueriesForm queries={queries} setQueries={setQueries} />
           </Grid>
-          <ProcessStatus state={searchState} />
-          {queries.length > 0 && (
+
+          <ProcessStatus state={state.searchState} />
+          {state.queries.length > 0 && state.searchState !== 'DONE' && (
             <>
               <Divider />
               <Box m={2}>
-                {(searchState === 'WAITING' ||
-                  searchState === 'INDEXING' ||
-                  searchState === 'PROCESSING') && (
-                  <BlackButton variant="contained" size="large">
-                    {t<string>('process.stop')}
-                  </BlackButton>
-                )}
+                <BlackButton
+                  variant="contained"
+                  size="large"
+                  color="primary"
+                  onClick={() => handleSearchStop()}>
+                  {t<string>('process.stop')}
+                </BlackButton>
               </Box>
             </>
           )}
-          {searchState === 'DONE' && (
-            <Grid item xs={12}>
-              <Grid container justifyContent="flex-start" spacing={2}>
-                <Grid item>
-                  <Button
-                    key="download"
-                    variant="contained"
-                    color={'primary'}
-                    disabled={!['DONE', 'ERROR'].includes(searchState)}
-                    size="medium"
-                    onClick={handleDownload}>
-                    <>
-                      {!['DONE', 'ERROR'].includes(searchState) ? (
-                        <CircularProgress size={15} />
-                      ) : (
-                        <GetAppIcon className={classes.icon} />
-                      )}
+          {state.queries.length > 0 && state.searchState === 'DONE' && (
+            <>
+              <Divider />
+              <Grid item xs={12}>
+                <Grid container justifyContent="flex-start" spacing={2}>
+                  <Grid item>
+                    <Button
+                      variant="contained"
+                      size="medium"
+                      color="primary"
+                      onClick={() =>
+                        ['DONE'].includes(state.searchState) &&
+                        fetch('/api/download/' + state.queryId)
+                          .then((response) => response.blob())
+                          .then((blob) => {
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'results.zip';
+                            document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
+                            a.click();
+                            a.remove(); //afterwards we remove the element again
+                            addNotification(
+                              t('query.success.title'),
+                              t('query.success.message'),
+                              'success'
+                            );
+                          })
+                          .catch(() =>
+                            addNotification(
+                              t('query.error.title'),
+                              t('query.error.message'),
+                              'danger'
+                            )
+                          )
+                      }>
+                      <>
+                        {!['DONE', 'ERROR'].includes(state.searchState) ? (
+                          <CircularProgress size={15} />
+                        ) : (
+                          <GetAppIcon className={classes.icon} />
+                        )}
+                      </>
                       {t<string>('query.buttons.download')}
-                    </>
-                  </Button>
-                </Grid>
-                <Grid item>
-                  <Button key="favourite" variant="text" color={'default'} size="medium">
-                    <>
-                      <StarIcon className={classes.icon} color="primary" />
-                      <span style={{ color: '#0000ff' }}>
-                        {t<string>('query.buttons.addToFavorites')}
-                      </span>
-                    </>
-                  </Button>
+                    </Button>
+                  </Grid>
+                  <Grid item>
+                    {state?.favorite === true && (
+                      <Button
+                        key="removeFromFavorite"
+                        variant="text"
+                        color={'default'}
+                        size="medium"
+                        onClick={() => {
+                          fetch(`/api/search/favorite/${state.queryId}`, {
+                            method: 'DELETE'
+                          })
+                            .then(() => {
+                              addNotification(
+                                t('header.favorite'),
+                                t('administration.users.notifications.removeFavoriteSuccess'),
+                                'success'
+                              );
+                            })
+                            .catch(() => {
+                              addNotification(
+                                t('header.favorite'),
+                                t('administration.users.notifications.removeFovriteError', 'danger')
+                              );
+                            });
+                          dispatch({
+                            type: Types.SetState,
+                            payload: {
+                              ...state,
+                              favorite: false
+                            }
+                          });
+                        }}>
+                        <StarBorderIcon className={classes.icon} color="primary" />
+                        <span style={{ color: '#0000ff' }}>
+                          {t<string>('query.buttons.removeFromFavorites')}
+                        </span>
+                      </Button>
+                    )}
+                    {!state?.favorite && (
+                      <>
+                        <Button
+                          key="addToFavorite"
+                          variant="text"
+                          color={'default'}
+                          size="medium"
+                          onClick={() => {
+                            // make sure queryId exists
+                            state.queryId &&
+                              dialog.open({
+                                size: 'sm',
+                                content: AddToFavoriteDialog,
+                                values: {
+                                  id: state.queryId
+                                },
+                                onSubmit: () => {
+                                  dispatch({
+                                    type: Types.SetState,
+                                    payload: {
+                                      ...state,
+                                      favorite:
+                                        state.favorite === undefined ? true : !state.favorite
+                                    }
+                                  });
+                                }
+                              });
+                          }}>
+                          <StarIcon className={classes.icon} color="primary" />
+                          <span style={{ color: '#0000ff' }}>
+                            {t<string>('query.buttons.addToFavorites')}
+                          </span>
+                        </Button>
+                      </>
+                    )}
+                  </Grid>
                 </Grid>
               </Grid>
-            </Grid>
+            </>
           )}
         </Grid>
       )
@@ -315,19 +414,17 @@ export const SearchScreen = () => {
       drawer={
         <FiltersDrawer
           query={query}
-          setQuery={setQuery}
           stopWords={stopWords}
           setStopWords={setStopWords}
           entriesLimit={entriesLimit}
           setEntriesLimit={setEntriesLimit}
           seed={seed}
           setSeed={setSeed}
-          drawerOpen={drawerOpen}
-          setDrawerOpen={setDrawerOpen}
-          disabled={stage !== Stage.QUERY}
+          drawerOpen={state.drawerOpen}
+          disabled={state.stage !== Stage.QUERY}
         />
       }>
-      {stages.filter((s) => s.state === stage)[0].content}
+      {stages.filter((s) => s.state === state.stage)[0].content}
     </Header>
   );
 };

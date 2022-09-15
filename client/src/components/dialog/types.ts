@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 export type DialogContentProps<T = undefined> = {
   values: T;
   onClose: () => void;
+  onSubmit?: () => void;
 };
 
 export type DialogLayerProps<T = undefined> = DialogContentProps<T> & {

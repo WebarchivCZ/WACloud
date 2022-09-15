@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Grid,
@@ -19,11 +19,14 @@ import GetAppIcon from '@material-ui/icons/GetApp';
 import StarIcon from '@material-ui/icons/Star';
 import CloseIcon from '@material-ui/icons/Close';
 import ReplayIcon from '@material-ui/icons/Replay';
+import StarBorderIcon from '@material-ui/icons/StarBorder';
 
 import ISearch from '../../interfaces/ISearch';
 import { addNotification } from '../../config/notifications';
 import ProcessStatus from '../ProcessStatus';
 
+import AddToFavoriteDialog from './AddToFavoriteDialog';
+import { DialogContext } from './Dialog.context';
 import { DialogContentProps } from './types';
 
 const useStyles = makeStyles((theme) => ({
@@ -63,10 +66,12 @@ const useStyles = makeStyles((theme) => ({
 
 const QueryDetailDialog = ({
   onClose,
-  values: { id, filter, queries, state }
+  values: { id, filter, name, queries, state, favorite }
 }: DialogContentProps<ISearch>) => {
   const { t } = useTranslation();
   const classes = useStyles();
+
+  const dialog = useContext(DialogContext);
 
   const handleDownload = () => {
     ['DONE'].includes(state) &&
@@ -90,8 +95,16 @@ const QueryDetailDialog = ({
   return (
     <Grid container spacing={2} className={classes.dialog}>
       <Grid item xs={12} justifyContent="space-between">
-        {/* TODO: display name instead of header, if query is favorite */}
-        <Typography variant="h2">{t<string>('query.header')}</Typography>
+        {favorite ? (
+          <Box display="flex" justifyContent="flex-start" alignItems="center" gridGap={8}>
+            <Typography variant="h2" color="primary">
+              {name}
+            </Typography>
+            <StarIcon color="primary" />
+          </Box>
+        ) : (
+          <Typography variant="h2">{t<string>('query.header')}</Typography>
+        )}
         <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
           <CloseIcon />
         </IconButton>
@@ -215,15 +228,58 @@ const QueryDetailDialog = ({
             </Button>
           </Grid>
           <Grid item>
-            <Button key="favourite" variant="text" color={'default'} size="medium">
-              <>
+            {favorite ? (
+              <Button
+                key="removeFromFavorite"
+                variant="text"
+                color={'default'}
+                size="medium"
+                onClick={() => {
+                  onClose();
+                  fetch(`/api/search/favorite/${id}`, {
+                    method: 'DELETE'
+                  })
+                    .then(() => {
+                      addNotification(
+                        t('header.favorite'),
+                        t('administration.users.notifications.removeFavoriteSuccess'),
+                        'success'
+                      );
+                    })
+                    .catch(() => {
+                      addNotification(
+                        t('header.favorite'),
+                        t('administration.users.notifications.removeFovriteError', 'danger')
+                      );
+                    });
+                }}>
+                <StarBorderIcon className={classes.icon} color="primary" />
+                <span style={{ color: '#0000ff' }}>
+                  {t<string>('query.buttons.removeFromFavorites')}
+                </span>
+              </Button>
+            ) : (
+              <Button
+                key="addToFavorite"
+                variant="text"
+                color={'default'}
+                size="medium"
+                onClick={() => {
+                  onClose();
+                  dialog.open({
+                    size: 'sm',
+                    content: AddToFavoriteDialog,
+                    values: {
+                      id
+                    }
+                  });
+                }}>
                 <StarIcon className={classes.icon} color="primary" />
-                {/* TODO: add option to remove from favourites */}
                 <span style={{ color: '#0000ff' }}>
                   {t<string>('query.buttons.addToFavorites')}
                 </span>
-              </>
-            </Button>
+              </Button>
+            )}
           </Grid>
           <Grid item className={classes.repeat}>
             <Button

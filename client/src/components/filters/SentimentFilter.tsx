@@ -1,10 +1,11 @@
+import React, { useContext } from 'react';
 import { Button, InputLabel, Slider } from '@material-ui/core';
 import SentimentVerySatisfiedIcon from '@material-ui/icons/SentimentVerySatisfied';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import withStyles from '@material-ui/core/styles/withStyles';
 
 import { ValuableProps } from '../../interfaces/ValuableProps';
+import { SearchContext } from '../Search.context';
 
 import { FilterContent } from './FilterContent';
 
@@ -25,13 +26,15 @@ export const SentimentFilter = ({
 }: ValuableProps<number | number[]> & { query: string }) => {
   const { t } = useTranslation();
 
+  const { state } = useContext(SearchContext);
+
   const buttonClick = (positive: boolean) => () => {
     if (append) {
       append(
-        (query.length > 0
-          ? !query.trim().endsWith('AND') &&
-            !query.trim().endsWith('OR') &&
-            !query.trim().endsWith('NOT')
+        (state.query.length > 0
+          ? !state.query.trim().endsWith('AND') &&
+            !state.query.trim().endsWith('OR') &&
+            !state.query.trim().endsWith('NOT')
             ? ' AND '
             : ''
           : '') +

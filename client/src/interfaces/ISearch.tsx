@@ -11,11 +11,14 @@ export default interface ISearch {
   entries: number;
   indexed: number;
   toIndex: number;
-  randomSeed: string;
+  randomSeed: number | null;
   harvests: string[];
   filter: string;
   startedAt: string;
+  updatedAt: string;
   finishedAt: string;
   createdAt: string;
   queries: IAnalyticQuery[];
+  stopWords: string[];
+  favorite: boolean;
 }

@@ -13,8 +13,6 @@ import {
 } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 import Visibility from '@material-ui/icons/Visibility';
-import StarIcon from '@material-ui/icons/Star';
-import ReplayIcon from '@material-ui/icons/Replay';
 import GetAppIcon from '@material-ui/icons/GetApp';
 
 import ActionsMenu from '../components/ActionsMenu';
@@ -74,7 +72,6 @@ export const AdminQueriesForm = () => {
     []
   );
 
-  // console.log(queries);
   const stateToString = (state: string) => {
     switch (state) {
       case 'WAITING':
@@ -92,7 +89,6 @@ export const AdminQueriesForm = () => {
   };
 
   const refreshSearches = () => {
-    console.log('refresh');
     fetch('/api/search/all')
       .then((res) => res.json())
       .then(
@@ -116,7 +112,6 @@ export const AdminQueriesForm = () => {
 
   useEffect(() => {
     refreshSearches();
-    console.log('effect');
     const interval = setInterval(refreshSearches, 2500);
     return () => clearInterval(interval);
   }, []);

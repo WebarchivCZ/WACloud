@@ -1,9 +1,11 @@
+import React, { Dispatch, SetStateAction, useContext } from 'react';
 import { Box, Checkbox, FormControlLabel, TextField } from '@material-ui/core';
 import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered';
-import React, { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ValuableProps } from '../../interfaces/ValuableProps';
+import { SearchContext } from '../Search.context';
+import { Types } from '../reducers';
 
 import { FilterContent } from './FilterContent';
 
@@ -21,6 +23,9 @@ export const EntriesLimitFilter = ({
   disabled
 }: ValuableProps<number> & SeedProps<number | null>) => {
   const { t } = useTranslation();
+
+  const { state, dispatch } = useContext(SearchContext);
+
   return (
     <FilterContent title={t<string>('filters.entriesLimit')} icon={<FormatListNumberedIcon />}>
       <Box my={2}>
@@ -29,9 +34,14 @@ export const EntriesLimitFilter = ({
           label={t<string>('filters.entriesLimit')}
           fullWidth
           inputProps={{ min: 10, max: 10000 }}
-          value={value}
+          value={state.entriesLimit}
           disabled={disabled}
-          onChange={(event) => setValue(parseInt(event.target.value))}
+          onChange={(event) =>
+            dispatch({
+              type: Types.SetLimit,
+              payload: { entriesLimit: parseInt(event.target.value) }
+            })
+          }
         />
       </Box>
       <Box my={2}>
@@ -39,12 +49,17 @@ export const EntriesLimitFilter = ({
           control={
             <Checkbox
               color="primary"
-              checked={seed != null}
+              checked={state.seed != null}
               disabled={disabled}
               onChange={(event) =>
-                setSeed(
-                  (event.target.checked as boolean) ? Math.floor(Math.random() * MAX_SEED) : null
-                )
+                dispatch({
+                  type: Types.SetSeed,
+                  payload: {
+                    seed: (event.target.checked as boolean)
+                      ? Math.floor(Math.random() * MAX_SEED)
+                      : null
+                  }
+                })
               }
             />
           }
@@ -59,7 +74,7 @@ export const EntriesLimitFilter = ({
             type="number"
             label={t<string>('seed.ownSeed')}
             fullWidth
-            value={seed}
+            value={state.seed}
             disabled={disabled}
             inputProps={{ min: 0, max: MAX_SEED - 1 }}
             onChange={(event) => setSeed(parseInt(event.target.value))}

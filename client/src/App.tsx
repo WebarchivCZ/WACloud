@@ -19,6 +19,7 @@ import AdminHarvestsScreen from './screens/admin/AdminHarvestsScreen';
 import HistoryScreen from './screens/HistoryScreen';
 import Dialog from './components/dialog/Dialog';
 import DialogProvider from './components/dialog/Dialog.context';
+import SearchProvider from './components/Search.context';
 import AdminUsersScreen from './screens/admin/AdminUsersScreen';
 import AdminQueriesScreen from './screens/admin/AdminQueriesScreen';
 import FavoriteScreen from './screens/FavoriteScreen';
@@ -69,46 +70,48 @@ function App() {
       <Suspense fallback={<Loader />}>
         <ThemeProvider theme={theme}>
           <DialogProvider>
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-              <CssBaseline />
-              <GlobalCss />
-              <ProvideAuth>
-                <Router>
-                  <Switch>
-                    <PrivateRoute path="/admin/queries" role="ADMIN">
-                      <ThemeProvider theme={themeAdmin}>
-                        <AdminQueriesScreen />
-                      </ThemeProvider>
-                    </PrivateRoute>
-                    <PrivateRoute path="/admin/harvests" role="ADMIN">
-                      <ThemeProvider theme={themeAdmin}>
-                        <AdminHarvestsScreen />
-                      </ThemeProvider>
-                    </PrivateRoute>
-                    <PrivateRoute path="/admin/users" role="ADMIN">
-                      <ThemeProvider theme={themeAdmin}>
-                        <AdminUsersScreen />
-                      </ThemeProvider>
-                    </PrivateRoute>
-                    <PrivateRoute path="/favorite">
-                      <FavoriteScreen />
-                    </PrivateRoute>
-                    <PrivateRoute path="/search">
-                      <SearchScreen />
-                    </PrivateRoute>
-                    <PrivateRoute path="/history">
-                      <HistoryScreen />
-                    </PrivateRoute>
-                    <Route path="/faq">
-                      <FaQScreen />
-                    </Route>
-                    <Route path="/">
-                      <LoginScreen />
-                    </Route>
-                  </Switch>
-                </Router>
-              </ProvideAuth>
-            </MuiPickersUtilsProvider>
+            <SearchProvider>
+              <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <CssBaseline />
+                <GlobalCss />
+                <ProvideAuth>
+                  <Router>
+                    <Switch>
+                      <PrivateRoute path="/admin/queries" role="ADMIN">
+                        <ThemeProvider theme={themeAdmin}>
+                          <AdminQueriesScreen />
+                        </ThemeProvider>
+                      </PrivateRoute>
+                      <PrivateRoute path="/admin/harvests" role="ADMIN">
+                        <ThemeProvider theme={themeAdmin}>
+                          <AdminHarvestsScreen />
+                        </ThemeProvider>
+                      </PrivateRoute>
+                      <PrivateRoute path="/admin/users" role="ADMIN">
+                        <ThemeProvider theme={themeAdmin}>
+                          <AdminUsersScreen />
+                        </ThemeProvider>
+                      </PrivateRoute>
+                      <PrivateRoute path="/favorite">
+                        <FavoriteScreen />
+                      </PrivateRoute>
+                      <PrivateRoute path="/search">
+                        <SearchScreen />
+                      </PrivateRoute>
+                      <PrivateRoute path="/history">
+                        <HistoryScreen />
+                      </PrivateRoute>
+                      <Route path="/faq">
+                        <FaQScreen />
+                      </Route>
+                      <Route path="/">
+                        <LoginScreen />
+                      </Route>
+                    </Switch>
+                  </Router>
+                </ProvideAuth>
+              </MuiPickersUtilsProvider>
+            </SearchProvider>
             <Dialog />
           </DialogProvider>
         </ThemeProvider>

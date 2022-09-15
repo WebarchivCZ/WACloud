@@ -250,7 +250,11 @@
         "changedSuccess": "Uživatel úspěšně změnen",
         "changedError": "Během operace nastala chyba",
         "createSuccess": "Uživatel úspěšně založen",
-        "createError": "Během operace nastala chyba"
+        "createError": "Během operace nastala chyba",
+        "favoriteSuccess": "Dotaz byl úspěšně označen jako oblíbený",
+        "favoriteError": "Dotaz se nepovedlo přidat do oblíbených",
+        "removeFavoriteSuccess": "Dotaz byl odebrán z oblíbených",
+        "removeFovriteError": "Dotaz se nepovedlo odebraz z oblíbených"
       }
     }
   }

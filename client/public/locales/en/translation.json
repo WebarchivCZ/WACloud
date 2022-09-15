@@ -250,7 +250,11 @@
         "changedSuccess": "User detail successfully changed",
         "changedError": "An error occurred during operation",
         "createSuccess": "Usr successfully created",
-        "createError": "An error occurred during operation"
+        "createError": "An error occurred during operation",
+        "favoriteSuccess": "The query has been successfully marked as a favorite",
+        "favoriteError": "Failed to add query to favorites",
+        "removeFavoriteSuccess": "The query has been successfully removed from favorites",
+        "removeFovriteError": "Failed to remove query from favorites"
       }
     }
   }

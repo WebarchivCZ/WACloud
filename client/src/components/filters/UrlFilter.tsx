@@ -1,8 +1,10 @@
+import React, { Dispatch, SetStateAction, useContext } from 'react';
 import { Button, MenuItem, TextField } from '@material-ui/core';
 import HttpIcon from '@material-ui/icons/Http';
-import React, { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import AddIcon from '@material-ui/icons/Add';
+
+import { SearchContext } from '../Search.context';
 
 import { FilterContent } from './FilterContent';
 
@@ -26,12 +28,15 @@ export const UrlFilter = ({
   query
 }: UrlFilterProps<string | null>) => {
   const { t } = useTranslation();
+
+  const { state } = useContext(SearchContext);
+
   const buttonClick = () => {
     const prefix =
-      query.length > 0
-        ? !query.trim().endsWith('AND') &&
-          !query.trim().endsWith('OR') &&
-          !query.trim().endsWith('NOT')
+      state.query.length > 0
+        ? !state.query.trim().endsWith('AND') &&
+          !state.query.trim().endsWith('OR') &&
+          !state.query.trim().endsWith('NOT')
           ? ' AND '
           : ''
         : '';

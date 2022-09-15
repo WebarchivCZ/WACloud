@@ -15,6 +15,7 @@ import React, {
   FunctionComponent,
   ReactNode,
   SetStateAction,
+  useContext,
   useEffect,
   useState
 } from 'react';
@@ -29,6 +30,8 @@ import { UrlFilter } from './filters/UrlFilter';
 import { SentimentFilter } from './filters/SentimentFilter';
 import { StopWordsFilter } from './filters/StopWordsFilter';
 import { EntriesLimitFilter } from './filters/EntriesLimitFilter';
+import { SearchContext } from './Search.context';
+import { Types } from './reducers';
 
 const drawerWidth = 320;
 const useStyles = makeStyles((theme: Theme) =>
@@ -108,7 +111,6 @@ const ListHeader: FunctionComponent<ListHeaderProps> = ({
 
 interface FiltersDrawerProps {
   query: string;
-  setQuery: Dispatch<SetStateAction<string>>;
   stopWords: string[];
   setStopWords: Dispatch<SetStateAction<string[]>>;
   entriesLimit: number;
@@ -116,13 +118,11 @@ interface FiltersDrawerProps {
   seed: number | null;
   setSeed: Dispatch<SetStateAction<number | null>>;
   drawerOpen: boolean;
-  setDrawerOpen: Dispatch<SetStateAction<boolean>>;
   disabled?: boolean;
 }
 
 export const FiltersDrawer = ({
   query,
-  setQuery,
   stopWords,
   setStopWords,
   entriesLimit,
@@ -130,11 +130,12 @@ export const FiltersDrawer = ({
   seed,
   setSeed,
   drawerOpen,
-  setDrawerOpen,
   disabled
 }: FiltersDrawerProps) => {
   const classes = useStyles();
   const { t } = useTranslation();
+
+  const { state, dispatch } = useContext(SearchContext);
 
   const [theme, setTheme] = useState<string | null>('');
   const [pageType, setPageType] = useState<string | undefined>('');
@@ -147,7 +148,8 @@ export const FiltersDrawer = ({
   const [topics, setTopics] = useState<string[]>([]);
   const [webTypes, setWebTypes] = useState<string[]>([]);
 
-  const appendQuery = (appendValue: string) => setQuery(query + appendValue);
+  const appendQuery = (appendValue: string) =>
+    dispatch({ type: Types.SetQuery, payload: { query: state.query + appendValue } });
 
   useEffect(() => {
     fetch('/api/topic')
@@ -165,15 +167,18 @@ export const FiltersDrawer = ({
   }, []);
 
   const toggleDrawer = () => {
-    setDrawerOpen(!drawerOpen);
+    dispatch({
+      type: Types.SetDrawer,
+      payload: { drawerOpen: !state.drawerOpen }
+    });
   };
 
   const lists = [
     {
       header: (
         <ListHeader
-          shown={drawerOpen}
-          icon={drawerOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+          shown={state.drawerOpen}
+          icon={state.drawerOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           onIconClick={toggleDrawer}
           disabled={disabled}>
           {t<string>('filters.filtersSectionHeader')}

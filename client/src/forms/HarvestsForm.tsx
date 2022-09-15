@@ -1,3 +1,4 @@
+import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Grid,
@@ -9,11 +10,12 @@ import {
   CardHeader,
   Box
 } from '@material-ui/core';
-import React, { useEffect, useState } from 'react';
 import _ from 'lodash';
 import clsx from 'clsx';
 
 import IHarvest from '../interfaces/IHarvest';
+import { SearchContext } from '../components/Search.context';
+import { Types } from '../components/reducers';
 
 const useStyles = makeStyles(() => ({
   shortCut: {
@@ -49,8 +51,6 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface HarvestsProps {
-  harvests: string[];
-  setHarvests: (harvests: string[]) => void;
   minimal: boolean;
 }
 
@@ -79,9 +79,11 @@ const fakeData: FakeDataProps[] = [
 ];
 // TODO FAKE REMOVE END
 
-export const HarvestsForm = ({ harvests, setHarvests, minimal }: HarvestsProps) => {
+export const HarvestsForm = ({ minimal }: HarvestsProps) => {
   const { t, i18n } = useTranslation();
   const classes = useStyles();
+
+  const { state, dispatch } = useContext(SearchContext);
 
   const [allHarvests, setAllHarvests] = useState<IHarvest[]>([]);
 
@@ -95,16 +97,16 @@ export const HarvestsForm = ({ harvests, setHarvests, minimal }: HarvestsProps) 
     return name.substring(0, 2);
   };
 
-  const isHarvestChecked = (name: string) => harvests.includes(name);
+  const isHarvestChecked = (name: string) => state.harvests.includes(name);
 
   const handleToggleHarvest = (name: string) => () => {
-    const harvestsCopy = _.clone(harvests);
+    const harvestsCopy = _.clone(state.harvests);
     if (isHarvestChecked(name)) {
       harvestsCopy.splice(harvestsCopy.indexOf(name), 1);
     } else {
       harvestsCopy.push(name);
     }
-    setHarvests(harvestsCopy);
+    dispatch({ type: Types.SetHarvests, payload: { harvests: harvestsCopy } });
   };
 
   useEffect(() => {

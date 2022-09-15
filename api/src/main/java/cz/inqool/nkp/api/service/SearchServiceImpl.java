@@ -126,6 +126,9 @@ public class SearchServiceImpl implements SearchService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void index(Search s) {
         Search query = searchRepository.findById(s.getId()).get();
+        if (query.getState().equals(Search.State.STOPPED)) {
+            throw new RuntimeException("This job was stopped.");
+        }
         try {
             List<String> ids = query.getIds();
             if (ids == null || ids.isEmpty()) {
@@ -598,6 +601,11 @@ public class SearchServiceImpl implements SearchService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void setIndexed(Search s, int totalCount) {
         Search search = searchRepository.findById(s.getId()).get();
+        if (search.getState().equals(Search.State.STOPPED)) {
+            search.setFinishedAt(new Date());
+            searchRepository.saveAndFlush(search);
+            throw new RuntimeException("This job was stopped.");
+        }
         search.setIndexed(totalCount);
         searchRepository.saveAndFlush(search);
     }
@@ -605,6 +613,11 @@ public class SearchServiceImpl implements SearchService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void startIndexing(Search s) {
         Search search = searchRepository.findById(s.getId()).get();
+        if (search.getState().equals(Search.State.STOPPED)) {
+            search.setFinishedAt(new Date());
+            searchRepository.saveAndFlush(search);
+            throw new RuntimeException("This job was stopped.");
+        }
         search.setState(Search.State.INDEXING);
         search.setStartedAt(new Date());
         searchRepository.saveAndFlush(search);
@@ -613,6 +626,11 @@ public class SearchServiceImpl implements SearchService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void startProcessing(Search s) {
         Search search = searchRepository.findById(s.getId()).get();
+        if (search.getState().equals(Search.State.STOPPED)) {
+            search.setFinishedAt(new Date());
+            searchRepository.saveAndFlush(search);
+            throw new RuntimeException("This job was stopped.");
+        }
         search.setState(Search.State.PROCESSING);
         searchRepository.saveAndFlush(search);
     }
@@ -620,6 +638,12 @@ public class SearchServiceImpl implements SearchService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void startProcessingQuery(AnalyticQuery s) {
         AnalyticQuery analyticQuery = analyticQueryRepository.findById(s.getId()).get();
+        Search search = analyticQuery.getSearch();
+        if (search.getState().equals(Search.State.STOPPED)) {
+            search.setFinishedAt(new Date());
+            searchRepository.saveAndFlush(search);
+            throw new RuntimeException("This job was stopped.");
+        }
         analyticQuery.setState(AnalyticQuery.State.RUNNING);
         analyticQuery.setStartedAt(new Date());
         analyticQueryRepository.saveAndFlush(analyticQuery);

@@ -94,11 +94,19 @@ public class SearchController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping(value="/api/search/{id}")
     public Search getOne(@PathVariable Long id, Authentication authentication) {
-        Search search = searchRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-        AppUser user = ((AppUserPrincipal)authentication.getPrincipal()).getAppUser();
-        if(user.getId() != search.getUser().getId() && user.getRole().equals(AppUser.Role.ADMIN)) {
-            throw new RuntimeException("You are not allowed to view this saved search.");
+        return findSearch(id, authentication);
+    }
+
+    @Operation(summary = "Stop a request")
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping(value="/api/search/{id}/stop")
+    public Search stopOne(@PathVariable Long id, Authentication authentication) {
+        Search search = findSearch(id, authentication);
+        if (search.isFinished()) {
+            throw new RuntimeException("The search is already finished.");
         }
+        search.setState(Search.State.STOPPED);
+        searchRepository.saveAndFlush(search);
         return search;
     }
 
@@ -114,11 +122,7 @@ public class SearchController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping(value="/api/search/favorite/{id}")
     public Search saveOne(@PathVariable Long id, @Valid @RequestBody SaveSearchDTO request, Authentication authentication) {
-        Search search = searchRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-        AppUser user = ((AppUserPrincipal)authentication.getPrincipal()).getAppUser();
-        if(user.getId() != search.getUser().getId()) {
-            throw new RuntimeException("You are not allowed to view this saved search.");
-        }
+        Search search = findSearch(id, authentication);
         search.setName(request.getName());
         search.setFavorite(true);
         searchRepository.saveAndFlush(search);
@@ -129,11 +133,7 @@ public class SearchController {
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping(value="/api/search/favorite/{id}")
     public void deleteSavedOne(@PathVariable Long id, Authentication authentication) {
-        Search search = searchRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-        AppUser user = ((AppUserPrincipal)authentication.getPrincipal()).getAppUser();
-        if(user.getId() != search.getUser().getId()) {
-            throw new RuntimeException("You are not allowed to view this saved search.");
-        }
+        Search search = findSearch(id, authentication);
         search.setName("");
         search.setFavorite(false);
         searchRepository.saveAndFlush(search);
@@ -142,8 +142,8 @@ public class SearchController {
     @Operation(summary = "Download a result")
     @PreAuthorize("isAuthenticated()")
     @GetMapping(value="/api/download/{id}", produces="application/zip")
-    public byte[] download(@PathVariable Long id) throws IOException {
-        Search search = searchRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+    public byte[] download(@PathVariable Long id, Authentication authentication) throws IOException {
+        Search search = findSearch(id, authentication);
         if (!search.getState().equals(Search.State.DONE)) {
             throw new ResourceNotFoundException("Search is not processed yet.");
         }
@@ -173,5 +173,14 @@ public class SearchController {
         IOUtils.closeQuietly(bufferedOutputStream);
         IOUtils.closeQuietly(byteArrayOutputStream);
         return byteArrayOutputStream.toByteArray();
+    }
+
+    private Search findSearch(@PathVariable Long id, Authentication authentication) {
+        Search search = searchRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        AppUser user = ((AppUserPrincipal)authentication.getPrincipal()).getAppUser();
+        if(user.getId() != search.getUser().getId() && user.getRole().equals(AppUser.Role.ADMIN)) {
+            throw new RuntimeException("You are not allowed to view this saved search.");
+        }
+        return search;
     }
 }

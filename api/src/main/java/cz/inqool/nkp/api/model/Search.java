@@ -24,6 +24,7 @@ public class Search extends AuditModel {
 		INDEXING,
 		PROCESSING,
 		ERROR,
+		STOPPED,
 		DONE
 	}
 
@@ -94,4 +95,8 @@ public class Search extends AuditModel {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "finished_at")
 	private Date finishedAt;
+
+	public boolean isFinished() {
+		return state.equals(State.STOPPED) || state.equals(State.ERROR) || state.equals(State.DONE);
+	}
 }

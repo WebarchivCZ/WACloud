@@ -1,17 +1,17 @@
 package cz.inqool.nkp.api.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 @Getter
-@AllArgsConstructor
+@Setter
+@NoArgsConstructor
 public class SaveSearchDTO {
 
-	@Valid
 	@NotNull
-	private final String name;
+	private String name;
 
 }

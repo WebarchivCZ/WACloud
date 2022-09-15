@@ -53,7 +53,7 @@ public class TokenAuthorizationFilter extends BasicAuthenticationFilter {
         if (token != null) {
             final Optional<AppUser> appUser = userRepository.findByAccessToken(token.substring(TOKEN_PREFIX.length()).trim());
             if (appUser.isPresent()) {
-                return new UsernamePasswordAuthenticationToken(appUser.get(), null, Collections.<GrantedAuthority>singletonList(new SimpleGrantedAuthority(appUser.get().getRole().name())));
+                return new UsernamePasswordAuthenticationToken(new AppUserPrincipal(appUser.get()), null, Collections.<GrantedAuthority>singletonList(new SimpleGrantedAuthority(appUser.get().getRole().name())));
             }
             return null;
         }

@@ -194,7 +194,17 @@ export const FavoriteForm = () => {
                   {queries
                     .filter((v) => !['DONE', 'ERROR', 'STOPPED'].includes(v.state))
                     .map((row) => (
-                      <TableRow hover key={row.id}>
+                      <TableRow
+                        hover
+                        style={{ cursor: 'pointer' }}
+                        key={row.id}
+                        onClick={() =>
+                          dialog.open({
+                            size: 'lg',
+                            content: QueryDetailDialog,
+                            values: row
+                          })
+                        }>
                         <TableCell>
                           <span aria-label={row.filter}>
                             {row.filter.length > 60
@@ -238,8 +248,21 @@ export const FavoriteForm = () => {
                 .filter((v) => ['DONE', 'ERROR', 'STOPPED'].includes(v.state))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row) => (
-                  <TableRow hover key={row.id}>
-                    <TableCell>
+                  <TableRow
+                    hover
+                    style={{ cursor: 'pointer' }}
+                    key={row.id}
+                    onClick={() =>
+                      dialog.open({
+                        size: 'lg',
+                        content: QueryDetailDialog,
+                        values: row
+                      })
+                    }>
+                    <TableCell
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}>
                       <Button
                         key="removeFromFavorite"
                         variant="text"
@@ -277,7 +300,10 @@ export const FavoriteForm = () => {
                     </TableCell>
                     <TableCell>{new Date(row.createdAt).toLocaleString(i18n.language)}</TableCell>
                     <TableCell>{stateToString(row.state)}</TableCell>
-                    <TableCell>
+                    <TableCell
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}>
                       <ActionsMenu actions={actions?.(row) ?? []} hideEmpty />
                     </TableCell>
                   </TableRow>

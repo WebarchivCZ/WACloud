@@ -3,6 +3,7 @@ package cz.inqool.nkp.api.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.inqool.nkp.api.dto.*;
+import cz.inqool.nkp.api.exception.SearchStoppedException;
 import cz.inqool.nkp.api.model.AnalyticQuery;
 import cz.inqool.nkp.api.model.Harvest;
 import cz.inqool.nkp.api.model.Search;
@@ -127,7 +128,7 @@ public class SearchServiceImpl implements SearchService {
     public void index(Search s) {
         Search query = searchRepository.findById(s.getId()).get();
         if (query.getState().equals(Search.State.STOPPED)) {
-            throw new RuntimeException("This job was stopped.");
+            throw new SearchStoppedException();
         }
         try {
             List<String> ids = query.getIds();
@@ -604,7 +605,7 @@ public class SearchServiceImpl implements SearchService {
         if (search.getState().equals(Search.State.STOPPED)) {
             search.setFinishedAt(new Date());
             searchRepository.saveAndFlush(search);
-            throw new RuntimeException("This job was stopped.");
+            throw new SearchStoppedException();
         }
         search.setIndexed(totalCount);
         searchRepository.saveAndFlush(search);
@@ -616,7 +617,7 @@ public class SearchServiceImpl implements SearchService {
         if (search.getState().equals(Search.State.STOPPED)) {
             search.setFinishedAt(new Date());
             searchRepository.saveAndFlush(search);
-            throw new RuntimeException("This job was stopped.");
+            throw new SearchStoppedException();
         }
         search.setState(Search.State.INDEXING);
         search.setStartedAt(new Date());
@@ -629,7 +630,7 @@ public class SearchServiceImpl implements SearchService {
         if (search.getState().equals(Search.State.STOPPED)) {
             search.setFinishedAt(new Date());
             searchRepository.saveAndFlush(search);
-            throw new RuntimeException("This job was stopped.");
+            throw new SearchStoppedException();
         }
         search.setState(Search.State.PROCESSING);
         searchRepository.saveAndFlush(search);
@@ -642,7 +643,7 @@ public class SearchServiceImpl implements SearchService {
         if (search.getState().equals(Search.State.STOPPED)) {
             search.setFinishedAt(new Date());
             searchRepository.saveAndFlush(search);
-            throw new RuntimeException("This job was stopped.");
+            throw new SearchStoppedException();
         }
         analyticQuery.setState(AnalyticQuery.State.RUNNING);
         analyticQuery.setStartedAt(new Date());
@@ -692,6 +693,11 @@ public class SearchServiceImpl implements SearchService {
             finishProcessing(search, Search.State.DONE);
         }
         catch (Throwable ex) {
+            if (ex instanceof SearchStoppedException) {
+                log.info(ex.getMessage());
+                return;
+            }
+
             log.error("Error during processing", ex);
             finishProcessing(search, Search.State.ERROR);
         }

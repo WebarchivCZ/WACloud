@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Grid,
   makeStyles,
@@ -17,6 +17,8 @@ import AddIcon from '@material-ui/icons/Add';
 import { useTranslation } from 'react-i18next';
 
 import IQuery from '../interfaces/IQuery';
+import { SearchContext } from '../components/Search.context';
+import { Types } from '../components/reducers';
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -46,16 +48,20 @@ function AnalyticQueriesForm({
   const { t } = useTranslation();
   const classes = useStyles();
 
+  const { state, dispatch } = useContext(SearchContext);
+
   const handleQueryTypeChange = (index: number, event: React.ChangeEvent<{ value: unknown }>) => {
-    const q: IQuery[] = _.cloneDeep(queries);
+    const q: IQuery[] = _.cloneDeep(state.queries);
     q[index].searchType = event.target.value as string;
     setQueries(q);
+    dispatch({ type: Types.SetQueries, payload: { queries: q } });
   };
 
   const handleChangeSearchText = (index: number, event: React.ChangeEvent<{ value: unknown }>) => {
-    const q: IQuery[] = _.cloneDeep(queries);
+    const q: IQuery[] = _.cloneDeep(state.queries);
     q[index].searchText = event.target.value as string;
     setQueries(q);
+    dispatch({ type: Types.SetQueries, payload: { queries: q } });
   };
 
   const handleChangeSearchTextOpposite = (
@@ -68,9 +74,10 @@ function AnalyticQueriesForm({
   };
 
   const handleChangeContext = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
-    const q: IQuery[] = _.cloneDeep(queries);
+    const q: IQuery[] = _.cloneDeep(state.queries);
     q[index].context = event.target.checked as boolean;
     setQueries(q);
+    dispatch({ type: Types.SetQueries, payload: { queries: q } });
   };
 
   const handleChangeUseOnlyDomains = (
@@ -95,21 +102,24 @@ function AnalyticQueriesForm({
     index: number,
     event: React.ChangeEvent<{ value: unknown }>
   ) => {
-    const q: IQuery[] = _.cloneDeep(queries);
+    const q: IQuery[] = _.cloneDeep(state.queries);
     q[index].contextSize = event.target.value as number;
     setQueries(q);
+    dispatch({ type: Types.SetQueries, payload: { queries: q } });
   };
 
   const handleChangeLimit = (index: number, event: React.ChangeEvent<{ value: string }>) => {
-    const q: IQuery[] = _.cloneDeep(queries);
+    const q: IQuery[] = _.cloneDeep(state.queries);
     q[index].limit = parseInt(event.target.value);
     setQueries(q);
+    dispatch({ type: Types.SetQueries, payload: { queries: q } });
   };
 
   const handleDeleteQueryText = (index: number, ind: number) => {
-    const q: IQuery[] = _.cloneDeep(queries);
+    const q: IQuery[] = _.cloneDeep(state.queries);
     q[index].queries.splice(ind, 1);
     setQueries(q);
+    dispatch({ type: Types.SetQueries, payload: { queries: q } });
   };
 
   const handleDeleteQueryOppositeText = (index: number, ind: number) => {
@@ -119,11 +129,12 @@ function AnalyticQueriesForm({
   };
 
   const handleAddQueryText = (index: number) => {
-    if (queries[index].searchText.length > 0) {
-      const q: IQuery[] = _.cloneDeep(queries);
+    if (state.queries[index].searchText.length > 0) {
+      const q: IQuery[] = _.cloneDeep(state.queries);
       q[index].queries.push(q[index].searchText);
       q[index].searchText = '';
       setQueries(q);
+      dispatch({ type: Types.SetQueries, payload: { queries: q } });
     }
   };
 
@@ -137,7 +148,7 @@ function AnalyticQueriesForm({
   };
 
   const handleAddQuery = () => {
-    const q: IQuery[] = _.cloneDeep(queries);
+    const q: IQuery[] = _.cloneDeep(state.queries);
     q.push({
       queries: [],
       queriesOpposite: [],
@@ -151,12 +162,14 @@ function AnalyticQueriesForm({
       useOnlyDomainsOpposite: false
     });
     setQueries(q);
+    dispatch({ type: Types.SetQueries, payload: { queries: q } });
   };
 
   const handleDeleteQuery = (index: number) => {
-    const q: IQuery[] = _.cloneDeep(queries);
+    const q: IQuery[] = _.cloneDeep(state.queries);
     q.splice(index, 1);
     setQueries(q);
+    dispatch({ type: Types.SetQueries, payload: { queries: q } });
   };
 
   return (
@@ -175,7 +188,7 @@ function AnalyticQueriesForm({
           </Grid>
         </Grid>
       </Grid>
-      {queries.map((query, index) => (
+      {state.queries.map((query, index) => (
         <Box my={2} key={index}>
           <Paper>
             <Box p={2}>

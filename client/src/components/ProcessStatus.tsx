@@ -1,12 +1,14 @@
 import { Box, Typography, Grid, Paper, makeStyles } from '@material-ui/core';
-import React, { FC } from 'react';
+import React, { FC, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import CheckIcon from '@material-ui/icons/Check';
 
 import { SearchState } from '../interfaces/ISearch';
 
+import { SearchContext } from './Search.context';
+
 type Props = {
-  state: SearchState;
+  state?: SearchState;
 };
 
 const useStyles = makeStyles(() => ({
@@ -25,6 +27,10 @@ const ProcessStatus: FC<Props> = ({ state }) => {
 
   const classes = useStyles();
 
+  const { state: contextState } = useContext(SearchContext);
+
+  const currentSearchState = state ? state : contextState.searchState;
+
   return (
     <Grid item xs={12}>
       <Typography variant="h2">{t<string>('process.state')}</Typography>
@@ -37,7 +43,9 @@ const ProcessStatus: FC<Props> = ({ state }) => {
                 width={40}
                 height={40}
                 bgcolor={
-                  state === 'INDEXING' || state === 'DONE' || state === 'PROCESSING'
+                  currentSearchState == 'INDEXING' ||
+                  currentSearchState == 'DONE' ||
+                  currentSearchState == 'PROCESSING'
                     ? 'primary.main'
                     : '#757575'
                 }
@@ -45,7 +53,7 @@ const ProcessStatus: FC<Props> = ({ state }) => {
                 display="flex"
                 justifyContent="center"
                 alignItems="center">
-                {state === 'PROCESSING' || state === 'DONE' ? (
+                {currentSearchState == 'PROCESSING' || currentSearchState == 'DONE' ? (
                   <CheckIcon />
                 ) : (
                   <Typography className={classes.textBold}>1</Typography>
@@ -56,11 +64,11 @@ const ProcessStatus: FC<Props> = ({ state }) => {
                   {t<string>('process.indexing')}
                 </Typography>
                 <Typography>
-                  {state === 'WAITING'
+                  {currentSearchState == 'WAITING'
                     ? t<string>('process.waiting')
-                    : state === 'INDEXING'
+                    : currentSearchState == 'INDEXING'
                     ? t<string>('process.processing')
-                    : state === 'ERROR'
+                    : currentSearchState == 'ERROR'
                     ? t<string>('process.error')
                     : '100%'}
                 </Typography>
@@ -72,12 +80,16 @@ const ProcessStatus: FC<Props> = ({ state }) => {
                 mx={2}
                 width={40}
                 height={40}
-                bgcolor={state === 'PROCESSING' || state === 'DONE' ? 'primary.main' : '#757575'}
+                bgcolor={
+                  currentSearchState == 'PROCESSING' || currentSearchState == 'DONE'
+                    ? 'primary.main'
+                    : '#757575'
+                }
                 color="white"
                 display="flex"
                 justifyContent="center"
                 alignItems="center">
-                {state === 'DONE' ? (
+                {currentSearchState == 'DONE' ? (
                   <CheckIcon />
                 ) : (
                   <Typography className={classes.textBold}>2</Typography>
@@ -88,11 +100,11 @@ const ProcessStatus: FC<Props> = ({ state }) => {
                   {t<string>('process.statisticalQueries')}
                 </Typography>
                 <Typography>
-                  {state === 'WAITING' || state === 'INDEXING'
+                  {currentSearchState == 'WAITING' || currentSearchState == 'INDEXING'
                     ? t<string>('process.waiting')
-                    : state === 'PROCESSING'
+                    : currentSearchState == 'PROCESSING'
                     ? t<string>('process.processing')
-                    : state === 'ERROR'
+                    : currentSearchState == 'ERROR'
                     ? t<string>('process.error')
                     : '100%'}
                 </Typography>
@@ -104,12 +116,12 @@ const ProcessStatus: FC<Props> = ({ state }) => {
                 mx={2}
                 width={40}
                 height={40}
-                bgcolor={state === 'DONE' ? 'primary.main' : '#757575'}
+                bgcolor={currentSearchState == 'DONE' ? 'primary.main' : '#757575'}
                 color="white"
                 display="flex"
                 justifyContent="center"
                 alignItems="center">
-                {state === 'DONE' ? (
+                {currentSearchState == 'DONE' ? (
                   <CheckIcon />
                 ) : (
                   <Typography className={classes.textBold}>3</Typography>

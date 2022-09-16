@@ -1,3 +1,4 @@
+import React, { useContext } from 'react';
 import {
   Button,
   createStyles,
@@ -7,10 +8,11 @@ import {
   Theme,
   Typography
 } from '@material-ui/core';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { SearchContext } from '../components/Search.context';
 import { ValuableProps } from '../interfaces/ValuableProps';
+import { Types } from '../components/reducers';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -33,12 +35,14 @@ interface LogicalButtonProps {
   appendValue: string;
 }
 
-export const QueryForm = ({ value, setValue, disabled }: ValuableProps<string>) => {
+export const QueryForm = ({ value, disabled }: ValuableProps<string>) => {
   const classes = useStyles();
   const { t } = useTranslation();
 
+  const { dispatch } = useContext(SearchContext);
+
   const handleChangeFilter = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(event.target.value);
+    dispatch({ type: Types.SetQuery, payload: { query: event.target.value } });
   };
 
   const LogicalButton = ({ label, appendValue }: LogicalButtonProps) => (
@@ -48,7 +52,7 @@ export const QueryForm = ({ value, setValue, disabled }: ValuableProps<string>) 
         variant="contained"
         className={classes.button}
         disabled={disabled}
-        onClick={() => setValue(value + appendValue)}>
+        onClick={() => dispatch({ type: Types.SetQuery, payload: { query: value + appendValue } })}>
         {label}
       </Button>
     </Grid>

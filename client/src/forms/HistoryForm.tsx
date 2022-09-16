@@ -16,6 +16,7 @@ import Visibility from '@material-ui/icons/Visibility';
 import StarIcon from '@material-ui/icons/Star';
 import ReplayIcon from '@material-ui/icons/Replay';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import { useHistory } from 'react-router-dom';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
 
 import ActionsMenu from '../components/ActionsMenu';
@@ -23,9 +24,14 @@ import { addNotification } from '../config/notifications';
 import ISearch from '../interfaces/ISearch';
 import { DialogContext } from '../components/dialog/Dialog.context';
 import QueryDetailDialog from '../components/dialog/QueryDetailDialog';
+import AddToFavoriteDialog from '../components/dialog/AddToFavoriteDialog';
+import { SearchContext } from '../components/Search.context';
+import { Types } from '../components/reducers';
 
 export const HistoryForm = () => {
   const { t, i18n } = useTranslation();
+  const history = useHistory();
+  const { state, dispatch } = useContext(SearchContext);
 
   const [queries, setQueries] = useState<ISearch[]>([]);
   const [page, setPage] = useState(0);
@@ -39,6 +45,7 @@ export const HistoryForm = () => {
         icon: <Visibility color="primary" />,
         title: t('query.buttons.detail'),
         onClick: () => {
+          console.log(r);
           dialog.open({
             size: 'lg',
             content: QueryDetailDialog,
@@ -47,12 +54,51 @@ export const HistoryForm = () => {
         }
       },
       {
-        icon: <StarIcon color="primary" />,
-        title: t('query.buttons.addToFavorites')
+        icon: r.favorite ? <StarBorderIcon color="primary" /> : <StarIcon color="primary" />,
+        title: r.favorite
+          ? t('query.buttons.removeFromFavorites')
+          : t('query.buttons.addToFavorites'),
+        onClick: () => {
+          r.favorite
+            ? fetch(`/api/search/favorite/${r.id}`, {
+                method: 'DELETE'
+              })
+                .then(() => {
+                  addNotification(
+                    t('header.favorite'),
+                    t('administration.users.notifications.removeFavoriteSuccess'),
+                    'success'
+                  );
+                })
+                .catch(() => {
+                  addNotification(
+                    t('header.favorite'),
+                    t('administration.users.notifications.removeFovriteError', 'danger')
+                  );
+                })
+            : dialog.open({
+                size: 'sm',
+                content: AddToFavoriteDialog,
+                values: r
+              });
+        }
       },
       {
         icon: <ReplayIcon color="primary" />,
-        title: t('query.buttons.repeat')
+        title: t('query.buttons.repeat'),
+        onClick: () => {
+          dispatch({
+            type: Types.SetState,
+            payload: {
+              ...state,
+              query: r.filter,
+              entriesLimit: r.entries,
+              seed: r.randomSeed,
+              harvests: r.harvests
+            }
+          });
+          history.push('/search');
+        }
       },
       {
         icon: !['DONE', 'ERROR'].includes(r.state) ? (
@@ -83,7 +129,6 @@ export const HistoryForm = () => {
     []
   );
 
-  // console.log(queries);
   const stateToString = (state: string) => {
     switch (state) {
       case 'WAITING':
@@ -101,7 +146,6 @@ export const HistoryForm = () => {
   };
 
   const refreshSearches = () => {
-    console.log('refresh');
     fetch('/api/search')
       .then((res) => res.json())
       .then(
@@ -125,7 +169,6 @@ export const HistoryForm = () => {
 
   useEffect(() => {
     refreshSearches();
-    console.log('effect');
     const interval = setInterval(refreshSearches, 2500);
     return () => clearInterval(interval);
   }, []);
@@ -195,9 +238,11 @@ export const HistoryForm = () => {
                 .map((row) => (
                   <TableRow hover key={row.id}>
                     <TableCell>
-                      {/* TODO: determine which star to show based on if query is favourite or not */}
-                      {/* <StarBorderIcon color="primary" /> */}
-                      <StarIcon color="primary" />
+                      {row.favorite ? (
+                        <StarIcon color="primary" />
+                      ) : (
+                        <StarBorderIcon color="primary" />
+                      )}
                     </TableCell>
 
                     <TableCell>

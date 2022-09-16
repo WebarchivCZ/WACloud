@@ -18,8 +18,6 @@ import Spinner from '../components/Spinner';
 import { addNotification } from '../config/notifications';
 import { useAuth } from '../services/useAuth';
 
-// import IHarvest from "../interfaces/IHarvest";
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {

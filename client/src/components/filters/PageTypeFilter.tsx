@@ -1,9 +1,10 @@
+import React, { useContext } from 'react';
 import { Button, MenuItem, TextField } from '@material-ui/core';
 import DvrIcon from '@material-ui/icons/Dvr';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ValuableOptionalsProps } from '../../interfaces/ValuableOptionalsProps';
+import { SearchContext } from '../Search.context';
 
 import { FilterContent } from './FilterContent';
 
@@ -16,14 +17,15 @@ export const PageTypeFilter = ({
   query
 }: ValuableOptionalsProps<string | undefined> & { query: string }) => {
   const { t } = useTranslation();
+  const { state } = useContext(SearchContext);
 
   const buttonClick = (positive: boolean) => () => {
     if (append) {
       append(
-        (query.length > 0
-          ? !query.trim().endsWith('AND') &&
-            !query.trim().endsWith('OR') &&
-            !query.trim().endsWith('NOT')
+        (state.query.length > 0
+          ? !state.query.trim().endsWith('AND') &&
+            !state.query.trim().endsWith('OR') &&
+            !state.query.trim().endsWith('NOT')
             ? ' AND '
             : ''
           : '') +

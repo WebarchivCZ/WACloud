@@ -1,10 +1,12 @@
+import React, { Dispatch, SetStateAction, useContext } from 'react';
 import { Button } from '@material-ui/core';
 import DateRangeIcon from '@material-ui/icons/DateRange';
-import React, { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KeyboardDatePicker } from '@material-ui/pickers';
 import AddIcon from '@material-ui/icons/Add';
 import { format } from 'date-fns';
+
+import { SearchContext } from '../Search.context';
 
 import { FilterContent } from './FilterContent';
 
@@ -28,13 +30,16 @@ export const DateFilter = ({
   query
 }: DateFilterProps<Date | null>) => {
   const { t } = useTranslation();
+
+  const { state } = useContext(SearchContext);
+
   const buttonClick = () => {
     if (append) {
       append(
-        (query.length > 0
-          ? !query.trim().endsWith('AND') &&
-            !query.trim().endsWith('OR') &&
-            !query.trim().endsWith('NOT')
+        (state.query.length > 0
+          ? !state.query.trim().endsWith('AND') &&
+            !state.query.trim().endsWith('OR') &&
+            !state.query.trim().endsWith('NOT')
             ? ' AND '
             : ''
           : '') +

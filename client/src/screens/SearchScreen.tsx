@@ -120,7 +120,19 @@ const SearchScreen = () => {
             searchState: data.state
           }
         });
-      });
+        addNotification(
+          t('header.query'),
+          t('administration.users.notifications.stopQuerySuccess'),
+          'success'
+        );
+      })
+      .catch(() =>
+        addNotification(
+          t('header.query'),
+          t('administration.users.notifications.stopQueryError'),
+          'danger'
+        )
+      );
   };
 
   useEffect(() => {
@@ -128,11 +140,19 @@ const SearchScreen = () => {
       refreshSearchState(state.queryId);
       const interval = setInterval(() => {
         refreshSearchState(state.queryId ?? 0);
-        if (state.searchState === 'DONE') {
+        if (
+          state.searchState === 'DONE' ||
+          state.searchState === 'STOPPED' ||
+          state.searchState === 'ERROR'
+        ) {
           clearInterval(interval);
         }
-      }, 200);
-      if (state.searchState === 'DONE') {
+      }, 2000);
+      if (
+        state.searchState === 'DONE' ||
+        state.searchState === 'STOPPED' ||
+        state.searchState === 'ERROR'
+      ) {
         clearInterval(interval);
       }
       return () => {
@@ -263,8 +283,10 @@ const SearchScreen = () => {
                   variant="contained"
                   size="large"
                   color="primary"
-                  onClick={() => handleSearchStop()}>
-                  {t<string>('process.stop')}
+                  onClick={() => state.searchState !== 'STOPPED' && handleSearchStop()}>
+                  {state.searchState === 'STOPPED'
+                    ? t<string>('administration.harvests.states.STOPPED')
+                    : t<string>('process.stop')}
                 </BlackButton>
               </Box>
             </>

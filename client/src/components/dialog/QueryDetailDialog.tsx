@@ -214,11 +214,11 @@ const QueryDetailDialog = ({
               key="download"
               variant="contained"
               color={'primary'}
-              disabled={!['DONE', 'ERROR'].includes(state)}
+              disabled={!['DONE', 'ERROR'].includes(state) || ['STOPPED'].includes(state)}
               size="medium"
               onClick={handleDownload}>
               <>
-                {!['DONE', 'ERROR'].includes(state) ? (
+                {!['DONE', 'ERROR', 'STOPPED'].includes(state) ? (
                   <CircularProgress size={15} />
                 ) : (
                   <GetAppIcon className={classes.icon} />

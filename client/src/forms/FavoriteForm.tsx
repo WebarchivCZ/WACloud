@@ -9,6 +9,7 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  Button,
   Typography
 } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
@@ -19,7 +20,7 @@ import ReplayIcon from '@material-ui/icons/Replay';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import { useHistory } from 'react-router-dom';
 
-import ActionsMenu from '../components/ActionsMenu';
+import ActionsMenu, { MenuAction } from '../components/ActionsMenu';
 import { addNotification } from '../config/notifications';
 import ISearch from '../interfaces/ISearch';
 import { DialogContext } from '../components/dialog/Dialog.context';
@@ -39,82 +40,91 @@ export const FavoriteForm = () => {
   const dialog = useContext(DialogContext);
 
   const actions = useCallback(
-    (r: ISearch) => [
-      {
-        icon: <Visibility color="primary" />,
-        title: t('query.buttons.detail'),
-        onClick: () => {
-          dialog.open({
-            size: 'lg',
-            content: QueryDetailDialog,
-            values: r
-          });
-        }
-      },
-      {
-        icon: <StarBorderIcon color="primary" />,
-        title: t('query.buttons.removeFromFavorites'),
-        onClick: () =>
-          fetch(`/api/search/favorite/${r.id}`, {
-            method: 'DELETE'
-          })
-            .then(() => {
-              addNotification(
-                t('header.favorite'),
-                t('administration.users.notifications.removeFavoriteSuccess'),
-                'success'
-              );
-            })
-            .catch(() => {
-              addNotification(
-                t('header.favorite'),
-                t('administration.users.notifications.removeFovriteError', 'danger')
-              );
-            })
-      },
-      {
-        icon: <ReplayIcon color="primary" />,
-        title: t('query.buttons.repeat'),
-        onClick: () => {
-          dispatch({
-            type: Types.SetState,
-            payload: {
-              ...state,
-              query: r.filter,
-              entriesLimit: r.entries,
-              seed: r.randomSeed,
-              harvests: r.harvests
+    (r: ISearch) =>
+      (
+        [
+          {
+            icon: <Visibility color="primary" />,
+            title: t('query.buttons.detail'),
+            onClick: () => {
+              dialog.open({
+                size: 'lg',
+                content: QueryDetailDialog,
+                values: r
+              });
             }
-          });
-          history.push('/search');
-        }
-      },
-      {
-        icon: !['DONE', 'ERROR'].includes(r.state) ? (
-          <CircularProgress size={15} />
-        ) : (
-          <GetAppIcon color="primary" />
-        ),
-        title: t('query.buttons.download'),
-        onClick: () =>
-          ['DONE'].includes(r.state) &&
-          fetch('/api/download/' + r.id)
-            .then((response) => response.blob())
-            .then((blob) => {
-              const url = window.URL.createObjectURL(blob);
-              const a = document.createElement('a');
-              a.href = url;
-              a.download = 'results.zip';
-              document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
-              a.click();
-              a.remove(); //afterwards we remove the element again
-              addNotification(t('query.success.title'), t('query.success.message'), 'success');
-            })
-            .catch(() =>
-              addNotification(t('query.error.title'), t('query.error.message'), 'danger')
-            )
-      }
-    ],
+          },
+          {
+            icon: <StarBorderIcon color="primary" />,
+            title: t('query.buttons.removeFromFavorites'),
+            onClick: () =>
+              fetch(`/api/search/favorite/${r.id}`, {
+                method: 'DELETE'
+              })
+                .then(() => {
+                  addNotification(
+                    t('header.favorite'),
+                    t('administration.users.notifications.removeFavoriteSuccess'),
+                    'success'
+                  );
+                })
+                .catch(() => {
+                  addNotification(
+                    t('header.favorite'),
+                    t('administration.users.notifications.removeFovriteError', 'danger')
+                  );
+                })
+          },
+          {
+            icon: <ReplayIcon color="primary" />,
+            title: t('query.buttons.repeat'),
+            onClick: () => {
+              dispatch({
+                type: Types.SetState,
+                payload: {
+                  ...state,
+                  query: r.filter,
+                  entriesLimit: r.entries,
+                  seed: r.randomSeed,
+                  harvests: r.harvests
+                }
+              });
+              history.push('/search');
+            }
+          },
+          !['STOPPED'].includes(r.state)
+            ? {
+                icon: !['DONE', 'ERROR'].includes(r.state) ? (
+                  <CircularProgress size={15} />
+                ) : (
+                  <GetAppIcon color="primary" />
+                ),
+                title: t('query.buttons.download'),
+                onClick: () =>
+                  ['DONE'].includes(r.state) &&
+                  fetch('/api/download/' + r.id)
+                    .then((response) => response.blob())
+                    .then((blob) => {
+                      const url = window.URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = 'results.zip';
+                      document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
+                      a.click();
+                      a.remove(); //afterwards we remove the element again
+                      addNotification(
+                        t('query.success.title'),
+                        t('query.success.message'),
+                        'success'
+                      );
+                    })
+                    .catch(() =>
+                      addNotification(t('query.error.title'), t('query.error.message'), 'danger')
+                    )
+              }
+            : undefined
+        ] as MenuAction[]
+      ).filter((i) => i !== undefined),
     []
   );
 
@@ -128,6 +138,8 @@ export const FavoriteForm = () => {
         return t('administration.harvests.states.PROCESSING');
       case 'ERROR':
         return t('administration.harvests.states.ERROR');
+      case 'STOPPED':
+        return t('administration.harvests.states.STOPPED');
       case 'DONE':
         return t('process.finished');
     }
@@ -164,7 +176,7 @@ export const FavoriteForm = () => {
 
   return (
     <>
-      {queries.filter((v) => !['DONE', 'ERROR'].includes(v.state)).length > 0 && (
+      {queries.filter((v) => !['DONE', 'ERROR', 'STOPPED'].includes(v.state)).length > 0 && (
         <>
           <Typography variant="h1">{t<string>('header.currentQueries')}</Typography>
           <Card variant="outlined">
@@ -180,7 +192,7 @@ export const FavoriteForm = () => {
                 </TableHead>
                 <TableBody>
                   {queries
-                    .filter((v) => !['DONE', 'ERROR'].includes(v.state))
+                    .filter((v) => !['DONE', 'ERROR', 'STOPPED'].includes(v.state))
                     .map((row) => (
                       <TableRow hover key={row.id}>
                         <TableCell>
@@ -223,12 +235,36 @@ export const FavoriteForm = () => {
             </TableHead>
             <TableBody>
               {queries
-                .filter((v) => ['DONE', 'ERROR'].includes(v.state))
+                .filter((v) => ['DONE', 'ERROR', 'STOPPED'].includes(v.state))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row) => (
                   <TableRow hover key={row.id}>
                     <TableCell>
-                      <StarIcon color="primary" />
+                      <Button
+                        key="removeFromFavorite"
+                        variant="text"
+                        color={'default'}
+                        size="medium"
+                        onClick={() => {
+                          fetch(`/api/search/favorite/${row.id}`, {
+                            method: 'DELETE'
+                          })
+                            .then(() => {
+                              addNotification(
+                                t('header.favorite'),
+                                t('administration.users.notifications.removeFavoriteSuccess'),
+                                'success'
+                              );
+                            })
+                            .catch(() => {
+                              addNotification(
+                                t('header.favorite'),
+                                t('administration.users.notifications.removeFovriteError', 'danger')
+                              );
+                            });
+                        }}>
+                        <StarIcon color="primary" />
+                      </Button>
                     </TableCell>
 
                     <TableCell>{row.name}</TableCell>
@@ -252,7 +288,7 @@ export const FavoriteForm = () => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={queries.filter((v) => ['DONE', 'ERROR'].includes(v.state)).length}
+          count={queries.filter((v) => ['DONE', 'ERROR', 'STOPPED'].includes(v.state)).length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

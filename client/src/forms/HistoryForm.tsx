@@ -9,6 +9,7 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  Button,
   Typography
 } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
@@ -250,9 +251,51 @@ export const HistoryForm = () => {
                   <TableRow hover key={row.id}>
                     <TableCell>
                       {row.favorite ? (
-                        <StarIcon color="primary" />
+                        <Button
+                          key="removeFromFavorite"
+                          variant="text"
+                          color={'default'}
+                          size="medium"
+                          onClick={() => {
+                            fetch(`/api/search/favorite/${row.id}`, {
+                              method: 'DELETE'
+                            })
+                              .then(() => {
+                                addNotification(
+                                  t('header.favorite'),
+                                  t('administration.users.notifications.removeFavoriteSuccess'),
+                                  'success'
+                                );
+                              })
+                              .catch(() => {
+                                addNotification(
+                                  t('header.favorite'),
+                                  t(
+                                    'administration.users.notifications.removeFovriteError',
+                                    'danger'
+                                  )
+                                );
+                              });
+                          }}>
+                          <StarIcon color="primary" />
+                        </Button>
                       ) : (
-                        <StarBorderIcon color="primary" />
+                        <Button
+                          key="addToFavorite"
+                          variant="text"
+                          color={'default'}
+                          size="medium"
+                          onClick={() => {
+                            dialog.open({
+                              size: 'sm',
+                              content: AddToFavoriteDialog,
+                              values: {
+                                id: row.id
+                              }
+                            });
+                          }}>
+                          <StarBorderIcon color="primary" />
+                        </Button>
                       )}
                     </TableCell>
 

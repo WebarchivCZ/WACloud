@@ -47,6 +47,10 @@ const useStyles = makeStyles((theme) => ({
     padding: '2rem',
     overflow: 'hidden !important'
   },
+  overflow: {
+    maxHeight: '220px',
+    overflowY: 'scroll'
+  },
   words: {
     display: 'flex',
     alignItems: 'center'
@@ -115,7 +119,7 @@ const QueryDetailDialog = ({
       <Grid item xs={12}>
         <Typography variant="h2">{t<string>('analytics.title')}</Typography>
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={12} className={classes.overflow}>
         {queries &&
           queries?.map((query, index) => (
             <Box my={2} key={index}>

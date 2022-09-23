@@ -113,10 +113,6 @@ interface FiltersDrawerProps {
   query: string;
   stopWords: string[];
   setStopWords: Dispatch<SetStateAction<string[]>>;
-  entriesLimit: number;
-  setEntriesLimit: Dispatch<SetStateAction<number>>;
-  seed: number | null;
-  setSeed: Dispatch<SetStateAction<number | null>>;
   drawerOpen: boolean;
   disabled?: boolean;
 }
@@ -125,10 +121,6 @@ export const FiltersDrawer = ({
   query,
   stopWords,
   setStopWords,
-  entriesLimit,
-  setEntriesLimit,
-  seed,
-  setSeed,
   drawerOpen,
   disabled
 }: FiltersDrawerProps) => {
@@ -246,14 +238,7 @@ export const FiltersDrawer = ({
           setValue={setStopWords}
           disabled={disabled}
         />,
-        <EntriesLimitFilter
-          key="entriesLimitFilter"
-          value={entriesLimit}
-          setValue={setEntriesLimit}
-          seed={seed}
-          setSeed={setSeed}
-          disabled={disabled}
-        />
+        <EntriesLimitFilter key="entriesLimitFilter" disabled={disabled} />
       ]
     }
   ];

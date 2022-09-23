@@ -43,8 +43,6 @@ const SearchScreen = () => {
 
   const [query, setQuery] = useState<string>('');
   const [stopWords, setStopWords] = useState<string[]>(stopWordsCzech.sort());
-  const [entriesLimit, setEntriesLimit] = useState<number>(1000);
-  const [seed, setSeed] = useState<number | null>(null);
 
   const [queries, setQueries] = useState<IQuery[]>([
     {
@@ -438,10 +436,6 @@ const SearchScreen = () => {
           query={query}
           stopWords={stopWords}
           setStopWords={setStopWords}
-          entriesLimit={entriesLimit}
-          setEntriesLimit={setEntriesLimit}
-          seed={seed}
-          setSeed={setSeed}
           drawerOpen={state.drawerOpen}
           disabled={state.stage !== Stage.QUERY}
         />

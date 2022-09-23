@@ -71,6 +71,7 @@ function AnalyticQueriesForm({
     const q: IQuery[] = _.cloneDeep(queries);
     q[index].searchTextOpposite = event.target.value as string;
     setQueries(q);
+    dispatch({ type: Types.SetQueries, payload: { queries: q } });
   };
 
   const handleChangeContext = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,6 +88,7 @@ function AnalyticQueriesForm({
     const q: IQuery[] = _.cloneDeep(queries);
     q[index].useOnlyDomains = event.target.checked as boolean;
     setQueries(q);
+    dispatch({ type: Types.SetQueries, payload: { queries: q } });
   };
 
   const handleChangeUseOnlyDomainsOpposite = (
@@ -96,6 +98,7 @@ function AnalyticQueriesForm({
     const q: IQuery[] = _.cloneDeep(queries);
     q[index].useOnlyDomainsOpposite = event.target.checked as boolean;
     setQueries(q);
+    dispatch({ type: Types.SetQueries, payload: { queries: q } });
   };
 
   const handleChangeContextLength = (
@@ -144,6 +147,7 @@ function AnalyticQueriesForm({
       q[index].queriesOpposite.push(q[index].searchTextOpposite);
       q[index].searchTextOpposite = '';
       setQueries(q);
+      dispatch({ type: Types.SetQueries, payload: { queries: q } });
     }
   };
 

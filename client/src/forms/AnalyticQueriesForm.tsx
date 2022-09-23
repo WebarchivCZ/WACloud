@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import IQuery from '../interfaces/IQuery';
 import { SearchContext } from '../components/Search.context';
 import { Types } from '../components/reducers';
+import { Type } from '../interfaces/Type';
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -52,7 +53,7 @@ function AnalyticQueriesForm({
 
   const handleQueryTypeChange = (index: number, event: React.ChangeEvent<{ value: unknown }>) => {
     const q: IQuery[] = _.cloneDeep(state.queries);
-    q[index].searchType = event.target.value as string;
+    q[index].searchType = event.target.value as Type;
     setQueries(q);
     dispatch({ type: Types.SetQueries, payload: { queries: q } });
   };
@@ -120,21 +121,21 @@ function AnalyticQueriesForm({
 
   const handleDeleteQueryText = (index: number, ind: number) => {
     const q: IQuery[] = _.cloneDeep(state.queries);
-    q[index].queries.splice(ind, 1);
+    q[index].queries?.splice(ind, 1);
     setQueries(q);
     dispatch({ type: Types.SetQueries, payload: { queries: q } });
   };
 
   const handleDeleteQueryOppositeText = (index: number, ind: number) => {
     const q: IQuery[] = _.cloneDeep(queries);
-    q[index].queriesOpposite.splice(ind, 1);
+    q[index].queriesOpposite?.splice(ind, 1);
     setQueries(q);
   };
 
   const handleAddQueryText = (index: number) => {
-    if (state.queries[index].searchText.length > 0) {
+    if (state.queries[index].searchText) {
       const q: IQuery[] = _.cloneDeep(state.queries);
-      q[index].queries.push(q[index].searchText);
+      q[index].queries?.push(q[index]?.searchText ?? '');
       q[index].searchText = '';
       setQueries(q);
       dispatch({ type: Types.SetQueries, payload: { queries: q } });
@@ -142,9 +143,9 @@ function AnalyticQueriesForm({
   };
 
   const handleAddQueryOppositeText = (index: number) => {
-    if (queries[index].searchTextOpposite.length > 0) {
+    if (queries[index].searchTextOpposite) {
       const q: IQuery[] = _.cloneDeep(queries);
-      q[index].queriesOpposite.push(q[index].searchTextOpposite);
+      q[index].queriesOpposite?.push(q[index]?.searchTextOpposite ?? '');
       q[index].searchTextOpposite = '';
       setQueries(q);
       dispatch({ type: Types.SetQueries, payload: { queries: q } });
@@ -160,7 +161,7 @@ function AnalyticQueriesForm({
       context: false,
       searchText: '',
       searchTextOpposite: '',
-      searchType: '',
+      searchType: 'FREQUENCY',
       limit: 10,
       useOnlyDomains: false,
       useOnlyDomainsOpposite: false
@@ -295,7 +296,7 @@ function AnalyticQueriesForm({
                     <Grid item xs={12} md={4}>
                       <Typography variant="body1">{t<string>('analytics.words')}</Typography>
                       <Box component="ul" className={classes.chipRoot}>
-                        {query.queries.map((q, ind) => (
+                        {query.queries?.map((q, ind) => (
                           <li key={ind}>
                             <Chip
                               label={q}
@@ -348,7 +349,7 @@ function AnalyticQueriesForm({
                             {t<string>('analytics.inputNodes')}
                           </Typography>
                           <Box component="ul" className={classes.chipRoot}>
-                            {query.queries.map((q, ind) => (
+                            {query.queries?.map((q, ind) => (
                               <li key={ind}>
                                 <Chip
                                   label={q}
@@ -408,7 +409,7 @@ function AnalyticQueriesForm({
                             {t<string>('analytics.outputNodes')}
                           </Typography>
                           <Box component="ul" className={classes.chipRoot}>
-                            {query.queriesOpposite.map((q, ind) => (
+                            {query.queriesOpposite?.map((q, ind) => (
                               <li key={ind}>
                                 <Chip
                                   label={q}

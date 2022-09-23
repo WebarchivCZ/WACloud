@@ -10,7 +10,6 @@ import { Header } from '../components/Header';
 import { UserMenu } from '../components/UserMenu';
 import { FiltersDrawer } from '../components/FiltersDrawer';
 import { QueryForm } from '../forms/QueryForm';
-import stopWordsCzech from '../config/stopWords';
 import { addNotification } from '../config/notifications';
 import AnalyticQueriesForm from '../forms/AnalyticQueriesForm';
 import IQuery from '../interfaces/IQuery';
@@ -42,7 +41,6 @@ const SearchScreen = () => {
   const dialog = useContext(DialogContext);
 
   const [query, setQuery] = useState<string>('');
-  const [stopWords, setStopWords] = useState<string[]>(stopWordsCzech.sort());
 
   const [queries, setQueries] = useState<IQuery[]>([
     {
@@ -52,7 +50,7 @@ const SearchScreen = () => {
       context: false,
       searchText: '',
       searchTextOpposite: '',
-      searchType: '',
+      searchType: 'FREQUENCY',
       limit: 10,
       useOnlyDomains: false,
       useOnlyDomainsOpposite: false
@@ -434,8 +432,6 @@ const SearchScreen = () => {
       drawer={
         <FiltersDrawer
           query={query}
-          stopWords={stopWords}
-          setStopWords={setStopWords}
           drawerOpen={state.drawerOpen}
           disabled={state.stage !== Stage.QUERY}
         />

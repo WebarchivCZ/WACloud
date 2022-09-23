@@ -32,6 +32,7 @@ import { Types } from '../components/reducers';
 export const HistoryForm = () => {
   const { t, i18n } = useTranslation();
   const history = useHistory();
+
   const { state, dispatch } = useContext(SearchContext);
 
   const [queries, setQueries] = useState<ISearch[]>([]);
@@ -97,7 +98,20 @@ export const HistoryForm = () => {
                   query: r.filter,
                   entriesLimit: r.entries,
                   seed: r.randomSeed,
-                  harvests: r.harvests
+                  harvests: r.harvests,
+                  stopWords: r.stopWords,
+                  queries: r.queries.map((q) => ({
+                    searchType: q.type,
+                    // searchText: q.,
+                    queries: q.expressions,
+                    queriesOpposite: q.expressionsOpposite,
+                    // query: q.,
+                    context: q.contextSize ? true : false,
+                    useOnlyDomains: q.useOnlyDomains,
+                    useOnlyDomainsOpposite: q.useOnlyDomainsOpposite,
+                    contextSize: q.contextSize,
+                    limit: q.limit
+                  }))
                 }
               });
               history.push('/search');

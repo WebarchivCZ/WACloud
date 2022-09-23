@@ -3,6 +3,7 @@ import React, { createContext, FC, useReducer } from 'react';
 import stopWordsCzech from '../config/stopWords';
 import IQuery from '../interfaces/IQuery';
 import { SearchState } from '../interfaces/ISearch';
+import { Type } from '../interfaces/Type';
 
 import { SearchActions, searchReducer } from './reducers';
 
@@ -49,7 +50,7 @@ const initialState = {
       context: false,
       searchText: '',
       searchTextOpposite: '',
-      searchType: '',
+      searchType: 'FREQUENCY' as Type,
       limit: 10,
       useOnlyDomains: false,
       useOnlyDomainsOpposite: false

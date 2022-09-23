@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useHistory } from 'react-router-dom';
 import {
   Grid,
   makeStyles,
@@ -24,6 +25,8 @@ import StarBorderIcon from '@material-ui/icons/StarBorder';
 import ISearch from '../../interfaces/ISearch';
 import { addNotification } from '../../config/notifications';
 import ProcessStatus from '../ProcessStatus';
+import { SearchContext } from '../Search.context';
+import { Types } from '../reducers';
 
 import AddToFavoriteDialog from './AddToFavoriteDialog';
 import { DialogContext } from './Dialog.context';
@@ -70,12 +73,15 @@ const useStyles = makeStyles((theme) => ({
 
 const QueryDetailDialog = ({
   onClose,
-  values: { id, filter, name, queries, state, favorite }
+  values: { id, filter, name, queries, state, favorite, entries, randomSeed, harvests, stopWords }
 }: DialogContentProps<ISearch>) => {
   const { t } = useTranslation();
   const classes = useStyles();
+  const history = useHistory();
 
   const dialog = useContext(DialogContext);
+
+  const { state: contextState, dispatch } = useContext(SearchContext);
 
   const handleDownload = () => {
     ['DONE'].includes(state) &&
@@ -136,6 +142,8 @@ const QueryDetailDialog = ({
                         <MenuItem value="FREQUENCY">Frequency</MenuItem>
                         <MenuItem value="COLLOCATION">Colocation</MenuItem>
                         {/*<MenuItem value="OCCURENCE">Occurence</MenuItem>*/}
+                        <MenuItem value="NETWORK">Network</MenuItem>
+
                         <MenuItem value="RAW">Raw</MenuItem>
                       </TextField>
                     </Grid>
@@ -183,9 +191,61 @@ const QueryDetailDialog = ({
                             </Grid>
                           </>
                         )}
+                        {query.type === 'NETWORK' && (
+                          <>
+                            <Grid item xs={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    color="primary"
+                                    checked={query.useOnlyDomains}
+                                    disabled
+                                  />
+                                }
+                                label={t<string>('analytics.useDomainsOnly')}
+                              />
+                            </Grid>
+                            <Box className={classes.words}>
+                              <Typography variant="body1">
+                                {t<string>('analytics.inputNodes')}
+                              </Typography>
+                              <Box component="ul" className={classes.chipRoot}>
+                                {query.expressions?.map((q, ind) => (
+                                  <li key={ind}>
+                                    <Chip label={q} className={classes.chip} />
+                                  </li>
+                                ))}
+                              </Box>
+                            </Box>
+                            <Grid item xs={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    color="primary"
+                                    checked={query.useOnlyDomainsOpposite}
+                                    disabled
+                                  />
+                                }
+                                label={t<string>('analytics.useDomainsOnly')}
+                              />
+                            </Grid>
+                            <Box className={classes.words}>
+                              <Typography variant="body1">
+                                {t<string>('analytics.outputNodes')}
+                              </Typography>
+                              <Box component="ul" className={classes.chipRoot}>
+                                {query.expressionsOpposite?.map((q, ind) => (
+                                  <li key={ind}>
+                                    <Chip label={q} className={classes.chip} />
+                                  </li>
+                                ))}
+                              </Box>
+                            </Box>
+                          </>
+                        )}
                       </Grid>
                     </Grid>
-                    {query.expressions.length > 0 && (
+                    {query.type !== 'NETWORK' && query.expressions.length > 0 && (
                       <Box className={classes.words}>
                         <Typography variant="body1">{t<string>('analytics.words')}</Typography>
                         <Box component="ul" className={classes.chipRoot}>
@@ -291,7 +351,35 @@ const QueryDetailDialog = ({
               variant="outlined"
               color={'primary'}
               size="medium"
-              // onClick={handleSearch}
+              // TODO: repeat query from detail dialog
+              // onClick={() => {
+              //   onClose();
+              //   dispatch({
+              //     type: Types.SetState,
+              //     payload: {
+              //       ...contextState,
+              //       query: filter,
+              //       entriesLimit: entries,
+              //       seed: randomSeed,
+              //       harvests: harvests,
+              //       stopWords: stopWords,
+              //       queries: queries.map((q) => ({
+              //         searchType: q.type,
+              //         // searchText: q.,
+              //         queries: q.expressions,
+              //         queriesOpposite: q.expressionsOpposite,
+              //         // query: q.,
+              //         context: q.contextSize ? true : false,
+              //         useOnlyDomains: q.useOnlyDomains,
+              //         useOnlyDomainsOpposite: q.useOnlyDomainsOpposite,
+              //         contextSize: q.contextSize,
+              //         limit: q.limit
+              //       }))
+              //     }
+              //   });
+              //   console.log(contextState);
+              //   history.push('/search');
+              // }}
             >
               <>
                 <ReplayIcon className={classes.icon} color="primary" />

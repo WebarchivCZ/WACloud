@@ -121,6 +121,11 @@ export const searchReducer = (state: SearchType, action: SearchActions) => {
         ...state,
         seed: action.payload.seed
       };
+    case 'SET_STOP_WORDS':
+      return {
+        ...state,
+        stopWords: action.payload.stopWords
+      };
     case 'SET_QUERIES':
       return { ...state, queries: action.payload.queries };
     default:

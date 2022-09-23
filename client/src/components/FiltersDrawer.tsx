@@ -10,15 +10,7 @@ import {
   Theme,
   Toolbar
 } from '@material-ui/core';
-import React, {
-  Dispatch,
-  FunctionComponent,
-  ReactNode,
-  SetStateAction,
-  useContext,
-  useEffect,
-  useState
-} from 'react';
+import React, { FunctionComponent, ReactNode, useContext, useEffect, useState } from 'react';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { useTranslation } from 'react-i18next';
@@ -111,19 +103,11 @@ const ListHeader: FunctionComponent<ListHeaderProps> = ({
 
 interface FiltersDrawerProps {
   query: string;
-  stopWords: string[];
-  setStopWords: Dispatch<SetStateAction<string[]>>;
   drawerOpen: boolean;
   disabled?: boolean;
 }
 
-export const FiltersDrawer = ({
-  query,
-  stopWords,
-  setStopWords,
-  drawerOpen,
-  disabled
-}: FiltersDrawerProps) => {
+export const FiltersDrawer = ({ query, drawerOpen, disabled }: FiltersDrawerProps) => {
   const classes = useStyles();
   const { t } = useTranslation();
 
@@ -232,12 +216,7 @@ export const FiltersDrawer = ({
         </ListHeader>
       ),
       filters: [
-        <StopWordsFilter
-          key="stopWordsFilter"
-          value={stopWords}
-          setValue={setStopWords}
-          disabled={disabled}
-        />,
+        <StopWordsFilter key="stopWordsFilter" disabled={disabled} />,
         <EntriesLimitFilter key="entriesLimitFilter" disabled={disabled} />
       ]
     }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -21,7 +21,8 @@ import GetAppIcon from '@material-ui/icons/GetApp';
 import PublishIcon from '@material-ui/icons/Publish';
 import DeleteIcon from '@material-ui/icons/Delete';
 
-import { ValuableProps } from '../../interfaces/ValuableProps';
+import { SearchContext } from '../Search.context';
+import { Types } from '../reducers';
 
 import { FilterContent } from './FilterContent';
 
@@ -48,17 +49,23 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export const StopWordsFilter = ({ value, setValue, disabled }: ValuableProps<string[]>) => {
+type Props = {
+  disabled?: boolean;
+};
+
+export const StopWordsFilter = ({ disabled }: Props) => {
   const { t } = useTranslation();
   const classes = useStyles();
 
+  const { state, dispatch } = useContext(SearchContext);
+
   const [open, setOpen] = useState(false);
-  const [stopWords, setStopWords] = useState(value);
+  const [stopWords, setStopWords] = useState(state.stopWords); // Current stopwords
   const [currentStopWord, setCurrentStopWord] = useState('');
 
   const handleClickOpen = () => {
     setOpen(true);
-    setStopWords(value);
+    setStopWords(state.stopWords);
   };
 
   const handleClose = () => {
@@ -80,8 +87,8 @@ export const StopWordsFilter = ({ value, setValue, disabled }: ValuableProps<str
   const loadStopWords = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     e.preventDefault();
-    const stopWords = await e.target.files?.[0].text();
-    setStopWords(stopWords.split('\n'));
+    const newStopWords = await e.target.files?.[0].text();
+    setStopWords(newStopWords.split('\n'));
   };
 
   const exportStopWords = () => {
@@ -111,7 +118,7 @@ export const StopWordsFilter = ({ value, setValue, disabled }: ValuableProps<str
           </Button>
         ]}>
         <Typography variant="body2" style={{ whiteSpace: 'break-spaces' }}>
-          {value.slice(0, 8).join(', ') + (value.length > 8 ? ',...' : '')}
+          {state.stopWords.slice(0, 8).join(', ') + (state.stopWords.length > 8 ? ',...' : '')}
         </Typography>
       </FilterContent>
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="lg">
@@ -214,7 +221,8 @@ export const StopWordsFilter = ({ value, setValue, disabled }: ValuableProps<str
           <Button
             onClick={() => {
               handleClose();
-              setValue(stopWords);
+              // Upade stopwords in context
+              dispatch({ type: Types.SetStopWords, payload: { stopWords } });
             }}
             variant="contained"
             color="primary">

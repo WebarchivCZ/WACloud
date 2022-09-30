@@ -7,13 +7,13 @@ import { Type } from '../interfaces/Type';
 
 import { SearchActions, searchReducer } from './reducers';
 
-enum Stage {
+export enum Stage {
   QUERY,
   ANALYTICS,
   PROCESS
 }
 
-type SearchContext = {
+export type SearchContext = {
   stage: Stage;
   drawerOpen: boolean;
   query: string;

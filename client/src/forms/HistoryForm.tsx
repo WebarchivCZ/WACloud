@@ -49,11 +49,13 @@ export const HistoryForm = () => {
             icon: <Visibility color="primary" />,
             title: t('query.buttons.detail'),
             onClick: () => {
-              console.log(r);
               dialog.open({
                 size: 'lg',
                 content: QueryDetailDialog,
-                values: r
+                values: r,
+                state,
+                dispatch,
+                history
               });
             }
           },

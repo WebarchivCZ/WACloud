@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
 import {
   Grid,
   makeStyles,
@@ -25,7 +24,7 @@ import StarBorderIcon from '@material-ui/icons/StarBorder';
 import ISearch from '../../interfaces/ISearch';
 import { addNotification } from '../../config/notifications';
 import ProcessStatus from '../ProcessStatus';
-import { SearchContext } from '../Search.context';
+import { Stage } from '../Search.context';
 import { Types } from '../reducers';
 
 import AddToFavoriteDialog from './AddToFavoriteDialog';
@@ -73,15 +72,15 @@ const useStyles = makeStyles((theme) => ({
 
 const QueryDetailDialog = ({
   onClose,
-  values: { id, filter, name, queries, state, favorite, entries, randomSeed, harvests, stopWords }
+  values: { id, filter, name, queries, state, favorite, entries, randomSeed, harvests, stopWords },
+  state: contextState,
+  dispatch,
+  history
 }: DialogContentProps<ISearch>) => {
   const { t } = useTranslation();
   const classes = useStyles();
-  const history = useHistory();
 
   const dialog = useContext(DialogContext);
-
-  const { state: contextState, dispatch } = useContext(SearchContext);
 
   const handleDownload = () => {
     ['DONE'].includes(state) &&
@@ -351,36 +350,40 @@ const QueryDetailDialog = ({
               variant="outlined"
               color={'primary'}
               size="medium"
-              // TODO: repeat query from detail dialog
-              // onClick={() => {
-              //   onClose();
-              //   dispatch({
-              //     type: Types.SetState,
-              //     payload: {
-              //       ...contextState,
-              //       query: filter,
-              //       entriesLimit: entries,
-              //       seed: randomSeed,
-              //       harvests: harvests,
-              //       stopWords: stopWords,
-              //       queries: queries.map((q) => ({
-              //         searchType: q.type,
-              //         // searchText: q.,
-              //         queries: q.expressions,
-              //         queriesOpposite: q.expressionsOpposite,
-              //         // query: q.,
-              //         context: q.contextSize ? true : false,
-              //         useOnlyDomains: q.useOnlyDomains,
-              //         useOnlyDomainsOpposite: q.useOnlyDomainsOpposite,
-              //         contextSize: q.contextSize,
-              //         limit: q.limit
-              //       }))
-              //     }
-              //   });
-              //   console.log(contextState);
-              //   history.push('/search');
-              // }}
-            >
+              onClick={() => {
+                onClose();
+                if (typeof dispatch !== 'undefined') {
+                  dispatch({
+                    type: Types.SetState,
+                    payload: {
+                      stage: contextState?.stage
+                        ? contextState.stage
+                        : queries
+                        ? Stage.PROCESS
+                        : Stage.ANALYTICS,
+                      queryId: id,
+                      drawerOpen: false,
+                      searchState: contextState?.searchState ?? 'WAITING',
+                      query: filter,
+                      entriesLimit: entries,
+                      seed: randomSeed,
+                      harvests: harvests,
+                      stopWords: stopWords,
+                      queries: queries.map((q) => ({
+                        searchType: q.type,
+                        queries: q.expressions,
+                        queriesOpposite: q.expressionsOpposite,
+                        context: q.contextSize ? true : false,
+                        useOnlyDomains: q.useOnlyDomains,
+                        useOnlyDomainsOpposite: q.useOnlyDomainsOpposite,
+                        contextSize: q.contextSize,
+                        limit: q.limit
+                      }))
+                    }
+                  });
+                }
+                history?.push('/search');
+              }}>
               <>
                 <ReplayIcon className={classes.icon} color="primary" />
                 {t<string>('query.buttons.repeat')}

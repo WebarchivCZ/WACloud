@@ -26,8 +26,7 @@ export const DateFilter = ({
   to,
   setTo,
   append,
-  disabled,
-  query
+  disabled
 }: DateFilterProps<Date | null>) => {
   const { t } = useTranslation();
 
@@ -44,9 +43,9 @@ export const DateFilter = ({
             : ''
           : '') +
           'date:[' +
-          format(from ? from : 0, 'yyyy-MM-dd') +
+          format(from ? from : new Date(), 'yyyy-MM-dd') +
           'T00:00:00Z TO ' +
-          format(to ? to : 0, 'yyyy-MM-dd') +
+          format(to ? to : new Date(), 'yyyy-MM-dd') +
           'T00:00:00Z]'
       );
     }

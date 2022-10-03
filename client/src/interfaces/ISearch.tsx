@@ -1,7 +1,7 @@
 import IAnalyticQuery from './IAnalyticQuery';
 import IUser from './IUser';
 
-export type SearchState = 'WAITING' | 'INDEXING' | 'PROCESSING' | 'ERROR' | 'DONE';
+export type SearchState = 'WAITING' | 'INDEXING' | 'PROCESSING' | 'ERROR' | 'DONE' | 'STOPPED';
 
 export default interface ISearch {
   id: number;

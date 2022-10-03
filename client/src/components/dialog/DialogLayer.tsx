@@ -14,7 +14,7 @@ export const DialogLayer = ({ id, content, size, onClose, ...props }: DialogLaye
 
   return (
     <Dialog maxWidth={size} fullWidth onClose={handleClose} open>
-      <DialogContent style={{ overflow: 'hidden' }}>
+      <DialogContent style={{ overflow: 'auto' }}>
         {content({ ...props, onClose: handleClose })}
       </DialogContent>
     </Dialog>

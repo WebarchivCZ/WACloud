@@ -13,6 +13,7 @@
     "success": "Byl jste úspěšně odhlášen."
   },
   "header": {
+    "query": "Dotaz",
     "newQuery": "Nový dotaz",
     "favorite": "Oblíbené",
     "myQueries": "Moje dotazy",
@@ -58,6 +59,7 @@
   },
   "query": {
     "header": "Dotaz",
+    "settings": "Nastavení dotazu",
     "operators": "Logické operátory:",
     "error": {
       "title": "Došlo k chybě",
@@ -166,7 +168,8 @@
         "INDEXED": "Importované",
         "CLEARED": "Smazané z indexu",
         "ERROR": "Chyba při importu",
-        "UNKNOWN": "Neznámý"
+        "UNKNOWN": "Neznámý",
+        "STOPPED": "Zastavený"
       },
       "notifications": {
         "import": {
@@ -254,7 +257,9 @@
         "favoriteSuccess": "Dotaz byl úspěšně označen jako oblíbený",
         "favoriteError": "Dotaz se nepovedlo přidat do oblíbených",
         "removeFavoriteSuccess": "Dotaz byl odebrán z oblíbených",
-        "removeFovriteError": "Dotaz se nepovedlo odebraz z oblíbených"
+        "removeFovriteError": "Dotaz se nepovedlo odebrat z oblíbených",
+        "stopQuerySuccess": "Dotaz byl úspěšné zastaven",
+        "stopQueryError": "Dotaz se nepovedlo zastavit"
       }
     }
   }

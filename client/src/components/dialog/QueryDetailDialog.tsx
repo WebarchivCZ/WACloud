@@ -13,17 +13,23 @@ import {
   FormControlLabel,
   Chip,
   Button,
-  CircularProgress
+  CircularProgress,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails
 } from '@material-ui/core';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import StarIcon from '@material-ui/icons/Star';
 import CloseIcon from '@material-ui/icons/Close';
 import ReplayIcon from '@material-ui/icons/Replay';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import ISearch from '../../interfaces/ISearch';
 import { addNotification } from '../../config/notifications';
 import ProcessStatus from '../ProcessStatus';
+import { Stage } from '../Search.context';
+import { Types } from '../reducers';
 
 import AddToFavoriteDialog from './AddToFavoriteDialog';
 import { DialogContext } from './Dialog.context';
@@ -36,6 +42,13 @@ const useStyles = makeStyles((theme) => ({
   chip: {
     margin: theme.spacing(0.5)
   },
+  disabled: {
+    color: 'rgba(0, 0, 0, 0.38)'
+  },
+  gap: {
+    display: 'flex',
+    gap: '1rem'
+  },
   chipRoot: {
     display: 'flex',
     flexWrap: 'wrap',
@@ -45,7 +58,11 @@ const useStyles = makeStyles((theme) => ({
   },
   dialog: {
     padding: '2rem',
-    overflow: 'hidden !important'
+    overflow: 'auto !important'
+  },
+  overflow: {
+    maxHeight: '220px',
+    overflowY: 'scroll'
   },
   words: {
     display: 'flex',
@@ -66,7 +83,10 @@ const useStyles = makeStyles((theme) => ({
 
 const QueryDetailDialog = ({
   onClose,
-  values: { id, filter, name, queries, state, favorite }
+  values: { id, filter, name, queries, state, favorite, entries, randomSeed, harvests, stopWords },
+  state: contextState,
+  dispatch,
+  history
 }: DialogContentProps<ISearch>) => {
   const { t } = useTranslation();
   const classes = useStyles();
@@ -112,10 +132,52 @@ const QueryDetailDialog = ({
       <Grid item xs={12}>
         <TextField multiline rows={3} variant="outlined" fullWidth value={filter} disabled />
       </Grid>
+      <Grid item xs={6}>
+        <Typography variant="h2">{t<string>('query.settings')}</Typography>
+        <Box my={2} className={classes.gap}>
+          <TextField
+            type="number"
+            label={t<string>('filters.entriesLimit')}
+            value={entries}
+            disabled
+          />
+          <FormControlLabel
+            control={<Checkbox color="primary" checked={randomSeed != null} disabled />}
+            label={t<string>('seed.randomEntries')}
+          />
+          {randomSeed !== null && (
+            <TextField
+              type="number"
+              label={t<string>('seed.ownSeed')}
+              value={randomSeed}
+              disabled
+            />
+          )}
+        </Box>
+      </Grid>
+      <Grid item xs={6}>
+        <Typography variant="h2">{t<string>('filters.stopWords.title')}</Typography>
+        <Box my={2}>
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1a-content"
+              id="panel1a-header">
+              <Typography className={classes.disabled}>
+                {stopWords.slice(0, 10).join(', ') + (stopWords.length > 8 ? ',...' : '')}
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Typography className={classes.disabled}>{stopWords.join(', ')}</Typography>
+            </AccordionDetails>
+          </Accordion>
+        </Box>
+      </Grid>
+
       <Grid item xs={12}>
         <Typography variant="h2">{t<string>('analytics.title')}</Typography>
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={12} className={classes.overflow}>
         {queries &&
           queries?.map((query, index) => (
             <Box my={2} key={index}>
@@ -132,6 +194,8 @@ const QueryDetailDialog = ({
                         <MenuItem value="FREQUENCY">Frequency</MenuItem>
                         <MenuItem value="COLLOCATION">Colocation</MenuItem>
                         {/*<MenuItem value="OCCURENCE">Occurence</MenuItem>*/}
+                        <MenuItem value="NETWORK">Network</MenuItem>
+
                         <MenuItem value="RAW">Raw</MenuItem>
                       </TextField>
                     </Grid>
@@ -179,9 +243,61 @@ const QueryDetailDialog = ({
                             </Grid>
                           </>
                         )}
+                        {query.type === 'NETWORK' && (
+                          <>
+                            <Grid item xs={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    color="primary"
+                                    checked={query.useOnlyDomains}
+                                    disabled
+                                  />
+                                }
+                                label={t<string>('analytics.useDomainsOnly')}
+                              />
+                            </Grid>
+                            <Box className={classes.words}>
+                              <Typography variant="body1">
+                                {t<string>('analytics.inputNodes')}
+                              </Typography>
+                              <Box component="ul" className={classes.chipRoot}>
+                                {query.expressions?.map((q, ind) => (
+                                  <li key={ind}>
+                                    <Chip label={q} className={classes.chip} />
+                                  </li>
+                                ))}
+                              </Box>
+                            </Box>
+                            <Grid item xs={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    color="primary"
+                                    checked={query.useOnlyDomainsOpposite}
+                                    disabled
+                                  />
+                                }
+                                label={t<string>('analytics.useDomainsOnly')}
+                              />
+                            </Grid>
+                            <Box className={classes.words}>
+                              <Typography variant="body1">
+                                {t<string>('analytics.outputNodes')}
+                              </Typography>
+                              <Box component="ul" className={classes.chipRoot}>
+                                {query.expressionsOpposite?.map((q, ind) => (
+                                  <li key={ind}>
+                                    <Chip label={q} className={classes.chip} />
+                                  </li>
+                                ))}
+                              </Box>
+                            </Box>
+                          </>
+                        )}
                       </Grid>
                     </Grid>
-                    {query.expressions.length > 0 && (
+                    {query.type !== 'NETWORK' && query.expressions.length > 0 && (
                       <Box className={classes.words}>
                         <Typography variant="body1">{t<string>('analytics.words')}</Typography>
                         <Box component="ul" className={classes.chipRoot}>
@@ -214,11 +330,11 @@ const QueryDetailDialog = ({
               key="download"
               variant="contained"
               color={'primary'}
-              disabled={!['DONE', 'ERROR'].includes(state)}
+              disabled={!['DONE', 'ERROR'].includes(state) || ['STOPPED'].includes(state)}
               size="medium"
               onClick={handleDownload}>
               <>
-                {!['DONE', 'ERROR'].includes(state) ? (
+                {!['DONE', 'ERROR', 'STOPPED'].includes(state) ? (
                   <CircularProgress size={15} />
                 ) : (
                   <GetAppIcon className={classes.icon} />
@@ -287,8 +403,40 @@ const QueryDetailDialog = ({
               variant="outlined"
               color={'primary'}
               size="medium"
-              // onClick={handleSearch}
-            >
+              onClick={() => {
+                onClose();
+                if (typeof dispatch !== 'undefined') {
+                  dispatch({
+                    type: Types.SetState,
+                    payload: {
+                      stage: contextState?.stage
+                        ? contextState.stage
+                        : queries
+                        ? Stage.PROCESS
+                        : Stage.ANALYTICS,
+                      queryId: id,
+                      drawerOpen: false,
+                      searchState: contextState?.searchState ?? 'WAITING',
+                      query: filter,
+                      entriesLimit: entries,
+                      seed: randomSeed,
+                      harvests: harvests,
+                      stopWords: stopWords,
+                      queries: queries.map((q) => ({
+                        searchType: q.type,
+                        queries: q.expressions,
+                        queriesOpposite: q.expressionsOpposite,
+                        context: q.contextSize ? true : false,
+                        useOnlyDomains: q.useOnlyDomains,
+                        useOnlyDomainsOpposite: q.useOnlyDomainsOpposite,
+                        contextSize: q.contextSize,
+                        limit: q.limit
+                      }))
+                    }
+                  });
+                }
+                history?.push('/search');
+              }}>
               <>
                 <ReplayIcon className={classes.icon} color="primary" />
                 {t<string>('query.buttons.repeat')}

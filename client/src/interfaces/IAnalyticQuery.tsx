@@ -7,10 +7,13 @@ export default interface IAnalyticQuery {
   state: AnalyticQueryState;
   type: Type;
   expressions: string[];
+  expressionsOpposite?: string[];
   contextSize?: number;
   limit?: number;
   startedAt: string;
   updatedAt: string;
   createdAt: string;
   finishedAt: string;
+  useOnlyDomains: boolean;
+  useOnlyDomainsOpposite: boolean;
 }

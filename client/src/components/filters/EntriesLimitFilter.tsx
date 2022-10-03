@@ -1,27 +1,20 @@
-import React, { Dispatch, SetStateAction, useContext } from 'react';
+import React, { useContext } from 'react';
 import { Box, Checkbox, FormControlLabel, TextField } from '@material-ui/core';
 import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered';
 import { useTranslation } from 'react-i18next';
 
-import { ValuableProps } from '../../interfaces/ValuableProps';
 import { SearchContext } from '../Search.context';
 import { Types } from '../reducers';
 
 import { FilterContent } from './FilterContent';
 
 const MAX_SEED = 10000000;
-type SeedProps<T> = {
-  setSeed: Dispatch<SetStateAction<T>>;
-  seed: T;
+
+type Props = {
+  disabled?: boolean;
 };
 
-export const EntriesLimitFilter = ({
-  value,
-  setValue,
-  seed,
-  setSeed,
-  disabled
-}: ValuableProps<number> & SeedProps<number | null>) => {
+export const EntriesLimitFilter = ({ disabled }: Props) => {
   const { t } = useTranslation();
 
   const { state, dispatch } = useContext(SearchContext);
@@ -68,7 +61,7 @@ export const EntriesLimitFilter = ({
       </Box>
       {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
       {/* @ts-ignore */}
-      {seed !== null && (
+      {state.seed !== null && (
         <Box my={2}>
           <TextField
             type="number"
@@ -77,7 +70,14 @@ export const EntriesLimitFilter = ({
             value={state.seed}
             disabled={disabled}
             inputProps={{ min: 0, max: MAX_SEED - 1 }}
-            onChange={(event) => setSeed(parseInt(event.target.value))}
+            onChange={(event) =>
+              dispatch({
+                type: Types.SetSeed,
+                payload: {
+                  seed: parseInt(event.target.value)
+                }
+              })
+            }
           />
         </Box>
       )}

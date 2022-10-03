@@ -14,8 +14,7 @@ export const ThemeFilter = ({
   value,
   setValue,
   append,
-  disabled,
-  query
+  disabled
 }: ValuableOptionalsProps<string | null> & { query: string }) => {
   const { t } = useTranslation();
   const [input, setInput] = useState<string | undefined>('');

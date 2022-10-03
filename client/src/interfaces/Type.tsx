@@ -1,1 +1,1 @@
-export type Type = 'FREQUENCY' | 'COLLOCATION' | 'OCCURENCE' | 'RAW';
+export type Type = 'FREQUENCY' | 'COLLOCATION' | 'OCCURENCE' | 'RAW' | 'NETWORK';

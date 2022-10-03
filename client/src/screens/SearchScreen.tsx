@@ -10,7 +10,6 @@ import { Header } from '../components/Header';
 import { UserMenu } from '../components/UserMenu';
 import { FiltersDrawer } from '../components/FiltersDrawer';
 import { QueryForm } from '../forms/QueryForm';
-import stopWordsCzech from '../config/stopWords';
 import { addNotification } from '../config/notifications';
 import AnalyticQueriesForm from '../forms/AnalyticQueriesForm';
 import IQuery from '../interfaces/IQuery';
@@ -42,9 +41,6 @@ const SearchScreen = () => {
   const dialog = useContext(DialogContext);
 
   const [query, setQuery] = useState<string>('');
-  const [stopWords, setStopWords] = useState<string[]>(stopWordsCzech.sort());
-  const [entriesLimit, setEntriesLimit] = useState<number>(1000);
-  const [seed, setSeed] = useState<number | null>(null);
 
   const [queries, setQueries] = useState<IQuery[]>([
     {
@@ -54,7 +50,7 @@ const SearchScreen = () => {
       context: false,
       searchText: '',
       searchTextOpposite: '',
-      searchType: '',
+      searchType: 'FREQUENCY',
       limit: 10,
       useOnlyDomains: false,
       useOnlyDomainsOpposite: false
@@ -120,7 +116,19 @@ const SearchScreen = () => {
             searchState: data.state
           }
         });
-      });
+        addNotification(
+          t('header.query'),
+          t('administration.users.notifications.stopQuerySuccess'),
+          'success'
+        );
+      })
+      .catch(() =>
+        addNotification(
+          t('header.query'),
+          t('administration.users.notifications.stopQueryError'),
+          'danger'
+        )
+      );
   };
 
   useEffect(() => {
@@ -128,11 +136,19 @@ const SearchScreen = () => {
       refreshSearchState(state.queryId);
       const interval = setInterval(() => {
         refreshSearchState(state.queryId ?? 0);
-        if (state.searchState === 'DONE') {
+        if (
+          state.searchState === 'DONE' ||
+          state.searchState === 'STOPPED' ||
+          state.searchState === 'ERROR'
+        ) {
           clearInterval(interval);
         }
-      }, 200);
-      if (state.searchState === 'DONE') {
+      }, 2000);
+      if (
+        state.searchState === 'DONE' ||
+        state.searchState === 'STOPPED' ||
+        state.searchState === 'ERROR'
+      ) {
         clearInterval(interval);
       }
       return () => {
@@ -263,8 +279,10 @@ const SearchScreen = () => {
                   variant="contained"
                   size="large"
                   color="primary"
-                  onClick={() => handleSearchStop()}>
-                  {t<string>('process.stop')}
+                  onClick={() => state.searchState !== 'STOPPED' && handleSearchStop()}>
+                  {state.searchState === 'STOPPED'
+                    ? t<string>('administration.harvests.states.STOPPED')
+                    : t<string>('process.stop')}
                 </BlackButton>
               </Box>
             </>
@@ -414,12 +432,6 @@ const SearchScreen = () => {
       drawer={
         <FiltersDrawer
           query={query}
-          stopWords={stopWords}
-          setStopWords={setStopWords}
-          entriesLimit={entriesLimit}
-          setEntriesLimit={setEntriesLimit}
-          seed={seed}
-          setSeed={setSeed}
           drawerOpen={state.drawerOpen}
           disabled={state.stage !== Stage.QUERY}
         />

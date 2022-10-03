@@ -12,6 +12,7 @@ import {
   Typography
 } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
+import { useHistory } from 'react-router-dom';
 import Visibility from '@material-ui/icons/Visibility';
 import GetAppIcon from '@material-ui/icons/GetApp';
 
@@ -20,9 +21,13 @@ import { addNotification } from '../config/notifications';
 import ISearch from '../interfaces/ISearch';
 import { DialogContext } from '../components/dialog/Dialog.context';
 import QueryDetailDialog from '../components/dialog/QueryDetailDialog';
+import { SearchContext } from '../components/Search.context';
 
 export const AdminQueriesForm = () => {
   const { t, i18n } = useTranslation();
+  const history = useHistory();
+
+  const { state, dispatch } = useContext(SearchContext);
 
   const [queries, setQueries] = useState<ISearch[]>([]);
   const [page, setPage] = useState(0);
@@ -39,7 +44,10 @@ export const AdminQueriesForm = () => {
           dialog.open({
             size: 'lg',
             content: QueryDetailDialog,
-            values: r
+            values: r,
+            state,
+            dispatch,
+            history
           });
         }
       },
@@ -82,6 +90,8 @@ export const AdminQueriesForm = () => {
         return t('administration.harvests.states.PROCESSING');
       case 'ERROR':
         return t('administration.harvests.states.ERROR');
+      case 'STOPPED':
+        return t('administration.harvests.states.STOPPED');
       case 'DONE':
         return t('process.finished');
     }
@@ -118,7 +128,7 @@ export const AdminQueriesForm = () => {
 
   return (
     <>
-      {queries.filter((v) => !['DONE', 'ERROR'].includes(v.state)).length > 0 && (
+      {queries.filter((v) => !['DONE', 'ERROR', 'STOPPED'].includes(v.state)).length > 0 && (
         <>
           <Typography variant="h1">{t<string>('header.currentQueries')}</Typography>
           <Card variant="outlined">
@@ -135,7 +145,7 @@ export const AdminQueriesForm = () => {
                 </TableHead>
                 <TableBody>
                   {queries
-                    .filter((v) => !['DONE', 'ERROR'].includes(v.state))
+                    .filter((v) => !['DONE', 'ERROR', 'STOPPED'].includes(v.state))
                     .map((row) => (
                       <TableRow hover key={row.id}>
                         <TableCell>
@@ -178,7 +188,7 @@ export const AdminQueriesForm = () => {
             </TableHead>
             <TableBody>
               {queries
-                .filter((v) => ['DONE', 'ERROR'].includes(v.state))
+                .filter((v) => ['DONE', 'ERROR', 'STOPPED'].includes(v.state))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row) => (
                   <TableRow hover key={row.id}>
@@ -203,7 +213,7 @@ export const AdminQueriesForm = () => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={queries.filter((v) => ['DONE', 'ERROR'].includes(v.state)).length}
+          count={queries.filter((v) => ['DONE', 'ERROR', 'STOPPED'].includes(v.state)).length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

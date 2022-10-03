@@ -59,6 +59,7 @@
   },
   "query": {
     "header": "Dotaz",
+    "settings": "Nastavení dotazu",
     "operators": "Logické operátory:",
     "error": {
       "title": "Došlo k chybě",

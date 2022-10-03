@@ -13,13 +13,17 @@ import {
   FormControlLabel,
   Chip,
   Button,
-  CircularProgress
+  CircularProgress,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails
 } from '@material-ui/core';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import StarIcon from '@material-ui/icons/Star';
 import CloseIcon from '@material-ui/icons/Close';
 import ReplayIcon from '@material-ui/icons/Replay';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import ISearch from '../../interfaces/ISearch';
 import { addNotification } from '../../config/notifications';
@@ -38,6 +42,13 @@ const useStyles = makeStyles((theme) => ({
   chip: {
     margin: theme.spacing(0.5)
   },
+  disabled: {
+    color: 'rgba(0, 0, 0, 0.38)'
+  },
+  gap: {
+    display: 'flex',
+    gap: '1rem'
+  },
   chipRoot: {
     display: 'flex',
     flexWrap: 'wrap',
@@ -47,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
   },
   dialog: {
     padding: '2rem',
-    overflow: 'hidden !important'
+    overflow: 'auto !important'
   },
   overflow: {
     maxHeight: '220px',
@@ -121,6 +132,48 @@ const QueryDetailDialog = ({
       <Grid item xs={12}>
         <TextField multiline rows={3} variant="outlined" fullWidth value={filter} disabled />
       </Grid>
+      <Grid item xs={6}>
+        <Typography variant="h2">{t<string>('query.settings')}</Typography>
+        <Box my={2} className={classes.gap}>
+          <TextField
+            type="number"
+            label={t<string>('filters.entriesLimit')}
+            value={entries}
+            disabled
+          />
+          <FormControlLabel
+            control={<Checkbox color="primary" checked={randomSeed != null} disabled />}
+            label={t<string>('seed.randomEntries')}
+          />
+          {randomSeed !== null && (
+            <TextField
+              type="number"
+              label={t<string>('seed.ownSeed')}
+              value={randomSeed}
+              disabled
+            />
+          )}
+        </Box>
+      </Grid>
+      <Grid item xs={6}>
+        <Typography variant="h2">{t<string>('filters.stopWords.title')}</Typography>
+        <Box my={2}>
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1a-content"
+              id="panel1a-header">
+              <Typography className={classes.disabled}>
+                {stopWords.slice(0, 10).join(', ') + (stopWords.length > 8 ? ',...' : '')}
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Typography className={classes.disabled}>{stopWords.join(', ')}</Typography>
+            </AccordionDetails>
+          </Accordion>
+        </Box>
+      </Grid>
+
       <Grid item xs={12}>
         <Typography variant="h2">{t<string>('analytics.title')}</Typography>
       </Grid>

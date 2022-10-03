@@ -59,6 +59,7 @@
   },
   "query": {
     "header": "Query",
+    "settings": "Query settings",
     "operators": "Logical operators:",
     "error": {
       "title": "An error occurred",

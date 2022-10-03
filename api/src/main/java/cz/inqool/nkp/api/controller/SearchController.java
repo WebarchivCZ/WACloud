@@ -93,9 +93,10 @@ public class SearchController {
     @Operation(summary = "Estimate a search request", description = "Return number of evaluated documents, null if the request is not valid.")
     @PreAuthorize("isAuthenticated()")
     @PostMapping(value="/api/search/estimate")
-    public Long estimate(@Valid @RequestBody RequestDTO request, Authentication authentication) {
+    public Estimation estimate(@Valid @RequestBody RequestDTO request, Authentication authentication) {
         Search search = prepareSearch(request, authentication);
-        return searchService.estimate(search);
+        Long estimated = searchService.estimate(search);
+        return new Estimation(estimated != null, estimated);
     }
 
     @Operation(summary = "Get all requests (only for admins)")

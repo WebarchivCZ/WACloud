@@ -106,10 +106,10 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public long estimate(Search query) {
+    public Long estimate(Search query) {
         List<String> ids = query.getIds();
         if (ids != null && !ids.isEmpty()) {
-            return ids.size();
+            return (long) ids.size();
         }
         SolrQuery solrQuery = prepareQueryForIndex(query);
         solrQuery.setRows(0);
@@ -119,7 +119,7 @@ public class SearchServiceImpl implements SearchService {
         }
         catch (Throwable ex) {
             log.error("Cannot estimate base query.", ex);
-            return 0;
+            return null;
         }
     }
 

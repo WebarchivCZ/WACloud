@@ -42,11 +42,8 @@ public class SearchController {
         this.analyticQueryRepository = analyticQueryRepository;
     }
 
-    @Operation(summary = "Create a search request")
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping(value="/api/search")
-    public Search search(@Valid @RequestBody RequestDTO request, Authentication authentication) {
-        AppUser user = ((AppUserPrincipal)authentication.getPrincipal()).getAppUser();
+    private Search prepareSearch(@RequestBody @Valid RequestDTO request, Authentication authentication) {
+        AppUser user = ((AppUserPrincipal) authentication.getPrincipal()).getAppUser();
 
         Search search = new Search();
         search.setUser(user);
@@ -56,7 +53,25 @@ public class SearchController {
         search.setStopWords(request.getBase().getStopWords() == null ? new ArrayList<>() : Arrays.asList(request.getBase().getStopWords()));
         search.setIds(request.getBase().getIds() == null ? new ArrayList<>() : Arrays.asList(request.getBase().getIds()));
         search.setHarvests(request.getBase().getHarvests() == null ? new ArrayList<>() : Arrays.asList(request.getBase().getHarvests()));
-        search.setToIndex((int)searchService.estimate(search));
+
+        return search;
+    }
+
+    @Operation(summary = "Estimate a search request", description = "Return number of evaluated documents, null if the request is not valid.")
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping(value="/api/search")
+    public Long estimate(@Valid @RequestBody RequestDTO request, Authentication authentication) {
+        Search search = prepareSearch(request, authentication);
+        return searchService.estimate(search);
+    }
+
+    @Operation(summary = "Create a search request")
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping(value="/api/search")
+    public Search search(@Valid @RequestBody RequestDTO request, Authentication authentication) {
+        Search search = prepareSearch(request, authentication);
+        Long estimated = searchService.estimate(search);
+        search.setToIndex(estimated == null ? 0 : estimated.intValue());
         searchRepository.saveAndFlush(search);
 
         analyticQueryRepository.saveAllAndFlush(Arrays.stream(request.getQueries()).map(queryRequest -> {

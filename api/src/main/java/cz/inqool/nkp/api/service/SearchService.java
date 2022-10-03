@@ -9,7 +9,7 @@ public interface SearchService {
     void index(Search query);
     byte[] query(AnalyticQuery query);
 
-    long estimate(Search query);
+    Long estimate(Search query);
 
     List<String> getStopWords();
     void addStopWords(List<String> stopWords);

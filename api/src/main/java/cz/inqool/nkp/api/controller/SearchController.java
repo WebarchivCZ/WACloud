@@ -57,14 +57,6 @@ public class SearchController {
         return search;
     }
 
-    @Operation(summary = "Estimate a search request", description = "Return number of evaluated documents, null if the request is not valid.")
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping(value="/api/search/estimate")
-    public Long estimate(@Valid @RequestBody RequestDTO request, Authentication authentication) {
-        Search search = prepareSearch(request, authentication);
-        return searchService.estimate(search);
-    }
-
     @Operation(summary = "Create a search request")
     @PreAuthorize("isAuthenticated()")
     @PostMapping(value="/api/search")
@@ -96,6 +88,14 @@ public class SearchController {
     public List<Search> getMy(Authentication authentication) {
         AppUser user = ((AppUserPrincipal)authentication.getPrincipal()).getAppUser();
         return searchRepository.findByUserOrderByIdDesc(user);
+    }
+
+    @Operation(summary = "Estimate a search request", description = "Return number of evaluated documents, null if the request is not valid.")
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping(value="/api/search/estimate")
+    public Long estimate(@Valid @RequestBody RequestDTO request, Authentication authentication) {
+        Search search = prepareSearch(request, authentication);
+        return searchService.estimate(search);
     }
 
     @Operation(summary = "Get all requests (only for admins)")

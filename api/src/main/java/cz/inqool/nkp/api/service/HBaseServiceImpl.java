@@ -145,13 +145,13 @@ public class HBaseServiceImpl implements HBaseService {
     @Override
     public String getRowColumnAsString(Result result, String column) {
         byte[] value = result.getValue(HBaseService.family, column.getBytes());
-        return value.length == 0 ? "" : new String(value);
+        return value == null || value.length == 0 ? "" : new String(value);
     }
 
     @Override
     public Double getRowColumnAsDouble(Result result, String column) {
         byte[] value = result.getValue(HBaseService.family, column.getBytes());
-        return value.length == 0 ? null : Double.valueOf(new String(value));
+        return value == null || value.length == 0 ? null : Double.valueOf(new String(value));
     }
 
     @Override

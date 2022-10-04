@@ -76,6 +76,8 @@ public class SearchController {
             analyticQuery.setUseOnlyDomainsOpposite(queryRequest.isUseOnlyDomainsOpposite());
             analyticQuery.setLimit(queryRequest.getLimit());
             analyticQuery.setType(queryRequest.getType());
+            analyticQuery.setFormat(queryRequest.getFormat());
+            analyticQuery.setSorting(queryRequest.getSorting());
             return analyticQuery;
         }).collect(Collectors.toList()));
 

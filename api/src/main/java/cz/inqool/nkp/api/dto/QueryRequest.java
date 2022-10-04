@@ -5,6 +5,7 @@ import cz.inqool.nkp.api.model.AnalyticQuery;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public class QueryRequest {
@@ -12,6 +13,12 @@ public class QueryRequest {
 
     @NotBlank(message = "type of query is mandatory")
     private final AnalyticQuery.Type type;
+
+    @NotBlank(message = "format of query is mandatory")
+    private final AnalyticQuery.Format format;
+
+    @NotNull(message = "sorting of query is mandatory")
+    private final List<AnalyticQuery.SortBy> sorting;
 
     @NotBlank(message = "at least one text in query is mandatory")
     private final List<String> texts;
@@ -30,8 +37,10 @@ public class QueryRequest {
 
     private final boolean useOnlyDomainsOpposite;
 
-    public QueryRequest(AnalyticQuery.Type type, List<String> texts, List<String> textsOpposite, Integer contextSize, Integer limit, boolean useOnlyDomains, boolean useOnlyDomainsOpposite) {
+    public QueryRequest(AnalyticQuery.Type type, AnalyticQuery.Format format, List<AnalyticQuery.SortBy> sorting, List<String> texts, List<String> textsOpposite, Integer contextSize, Integer limit, boolean useOnlyDomains, boolean useOnlyDomainsOpposite) {
         this.type = type;
+        this.format = format;
+        this.sorting = sorting;
         this.texts = texts;
         this.textsOpposite = textsOpposite;
         this.contextSize = contextSize;
@@ -42,6 +51,14 @@ public class QueryRequest {
 
     public AnalyticQuery.Type getType() {
         return type;
+    }
+
+    public AnalyticQuery.Format getFormat() {
+        return format;
+    }
+
+    public List<AnalyticQuery.SortBy> getSorting() {
+        return sorting;
     }
 
     public List<String> getTexts() {

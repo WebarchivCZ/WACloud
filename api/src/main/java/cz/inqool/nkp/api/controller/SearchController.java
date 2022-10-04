@@ -174,8 +174,13 @@ public class SearchController {
         for (AnalyticQuery query : search.getQueries()) {
             try {
                 // Process query
+                String filename = queryIndex + "_" + query.getType().toString() + ".";
+                switch (query.getFormat()){
+                    case CSV: filename = filename + "csv"; break;
+                    default: filename = filename + "json"; break;
+                }
                 byte[] result = query.getData();
-                zipOutputStream.putNextEntry(new ZipEntry(queryIndex + "_" + query.getType().toString() + ".json"));
+                zipOutputStream.putNextEntry(new ZipEntry(filename));
                 zipOutputStream.write(result);
                 zipOutputStream.closeEntry();
             }

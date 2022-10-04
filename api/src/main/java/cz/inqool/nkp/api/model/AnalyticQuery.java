@@ -2,11 +2,13 @@ package cz.inqool.nkp.api.model;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import javax.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -49,7 +51,15 @@ public class AnalyticQuery extends AuditModel {
         SENTIMENT_ASC,
         SENTIMENT_DESC,
         SCORE_ASC,
-        SCORE_DESC
+        SCORE_DESC;
+
+        public String getField() {
+            return this.name().toLowerCase(Locale.ROOT).split("_")[0];
+        }
+
+        public SolrQuery.ORDER getOrder() {
+            return SolrQuery.ORDER.valueOf(this.name().toLowerCase(Locale.ROOT).split("_")[1]);
+        }
     }
 
 	@Id
@@ -76,6 +86,7 @@ public class AnalyticQuery extends AuditModel {
 
     @Column
     @Enumerated
+    @LazyCollection(LazyCollectionOption.FALSE)
     @ElementCollection(targetClass = SortBy.class)
     private List<SortBy> sorting;
 

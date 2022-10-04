@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class SearchServiceImpl implements SearchService {
@@ -268,21 +269,104 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public byte[] query(AnalyticQuery query) {
         try {
-            Object result = null;
-            switch (query.getType()) {
-                case COLLOCATION: result = queryCollocation(query); break;
-                case FREQUENCY: result = queryFrequency(query); break;
-                case NETWORK: result = queryNetwork(query); break;
-                case RAW: result = queryRaw(query); break;
-                default:
-                    log.warn("Unknown type of query: "+ query.getType().toString());
+            if (query.getFormat().equals(AnalyticQuery.Format.JSON)) {
+                Object result = null;
+                switch (query.getType()) {
+                    case COLLOCATION:
+                        result = queryCollocation(query);
+                        break;
+                    case FREQUENCY:
+                        result = queryFrequency(query);
+                        break;
+                    case NETWORK:
+                        result = queryNetwork(query);
+                        break;
+                    case RAW:
+                        result = queryRaw(query);
+                        break;
+                    default:
+                        log.warn("Unknown type of query: " + query.getType().toString());
+                }
+                String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
+                return json.getBytes();
             }
-            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
-            return json.getBytes();
+            else {
+                StringBuilder csv = new StringBuilder();
+                switch (query.getType()) {
+                    case COLLOCATION:
+                        csv.append(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(queryCollocation(query)));
+                        break;
+                    case FREQUENCY:
+                        csv.append(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(queryFrequency(query)));
+                        break;
+                    case NETWORK:
+                        csv.append(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(queryNetwork(query)));
+                        break;
+                    case RAW:
+                        List<SolrQueryEntry> rawResult = queryRaw(query);
+                        csv.append(convertToCSV(Stream.of(
+                                "id",
+                                "url",
+                                "urlDomain",
+                                "urlDomainTopLevel",
+                                "title",
+                                "language",
+//                                "plainText",
+                                "year",
+                                "headlines",
+                                "links",
+                                "linksDomain",
+                                "linksDomainTopLevel",
+                                "topics",
+                                "sentiment"
+                        )));
+                        csv.append("\n");
+                        for (SolrQueryEntry entry : rawResult) {
+                            csv.append(convertToCSV(Stream.of(
+                                    entry.getId(),
+                                    entry.getUrl(),
+                                    entry.getUrlDomain(),
+                                    entry.getUrlDomainTopLevel(),
+                                    entry.getTitle(),
+                                    entry.getLanguage(),
+//                                    entry.getPlainText(),
+                                    entry.getYear() == null ? "" : entry.getYear().toString(),
+                                    entry.getHeadlines() == null ? "" : entry.getHeadlines().toString(),
+                                    entry.getLinks() == null ? "" : entry.getLinks().toString(),
+                                    entry.getLinksDomain() == null ? "" : entry.getLinksDomain().toString(),
+                                    entry.getLinksDomainTopLevel() == null ? "" : entry.getLinksDomainTopLevel().toString(),
+                                    entry.getTopics() == null ? "" : entry.getTopics().toString(),
+                                    entry.getSentiment() == null ? "" : entry.getSentiment().toString()
+                            )));
+                            csv.append("\n");
+                        }
+                        break;
+                    default:
+                        log.warn("Unknown type of query: " + query.getType().toString());
+                }
+                return csv.toString().getBytes();
+            }
         }
         catch (Throwable ex) {
             throw new RuntimeException("Error during processing query.", ex);
         }
+    }
+
+    private String convertToCSV(Stream<String> stream) {
+        return stream.map(this::escapeSpecialCharacters)
+                .collect(Collectors.joining(","));
+    }
+
+    private String escapeSpecialCharacters(String data) {
+        if (data == null) {
+            return "";
+        }
+        String escapedData = data.replaceAll("\\R", " ");
+        if (data.contains(",") || data.contains("\"") || data.contains("'")) {
+            data = data.replace("\"", "\"\"");
+            escapedData = "\"" + data + "\"";
+        }
+        return escapedData;
     }
 
     private Map<String, Map<String, Integer>> queryFrequency(AnalyticQuery query) throws SolrServerException, IOException {
@@ -446,6 +530,9 @@ public class SearchServiceImpl implements SearchService {
             SolrQuery collocationQuery = new SolrQuery();
             collocationQuery.set("q", queryString.toString());
             collocationQuery.setRows(query.getLimit());
+            for (AnalyticQuery.SortBy sort : query.getSorting()) {
+                collocationQuery.addOrUpdateSort(sort.getField(), sort.getOrder());
+            }
             QueryResponse response = solrQuery.query(collocationQuery);
 
             SolrDocumentList docList = response.getResults();

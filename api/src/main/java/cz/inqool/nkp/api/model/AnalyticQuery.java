@@ -31,7 +31,27 @@ public class AnalyticQuery extends AuditModel {
         NETWORK,
 		RAW
     }
-    
+
+    public enum Format {
+        JSON,
+        CSV
+    }
+
+    public enum SortBy {
+        YEAR_ASC,
+        YEAR_DESC,
+        LANGUAGE_ASC,
+        LANGUAGE_DESC,
+        TITLE_ASC,
+        TITLE_DESC,
+        URL_ASC,
+        URL_DESC,
+        SENTIMENT_ASC,
+        SENTIMENT_DESC,
+        SCORE_ASC,
+        SCORE_DESC
+    }
+
 	@Id
     @GeneratedValue(generator = "analytic_query_generator")
     @SequenceGenerator(
@@ -50,6 +70,14 @@ public class AnalyticQuery extends AuditModel {
 
     @Enumerated(EnumType.STRING)
     private Type type;
+
+    @Enumerated(EnumType.STRING)
+    private Format format;
+
+    @Column
+    @Enumerated
+    @ElementCollection(targetClass = SortBy.class)
+    private List<SortBy> sorting;
 
     @ElementCollection
     @LazyCollection(LazyCollectionOption.FALSE)

@@ -75,7 +75,9 @@ export const QueryForm = ({ value, disabled }: ValuableProps<string>) => {
               contextSize: x.context ? x.contextSize : 0,
               limit: x.limit,
               useOnlyDomains: x.useOnlyDomains,
-              useOnlyDomainsOpposite: x.useOnlyDomainsOpposite
+              useOnlyDomainsOpposite: x.useOnlyDomainsOpposite,
+              format: 'JSON',
+              sorting: []
             };
           })
         })

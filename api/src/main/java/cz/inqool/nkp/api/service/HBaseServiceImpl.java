@@ -144,7 +144,8 @@ public class HBaseServiceImpl implements HBaseService {
 
     @Override
     public String getRowColumnAsString(Result result, String column) {
-        return new String(result.getValue(HBaseService.family, column.getBytes()));
+        byte[] value = result.getValue(HBaseService.family, column.getBytes());
+        return value.length == 0 ? "" : new String(value);
     }
 
     @Override

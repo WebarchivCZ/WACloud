@@ -89,8 +89,8 @@ const SearchScreen = () => {
             limit: x.limit,
             useOnlyDomains: x.useOnlyDomains,
             useOnlyDomainsOpposite: x.useOnlyDomainsOpposite,
-            format: 'JSON',
-            sorting: []
+            format: x.format,
+            sorting: x.sorting
           };
         })
       })

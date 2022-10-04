@@ -192,11 +192,11 @@ const QueryDetailDialog = ({
                         value={query.type}
                         disabled>
                         <MenuItem value="FREQUENCY">Frequency</MenuItem>
-                        <MenuItem value="COLLOCATION">Colocation</MenuItem>
+                        <MenuItem value="COLLOCATION">Collocation</MenuItem>
                         {/*<MenuItem value="OCCURENCE">Occurence</MenuItem>*/}
                         <MenuItem value="NETWORK">Network</MenuItem>
 
-                        <MenuItem value="RAW">Raw</MenuItem>
+                        <MenuItem value="RAW">Fulltext</MenuItem>
                       </TextField>
                     </Grid>
                     <Grid item md={4} xs={12}>
@@ -229,7 +229,56 @@ const QueryDetailDialog = ({
                           </>
                         )}
 
-                        {(query.type === 'RAW' || query.type === 'FREQUENCY') && (
+                        {query.type === 'RAW' && (
+                          <>
+                            <Grid item xs={4}>
+                              <TextField
+                                type="number"
+                                label={t<string>('filters.entriesLimit')}
+                                fullWidth
+                                value={query.limit}
+                                inputProps={{ min: 1, max: 1000 }}
+                                disabled
+                              />
+                            </Grid>
+                            <Grid item xs={4}>
+                              <TextField
+                                select
+                                label="Sorting"
+                                fullWidth
+                                value={
+                                  query.sorting && query.sorting.length > 0
+                                    ? query.sorting[0]
+                                    : 'YEAR_ASC'
+                                }
+                                disabled>
+                                <MenuItem value="YEAR_ASC">Year ASC</MenuItem>
+                                <MenuItem value="YEAR_DESC">Year DESC</MenuItem>
+                                <MenuItem value="LANGUAGE_ASC">Language ASC</MenuItem>
+                                <MenuItem value="LANGUAGE_DESC">Language DESC</MenuItem>
+                                <MenuItem value="TITLE_ASC">Title ASC</MenuItem>
+                                <MenuItem value="TITLE_DESC">Title DESC</MenuItem>
+                                <MenuItem value="URL_ASC">Url ASC</MenuItem>
+                                <MenuItem value="URL_DESC">Url DESC</MenuItem>
+                                <MenuItem value="SENTIMENT_ASC">Sentiment ASC</MenuItem>
+                                <MenuItem value="SENTIMENT_DESC">Sentiment DESC</MenuItem>
+                              </TextField>
+                            </Grid>
+                            <Grid item xs={4}>
+                              <TextField
+                                select
+                                label="Format"
+                                fullWidth
+                                value={query.format ? query.format : 'JSON'}
+                                disabled>
+                                <MenuItem value="CSV">CSV</MenuItem>
+                                <MenuItem value="JSON">JSON</MenuItem>
+                              </TextField>
+                            </Grid>
+                          </>
+                        )}
+
+                        {query.type === 'FREQUENCY' && (
                           <>
                             <Grid item xs={6}>
                               <TextField

@@ -1,4 +1,6 @@
 import { Type } from './Type';
+import { Format } from './Format';
+import { Sorting } from './Sorting';
 
 export default interface IQuery {
   searchType: Type;
@@ -12,4 +14,6 @@ export default interface IQuery {
   useOnlyDomainsOpposite?: boolean;
   contextSize?: number;
   limit?: number;
+  format?: Format;
+  sorting?: Sorting[];
 }

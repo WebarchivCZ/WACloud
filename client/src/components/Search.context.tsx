@@ -50,7 +50,7 @@ const initialState = {
       context: false,
       searchText: '',
       searchTextOpposite: '',
-      searchType: 'FREQUENCY' as Type,
+      searchType: 'RAW' as Type,
       limit: 10,
       useOnlyDomains: false,
       useOnlyDomainsOpposite: false

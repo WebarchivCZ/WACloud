@@ -20,6 +20,8 @@ import IQuery from '../interfaces/IQuery';
 import { SearchContext } from '../components/Search.context';
 import { Types } from '../components/reducers';
 import { Type } from '../interfaces/Type';
+import { Format } from '../interfaces/Format';
+import { Sorting } from '../interfaces/Sorting';
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -54,6 +56,23 @@ function AnalyticQueriesForm({
   const handleQueryTypeChange = (index: number, event: React.ChangeEvent<{ value: unknown }>) => {
     const q: IQuery[] = _.cloneDeep(state.queries);
     q[index].searchType = event.target.value as Type;
+    setQueries(q);
+    dispatch({ type: Types.SetQueries, payload: { queries: q } });
+  };
+
+  const handleQueryFormatChange = (index: number, event: React.ChangeEvent<{ value: unknown }>) => {
+    const q: IQuery[] = _.cloneDeep(state.queries);
+    q[index].format = event.target.value as Format;
+    setQueries(q);
+    dispatch({ type: Types.SetQueries, payload: { queries: q } });
+  };
+
+  const handleQuerySortingChange = (
+    index: number,
+    event: React.ChangeEvent<{ value: unknown }>
+  ) => {
+    const q: IQuery[] = _.cloneDeep(state.queries);
+    q[index].sorting = [event.target.value as Sorting];
     setQueries(q);
     dispatch({ type: Types.SetQueries, payload: { queries: q } });
   };
@@ -209,7 +228,7 @@ function AnalyticQueriesForm({
                     <MenuItem value="COLLOCATION">Colocation</MenuItem>
                     {/*<MenuItem value="OCCURENCE">Occurence</MenuItem>*/}
                     <MenuItem value="NETWORK">Network</MenuItem>
-                    <MenuItem value="RAW">Raw</MenuItem>
+                    <MenuItem value="RAW">Fulltext</MenuItem>
                   </TextField>
                 </Grid>
 
@@ -258,7 +277,56 @@ function AnalyticQueriesForm({
                           </>
                         )}
 
-                        {(query.searchType === 'RAW' || query.searchType === 'FREQUENCY') && (
+                        {query.searchType === 'RAW' && (
+                          <>
+                            <Grid item xs={4}>
+                              <TextField
+                                type="number"
+                                label={t<string>('filters.entriesLimit')}
+                                fullWidth
+                                value={query.limit}
+                                inputProps={{ min: 1, max: 1000 }}
+                                onChange={(event) => handleChangeLimit(index, event)}
+                              />
+                            </Grid>
+                            <Grid item xs={4}>
+                              <TextField
+                                select
+                                label="Sorting"
+                                fullWidth
+                                value={
+                                  query.sorting && query.sorting.length > 0
+                                    ? query.sorting[0]
+                                    : 'YEAR_ASC'
+                                }
+                                onChange={(event) => handleQuerySortingChange(index, event)}>
+                                <MenuItem value="YEAR_ASC">Year ASC</MenuItem>
+                                <MenuItem value="YEAR_DESC">Year DESC</MenuItem>
+                                <MenuItem value="LANGUAGE_ASC">Language ASC</MenuItem>
+                                <MenuItem value="LANGUAGE_DESC">Language DESC</MenuItem>
+                                <MenuItem value="TITLE_ASC">Title ASC</MenuItem>
+                                <MenuItem value="TITLE_DESC">Title DESC</MenuItem>
+                                <MenuItem value="URL_ASC">Url ASC</MenuItem>
+                                <MenuItem value="URL_DESC">Url DESC</MenuItem>
+                                <MenuItem value="SENTIMENT_ASC">Sentiment ASC</MenuItem>
+                                <MenuItem value="SENTIMENT_DESC">Sentiment DESC</MenuItem>
+                              </TextField>
+                            </Grid>
+                            <Grid item xs={4}>
+                              <TextField
+                                select
+                                label="Format"
+                                fullWidth
+                                value={query.format ? query.format : 'JSON'}
+                                onChange={(event) => handleQueryFormatChange(index, event)}>
+                                <MenuItem value="CSV">CSV</MenuItem>
+                                <MenuItem value="JSON">JSON</MenuItem>
+                              </TextField>
+                            </Grid>
+                          </>
+                        )}
+
+                        {query.searchType === 'FREQUENCY' && (
                           <>
                             <Grid item xs={6}>
                               <TextField

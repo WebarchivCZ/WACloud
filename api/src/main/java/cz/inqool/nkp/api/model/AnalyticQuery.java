@@ -72,7 +72,7 @@ public class AnalyticQuery extends AuditModel {
     private Type type;
 
     @Enumerated(EnumType.STRING)
-    private Format format;
+    private Format format = Format.JSON;
 
     @Column
     @Enumerated

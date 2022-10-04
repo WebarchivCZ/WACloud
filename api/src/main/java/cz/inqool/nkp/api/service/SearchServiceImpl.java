@@ -250,6 +250,11 @@ public class SearchServiceImpl implements SearchService {
                     if (date != null) {
                         entry.setYear(date.getYear());
                     }
+                    if (entry.getId() == null || entry.getId().isEmpty()) {
+                        String tmpUuid = Bytes.toString(result.getRow());
+                        log.warn("Not valid id for a row: "+(tmpUuid == null ? "UNKNOWN" : tmpUuid));
+                        continue;
+                    }
                     solrQuery.addBean(entry);
                 }
 

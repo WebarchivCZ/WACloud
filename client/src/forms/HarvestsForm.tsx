@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Grid,
@@ -8,10 +8,20 @@ import {
   makeStyles,
   Checkbox,
   CardHeader,
-  Box
+  Box,
+  createTheme,
+  ThemeProvider
 } from '@material-ui/core';
 import _ from 'lodash';
 import clsx from 'clsx';
+import {
+  DataGrid,
+  GridColDef,
+  GridValueGetterParams,
+  csCZ,
+  enUS,
+  GridSelectionModel
+} from '@material-ui/data-grid';
 
 import IHarvest from '../interfaces/IHarvest';
 import { SearchContext } from '../components/Search.context';
@@ -79,6 +89,9 @@ const fakeData: FakeDataProps[] = [
 ];
 // TODO FAKE REMOVE END
 
+/** Number of max harvests to show as cards*/
+const HARVESTS_TO_SHOW = 12;
+
 export const HarvestsForm = ({ minimal }: HarvestsProps) => {
   const { t, i18n } = useTranslation();
   const classes = useStyles();
@@ -86,6 +99,45 @@ export const HarvestsForm = ({ minimal }: HarvestsProps) => {
   const { state, dispatch } = useContext(SearchContext);
 
   const [allHarvests, setAllHarvests] = useState<IHarvest[]>([]);
+  const [selectionModel, setSelectionModel] = useState<GridSelectionModel>(state.harvests);
+
+  const theme = createTheme(
+    {
+      palette: {
+        primary: { main: '#0000ff' }
+      }
+    },
+    i18n.language === 'cs' ? csCZ : enUS
+  );
+
+  const columns = useMemo<GridColDef[]>(
+    () => [
+      {
+        field: 'identification',
+        headerName: t<string>('harvests.name'),
+        width: 300
+      },
+      {
+        field: 'type',
+        headerName: t<string>('harvests.type'),
+        width: 200
+      },
+      {
+        field: 'entries',
+        headerName: t<string>('harvests.WARCs'),
+        width: 200
+      },
+      {
+        field: 'date',
+        headerName: t<string>('harvests.date'),
+        type: 'number',
+        width: 200,
+        valueFormatter: (params: GridValueGetterParams) =>
+          new Date(`${params.getValue(params.id, 'date')}`).toLocaleDateString(i18n.language)
+      }
+    ],
+    []
+  );
 
   const nameToShortcut = (name: string) => {
     if (name.toLowerCase().indexOf('test') !== -1) {
@@ -99,7 +151,7 @@ export const HarvestsForm = ({ minimal }: HarvestsProps) => {
 
   const isHarvestChecked = (name: string) => state.harvests.includes(name);
 
-  const handleToggleHarvest = (name: string) => () => {
+  const handleToggleHarvest = (name: string) => {
     const harvestsCopy = _.clone(state.harvests);
     if (isHarvestChecked(name)) {
       harvestsCopy.splice(harvestsCopy.indexOf(name), 1);
@@ -149,54 +201,77 @@ export const HarvestsForm = ({ minimal }: HarvestsProps) => {
               </Box>
             ))}
       </Grid>
-      {!minimal &&
-        allHarvests.map((harvest, index) => (
-          <Grid item xs={12} sm={12} md={6} lg={4} xl={3} key={index}>
-            <Card
-              variant="outlined"
-              className={clsx({
-                [classes.selected]: isHarvestChecked(harvest.identification)
-              })}
-              onClick={handleToggleHarvest(harvest.identification)}>
-              <CardHeader
-                avatar={
-                  <Typography variant="h3" className={classes.shortCut}>
-                    {nameToShortcut(harvest.identification)}
-                  </Typography>
-                }
-                action={
-                  <Checkbox
-                    color="primary"
-                    checked={isHarvestChecked(harvest.identification)}
-                    onChange={handleToggleHarvest(harvest.identification)}
-                  />
-                }
-              />
-              <CardContent className={classes.content}>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th>{t<string>('harvests.name')}</th>
-                      <td>{harvest.identification}</td>
-                    </tr>
-                    <tr>
-                      <th>{t<string>('harvests.size')}</th>
-                      <td>{fakeData[index].size}</td>
-                    </tr>
-                    <tr>
-                      <th>{t<string>('harvests.WARCs')}</th>
-                      <td>{harvest.entries.toLocaleString(i18n.language)}</td>
-                    </tr>
-                    <tr>
-                      <th>{t<string>('harvests.date')}</th>
-                      <td>{new Date(harvest.date).toLocaleDateString(i18n.language)}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
+      {!minimal && allHarvests.length < HARVESTS_TO_SHOW
+        ? allHarvests.map((harvest, index) => (
+            <Grid item xs={12} sm={12} md={6} lg={4} xl={3} key={index}>
+              <Card
+                variant="outlined"
+                className={clsx({
+                  [classes.selected]: isHarvestChecked(harvest.identification)
+                })}
+                onClick={() => handleToggleHarvest(harvest.identification)}>
+                <CardHeader
+                  avatar={
+                    <Typography variant="h3" className={classes.shortCut}>
+                      {nameToShortcut(harvest.identification)}
+                    </Typography>
+                  }
+                  action={
+                    <Checkbox
+                      color="primary"
+                      checked={isHarvestChecked(harvest.identification)}
+                      onChange={() => handleToggleHarvest(harvest.identification)}
+                    />
+                  }
+                />
+                <CardContent className={classes.content}>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <th>{t<string>('harvests.name')}</th>
+                        <td>{harvest.identification}</td>
+                      </tr>
+                      <tr>
+                        <th>{t<string>('harvests.size')}</th>
+                        <td>{fakeData[index].size}</td>
+                      </tr>
+                      <tr>
+                        <th>{t<string>('harvests.WARCs')}</th>
+                        <td>{harvest.entries.toLocaleString(i18n.language)}</td>
+                      </tr>
+                      <tr>
+                        <th>{t<string>('harvests.date')}</th>
+                        <td>{new Date(harvest.date).toLocaleDateString(i18n.language)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))
+        : !minimal && (
+            <div style={{ height: 400, width: '100%' }}>
+              <ThemeProvider theme={theme}>
+                <DataGrid
+                  rows={allHarvests}
+                  columns={columns}
+                  getRowId={(row) => row.identification}
+                  pageSize={5}
+                  onRowClick={(r) => console.log(r)}
+                  checkboxSelection
+                  disableSelectionOnClick
+                  onSelectionModelChange={(newSelectionModel) => {
+                    setSelectionModel(newSelectionModel);
+                    dispatch({
+                      type: Types.SetHarvests,
+                      payload: { harvests: newSelectionModel as string[] }
+                    });
+                  }}
+                  selectionModel={selectionModel}
+                />
+              </ThemeProvider>
+            </div>
+          )}
     </Grid>
   );
 };

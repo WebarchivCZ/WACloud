@@ -124,6 +124,7 @@
     "title": "Sklizně",
     "name": "Název sklizně",
     "size": "Velikost",
+    "type": "Typ",
     "WARCs": "Počet WARCu",
     "date": "Datum spuštění"
   },

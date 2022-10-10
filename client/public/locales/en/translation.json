@@ -124,6 +124,7 @@
     "title": "Harvests",
     "name": "Harvest's name",
     "size": "Size",
+    "type": "Type",
     "WARCs": "Number of WARCs",
     "date": "Date of start"
   },

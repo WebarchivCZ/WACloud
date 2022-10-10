@@ -147,7 +147,7 @@ const SearchScreen = () => {
         ) {
           clearInterval(interval);
         }
-      }, 2000);
+      }, 3000);
       if (
         state.searchState === 'DONE' ||
         state.searchState === 'STOPPED' ||

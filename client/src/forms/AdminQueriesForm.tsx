@@ -122,7 +122,7 @@ export const AdminQueriesForm = () => {
 
   useEffect(() => {
     refreshSearches();
-    const interval = setInterval(refreshSearches, 2500);
+    const interval = setInterval(refreshSearches, 10000);
     return () => clearInterval(interval);
   }, []);
 

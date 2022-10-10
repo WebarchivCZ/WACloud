@@ -1,26 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Grid,
-  makeStyles,
-  TextField,
-  Typography,
-  Box,
-  Paper,
-  MenuItem,
-  IconButton,
-  Checkbox,
-  FormControlLabel,
-  Chip,
-  Button
-} from '@material-ui/core';
+import { Grid, makeStyles, Typography, IconButton, Button } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
-import ReplayIcon from '@material-ui/icons/Replay';
-
-import ISearch from '../../interfaces/ISearch';
-import { addNotification } from '../../config/notifications';
-import ProcessStatus from '../ProcessStatus';
-import IUser from '../../interfaces/IUser';
 
 import { DialogContentProps } from './types';
 

@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   Card,
-  CircularProgress,
   Grid,
   Table,
   TableBody,
@@ -21,7 +20,6 @@ import TokenIcon from '@material-ui/icons/VpnKey';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 
 import ActionsMenu from '../components/ActionsMenu';
-import { addNotification } from '../config/notifications';
 import { DialogContext } from '../components/dialog/Dialog.context';
 import IUser from '../interfaces/IUser';
 import { useAuth } from '../services/useAuth';
@@ -31,7 +29,7 @@ import CreateUserDialog from '../components/dialog/CreateUserDialog';
 import TokenDialog from '../components/dialog/TokenDialog';
 
 export const UsersForm = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const auth = useAuth();
 
   const [users, setUsers] = useState<IUser[]>([]);
@@ -171,7 +169,7 @@ export const UsersForm = () => {
                   dialog.open({
                     size: 'md',
                     content: CreateUserDialog,
-                    values: {},
+                    values: undefined,
                     onClose: () => refreshUsers()
                   });
                 }}>

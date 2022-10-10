@@ -21,9 +21,8 @@ export const SentimentFilter = ({
   value,
   setValue,
   append,
-  disabled,
-  query
-}: ValuableProps<number | number[]> & { query: string }) => {
+  disabled
+}: ValuableProps<number | number[]>) => {
   const { t } = useTranslation();
 
   const { state } = useContext(SearchContext);

@@ -15,7 +15,6 @@ interface UrlFilterProps<T> {
   setUrl: Dispatch<SetStateAction<T>>;
   append?: (appendValue: string) => void;
   disabled?: boolean;
-  query: string;
 }
 
 export const UrlFilter = ({
@@ -24,8 +23,7 @@ export const UrlFilter = ({
   url,
   setUrl,
   append,
-  disabled,
-  query
+  disabled
 }: UrlFilterProps<string | null>) => {
   const { t } = useTranslation();
 

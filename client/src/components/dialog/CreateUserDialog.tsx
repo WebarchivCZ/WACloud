@@ -5,24 +5,14 @@ import {
   makeStyles,
   TextField,
   Typography,
-  Box,
-  Paper,
-  MenuItem,
   IconButton,
   Checkbox,
   FormControlLabel,
-  Chip,
   Button
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
-import ReplayIcon from '@material-ui/icons/Replay';
-import _ from 'lodash';
 
-import ISearch from '../../interfaces/ISearch';
 import { addNotification } from '../../config/notifications';
-import ProcessStatus from '../ProcessStatus';
-import IUser from '../../interfaces/IUser';
-import IQuery from '../../interfaces/IQuery';
 
 import { DialogContentProps } from './types';
 
@@ -61,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const CreateUserDialog = ({ onClose }: DialogContentProps<any>) => {
+const CreateUserDialog = ({ onClose }: DialogContentProps) => {
   const { t } = useTranslation();
   const classes = useStyles();
   const [name, setName] = useState('');
@@ -104,7 +94,7 @@ const CreateUserDialog = ({ onClose }: DialogContentProps<any>) => {
         }
         throw new Error();
       })
-      .then((response) => {
+      .then(() => {
         addNotification(
           t('login.password'),
           t('administration.users.notifications.createSuccess'),

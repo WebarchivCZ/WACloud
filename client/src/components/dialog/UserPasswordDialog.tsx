@@ -1,25 +1,9 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Grid,
-  makeStyles,
-  TextField,
-  Typography,
-  Box,
-  Paper,
-  MenuItem,
-  IconButton,
-  Checkbox,
-  FormControlLabel,
-  Chip,
-  Button
-} from '@material-ui/core';
+import { Grid, makeStyles, TextField, Typography, IconButton, Button } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
-import ReplayIcon from '@material-ui/icons/Replay';
 
-import ISearch from '../../interfaces/ISearch';
 import { addNotification } from '../../config/notifications';
-import ProcessStatus from '../ProcessStatus';
 import IUser from '../../interfaces/IUser';
 
 import { DialogContentProps } from './types';
@@ -59,10 +43,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const UserPasswordDialog = ({
-  onClose,
-  values: { id, name, username, role }
-}: DialogContentProps<IUser>) => {
+const UserPasswordDialog = ({ onClose, values: { id } }: DialogContentProps<IUser>) => {
   const { t } = useTranslation();
   const classes = useStyles();
   const [password, setPassword] = useState('');
@@ -87,7 +68,7 @@ const UserPasswordDialog = ({
         }
         throw new Error();
       })
-      .then((response) => {
+      .then(() => {
         addNotification(
           t('login.password'),
           t('administration.users.notifications.passwordChangedSuccess'),

@@ -171,7 +171,6 @@ export const FiltersDrawer = ({ query, drawerOpen, disabled }: FiltersDrawerProp
           disabled={disabled}
         />,
         <PageTypeFilter
-          query={query}
           key="pageType"
           value={pageType}
           setValue={setPageType}
@@ -190,7 +189,6 @@ export const FiltersDrawer = ({ query, drawerOpen, disabled }: FiltersDrawerProp
           disabled={disabled}
         />,
         <UrlFilter
-          query={query}
           key="urlFilter"
           operator={urlSelect}
           setOperator={setUrlSelect}
@@ -200,7 +198,6 @@ export const FiltersDrawer = ({ query, drawerOpen, disabled }: FiltersDrawerProp
           disabled={disabled}
         />,
         <SentimentFilter
-          query={query}
           key="sentimentFilter"
           value={sentiment}
           setValue={setSentiment}

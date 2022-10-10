@@ -13,9 +13,8 @@ export const PageTypeFilter = ({
   value,
   setValue,
   append,
-  disabled,
-  query
-}: ValuableOptionalsProps<string | undefined> & { query: string }) => {
+  disabled
+}: ValuableOptionalsProps<string | undefined>) => {
   const { t } = useTranslation();
   const { state } = useContext(SearchContext);
 

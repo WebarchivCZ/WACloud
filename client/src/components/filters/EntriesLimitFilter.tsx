@@ -26,7 +26,7 @@ export const EntriesLimitFilter = ({ disabled }: Props) => {
           type="number"
           label={t<string>('filters.entriesLimit')}
           fullWidth
-          inputProps={{ min: 10, max: 10000 }}
+          inputProps={{ min: 10, max: 1000 }}
           value={state.entriesLimit}
           disabled={disabled}
           onChange={(event) =>

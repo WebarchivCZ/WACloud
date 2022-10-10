@@ -36,7 +36,7 @@ const initialState = {
   drawerOpen: true,
   query: '',
   stopWords: stopWordsCzech.sort(),
-  entriesLimit: 1000,
+  entriesLimit: 100,
   seed: null,
   harvests: [],
   searchState: 'WAITING' as SearchState,

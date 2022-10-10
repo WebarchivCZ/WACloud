@@ -30,3 +30,8 @@ export type DialogContextType = {
   ) => string;
   close: (id: string) => void;
 };
+
+export type ValidationObject = {
+  valid: boolean;
+  estimated: number;
+};

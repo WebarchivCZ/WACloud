@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, Dispatch, SetStateAction } from 'react';
 import {
   Button,
   createStyles,
@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { SearchContext, Stage } from '../components/Search.context';
 import { ValuableProps } from '../interfaces/ValuableProps';
 import { Types } from '../components/reducers';
+import { ValidationObject } from '../components/dialog/types';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -39,18 +40,19 @@ interface LogicalButtonProps {
   appendValue: string;
 }
 
-type ValidationObject = {
-  valid: boolean;
-  estimated: number;
-};
-
-export const QueryForm = ({ value, disabled }: ValuableProps<string>) => {
+export const QueryForm = ({
+  value,
+  disabled,
+  validation,
+  setValidation
+}: ValuableProps<string> & {
+  validation: ValidationObject | undefined;
+  setValidation: Dispatch<SetStateAction<ValidationObject | undefined>>;
+}) => {
   const classes = useStyles();
   const { t } = useTranslation();
 
   const { state, dispatch } = useContext(SearchContext);
-
-  const [validation, setValidation] = useState<ValidationObject | undefined>(undefined);
 
   useEffect(() => {
     if (state.stage === Stage.ANALYTICS) {

@@ -20,6 +20,7 @@ import { SearchContext } from '../components/Search.context';
 import { Types } from '../components/reducers';
 import AddToFavoriteDialog from '../components/dialog/AddToFavoriteDialog';
 import { DialogContext } from '../components/dialog/Dialog.context';
+import { ValidationObject } from '../components/dialog/types';
 
 enum Stage {
   QUERY,
@@ -41,6 +42,7 @@ const SearchScreen = () => {
   const dialog = useContext(DialogContext);
 
   const [query, setQuery] = useState<string>('');
+  const [validation, setValidation] = useState<ValidationObject | undefined>(undefined);
 
   const [queries, setQueries] = useState<IQuery[]>([
     {
@@ -165,7 +167,12 @@ const SearchScreen = () => {
       content: (
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <QueryForm value={state.query} setValue={setQuery} />
+            <QueryForm
+              value={state.query}
+              setValue={setQuery}
+              validation={validation}
+              setValidation={setValidation}
+            />
           </Grid>
           <Grid item xs={12}>
             <HarvestsForm minimal={false} />
@@ -196,7 +203,13 @@ const SearchScreen = () => {
       content: (
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <QueryForm value={state.query} setValue={setQuery} disabled={true} />
+            <QueryForm
+              value={state.query}
+              setValue={setQuery}
+              disabled={true}
+              validation={validation}
+              setValidation={setValidation}
+            />
           </Grid>
           <Grid item xs={12}>
             <Grid container spacing={2} justifyContent="space-between">
@@ -221,10 +234,12 @@ const SearchScreen = () => {
           <Grid item xs={12}>
             <Divider />
           </Grid>
-          <Grid item xs={12}>
-            <AnalyticQueriesForm queries={state.queries} setQueries={setQueries} />
-          </Grid>
-          {queries.length > 0 && (
+          {validation?.valid && (
+            <Grid item xs={12}>
+              <AnalyticQueriesForm queries={state.queries} setQueries={setQueries} />
+            </Grid>
+          )}
+          {queries.length > 0 && validation?.valid && (
             <>
               <Divider />
               <Box m={2}>
@@ -243,7 +258,13 @@ const SearchScreen = () => {
       content: (
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <QueryForm value={state.query} setValue={setQuery} disabled={true} />
+            <QueryForm
+              value={state.query}
+              setValue={setQuery}
+              disabled={true}
+              validation={validation}
+              setValidation={setValidation}
+            />
           </Grid>
           <Grid item xs={12}>
             <Grid container spacing={2} justifyContent="space-between">
@@ -268,9 +289,11 @@ const SearchScreen = () => {
           <Grid item xs={12}>
             <Divider />
           </Grid>
-          <Grid item xs={12}>
-            <AnalyticQueriesForm queries={queries} setQueries={setQueries} />
-          </Grid>
+          {validation?.valid && (
+            <Grid item xs={12}>
+              <AnalyticQueriesForm queries={queries} setQueries={setQueries} />
+            </Grid>
+          )}
 
           <ProcessStatus state={state.searchState} />
           {state.queries.length > 0 && state.searchState !== 'DONE' && (

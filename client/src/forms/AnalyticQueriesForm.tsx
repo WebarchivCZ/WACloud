@@ -17,7 +17,7 @@ import AddIcon from '@material-ui/icons/Add';
 import { useTranslation } from 'react-i18next';
 
 import IQuery from '../interfaces/IQuery';
-import { SearchContext } from '../components/Search.context';
+import { SearchContext, Stage } from '../components/Search.context';
 import { Types } from '../components/reducers';
 import { Type } from '../interfaces/Type';
 import { Format } from '../interfaces/Format';
@@ -204,11 +204,13 @@ function AnalyticQueriesForm({
         </Grid>
         <Grid item xs={6}>
           <Grid container justifyContent="flex-end">
-            <Grid item>
-              <Button variant="contained" size="large" color="primary" onClick={handleAddQuery}>
-                {t<string>('analytics.add')}
-              </Button>
-            </Grid>
+            {state.stage !== Stage.PROCESS && (
+              <Grid item>
+                <Button variant="contained" size="large" color="primary" onClick={handleAddQuery}>
+                  {t<string>('analytics.add')}
+                </Button>
+              </Grid>
+            )}
           </Grid>
         </Grid>
       </Grid>
@@ -222,6 +224,7 @@ function AnalyticQueriesForm({
                     select
                     label={t<string>('analytics.queryType')}
                     fullWidth
+                    disabled={state.stage === Stage.PROCESS}
                     value={query.searchType}
                     onChange={(event) => handleQueryTypeChange(index, event)}>
                     <MenuItem value="FREQUENCY">Frequency</MenuItem>
@@ -239,6 +242,7 @@ function AnalyticQueriesForm({
                         <Grid item xs={12}>
                           <TextField
                             fullWidth
+                            disabled={state.stage === Stage.PROCESS}
                             label={t<string>('analytics.wordInput')}
                             value={query.searchText}
                             onChange={(event) => handleChangeSearchText(index, event)}
@@ -255,6 +259,7 @@ function AnalyticQueriesForm({
                                 control={
                                   <Checkbox
                                     color="primary"
+                                    disabled={state.stage === Stage.PROCESS}
                                     checked={query.context}
                                     onChange={(event) => handleChangeContext(index, event)}
                                   />
@@ -268,6 +273,7 @@ function AnalyticQueriesForm({
                                 <TextField
                                   type="number"
                                   fullWidth
+                                  disabled={state.stage === Stage.PROCESS}
                                   label={t<string>('analytics.contextLength')}
                                   value={query.contextSize}
                                   onChange={(event) => handleChangeContextLength(index, event)}
@@ -284,6 +290,7 @@ function AnalyticQueriesForm({
                                 type="number"
                                 label={t<string>('filters.entriesLimit')}
                                 fullWidth
+                                disabled={state.stage === Stage.PROCESS}
                                 value={query.limit}
                                 inputProps={{ min: 1, max: 1000 }}
                                 onChange={(event) => handleChangeLimit(index, event)}
@@ -294,6 +301,7 @@ function AnalyticQueriesForm({
                                 select
                                 label="Sorting"
                                 fullWidth
+                                disabled={state.stage === Stage.PROCESS}
                                 value={
                                   query.sorting && query.sorting.length > 0
                                     ? query.sorting[0]
@@ -317,6 +325,7 @@ function AnalyticQueriesForm({
                                 select
                                 label="Format"
                                 fullWidth
+                                disabled={state.stage === Stage.PROCESS}
                                 value={query.format ? query.format : 'JSON'}
                                 onChange={(event) => handleQueryFormatChange(index, event)}>
                                 <MenuItem value="CSV">CSV</MenuItem>
@@ -333,6 +342,7 @@ function AnalyticQueriesForm({
                                 type="number"
                                 label={t<string>('filters.entriesLimit')}
                                 fullWidth
+                                disabled={state.stage === Stage.PROCESS}
                                 value={query.limit}
                                 inputProps={{ min: 1, max: 1000 }}
                                 onChange={(event) => handleChangeLimit(index, event)}
@@ -347,6 +357,7 @@ function AnalyticQueriesForm({
                       <Button
                         variant="contained"
                         color="primary"
+                        disabled={state.stage === Stage.PROCESS}
                         onClick={() => {
                           handleAddQueryText(index);
                         }}
@@ -368,6 +379,7 @@ function AnalyticQueriesForm({
                           <li key={ind}>
                             <Chip
                               label={q}
+                              disabled={state.stage === Stage.PROCESS}
                               onDelete={() => handleDeleteQueryText(index, ind)}
                               className={classes.chip}
                             />
@@ -385,6 +397,7 @@ function AnalyticQueriesForm({
                         <Grid item xs={5} md={5}>
                           <TextField
                             fullWidth
+                            disabled={state.stage === Stage.PROCESS}
                             label={t<string>('analytics.inputNodes')}
                             value={query.searchText}
                             onChange={(event) => handleChangeSearchText(index, event)}
@@ -396,6 +409,7 @@ function AnalyticQueriesForm({
 
                         <Grid item xs={2} md={2}>
                           <Button
+                            disabled={state.stage === Stage.PROCESS}
                             variant="contained"
                             color="primary"
                             onClick={() => {
@@ -421,6 +435,7 @@ function AnalyticQueriesForm({
                               <li key={ind}>
                                 <Chip
                                   label={q}
+                                  disabled={state.stage === Stage.PROCESS}
                                   onDelete={() => handleDeleteQueryText(index, ind)}
                                   className={classes.chip}
                                 />
@@ -434,6 +449,7 @@ function AnalyticQueriesForm({
                             control={
                               <Checkbox
                                 color="primary"
+                                disabled={state.stage === Stage.PROCESS}
                                 checked={query.useOnlyDomains}
                                 onChange={(event) => handleChangeUseOnlyDomains(index, event)}
                               />
@@ -445,6 +461,7 @@ function AnalyticQueriesForm({
                         <Grid item xs={5} md={5}>
                           <TextField
                             fullWidth
+                            disabled={state.stage === Stage.PROCESS}
                             label={t<string>('analytics.outputNodes')}
                             value={query.searchTextOpposite}
                             onChange={(event) => handleChangeSearchTextOpposite(index, event)}
@@ -457,6 +474,7 @@ function AnalyticQueriesForm({
                         <Grid item xs={2} md={2}>
                           <Button
                             variant="contained"
+                            disabled={state.stage === Stage.PROCESS}
                             color="primary"
                             onClick={() => {
                               handleAddQueryOppositeText(index);
@@ -481,6 +499,7 @@ function AnalyticQueriesForm({
                               <li key={ind}>
                                 <Chip
                                   label={q}
+                                  disabled={state.stage === Stage.PROCESS}
                                   onDelete={() => handleDeleteQueryOppositeText(index, ind)}
                                   className={classes.chip}
                                 />
@@ -494,6 +513,7 @@ function AnalyticQueriesForm({
                             control={
                               <Checkbox
                                 color="primary"
+                                disabled={state.stage === Stage.PROCESS}
                                 checked={query.useOnlyDomainsOpposite}
                                 onChange={(event) =>
                                   handleChangeUseOnlyDomainsOpposite(index, event)
@@ -517,6 +537,7 @@ function AnalyticQueriesForm({
                   <Button
                     color="secondary"
                     variant="contained"
+                    disabled={state.stage === Stage.PROCESS}
                     onClick={() => handleDeleteQuery(index)}>
                     {t<string>('analytics.delete')}
                   </Button>

@@ -223,7 +223,11 @@ const SearchScreen = () => {
                   onClick={() => {
                     dispatch({
                       type: Types.SetState,
-                      payload: { ...state, drawerOpen: true, stage: Stage.QUERY }
+                      payload: {
+                        ...state,
+                        drawerOpen: true,
+                        stage: Stage.QUERY
+                      }
                     });
                   }}>
                   {t<string>('query.edit')}
@@ -278,7 +282,11 @@ const SearchScreen = () => {
                   onClick={() => {
                     dispatch({
                       type: Types.SetState,
-                      payload: { ...state, stage: Stage.QUERY, drawerOpen: true }
+                      payload: {
+                        ...state,
+                        stage: Stage.QUERY,
+                        drawerOpen: true
+                      }
                     });
                   }}>
                   {t<string>('query.edit')}

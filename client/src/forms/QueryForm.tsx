@@ -84,13 +84,20 @@ export const QueryForm = ({
           })
         })
       })
-        .then((res) => res.json())
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          } else {
+            throw new Error();
+          }
+        })
         .then((data: ValidationObject) => {
           setValidation({
             valid: data.valid,
             estimated: data.estimated
           });
-        });
+        })
+        .catch(() => setValidation({ valid: false, estimated: 0 }));
     }
   }, [state.stage]);
 

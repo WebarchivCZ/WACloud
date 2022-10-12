@@ -168,14 +168,14 @@ export const HarvestsForm = ({ minimal }: HarvestsProps) => {
         (result) => {
           const harvests = result.filter((h: IHarvest) => h.state === 'INDEXED' && h.entries > 0);
           // TODO FAKE REMOVE start
-          while (harvests.length < fakeData.length) {
+          /*while (harvests.length < fakeData.length) {
             const fake = fakeData[harvests.length];
             harvests.push({
               identification: fake.name,
               entries: fake.warcs,
               date: fake.date
             });
-          }
+          }*/
           // TODO FAKE REMOVE END
           setAllHarvests(harvests);
         },
@@ -233,7 +233,7 @@ export const HarvestsForm = ({ minimal }: HarvestsProps) => {
                       </tr>
                       <tr>
                         <th>{t<string>('harvests.size')}</th>
-                        <td>{fakeData[index].size}</td>
+                        <td>-</td>
                       </tr>
                       <tr>
                         <th>{t<string>('harvests.WARCs')}</th>

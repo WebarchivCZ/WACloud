@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Box, Checkbox, FormControlLabel, TextField } from '@material-ui/core';
 import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,8 @@ import { Types } from '../reducers';
 import { FilterContent } from './FilterContent';
 
 const MAX_SEED = 10000000;
+const MIN = 10;
+const MAX = 1000;
 
 type Props = {
   disabled?: boolean;
@@ -18,6 +20,7 @@ export const EntriesLimitFilter = ({ disabled }: Props) => {
   const { t } = useTranslation();
 
   const { state, dispatch } = useContext(SearchContext);
+  const [error, setError] = useState(false);
 
   return (
     <FilterContent title={t<string>('filters.entriesLimit')} icon={<FormatListNumberedIcon />}>
@@ -26,15 +29,21 @@ export const EntriesLimitFilter = ({ disabled }: Props) => {
           type="number"
           label={t<string>('filters.entriesLimit')}
           fullWidth
-          inputProps={{ min: 10, max: 1000 }}
+          inputProps={{ min: MIN, max: MAX }}
           value={state.entriesLimit}
           disabled={disabled}
-          onChange={(event) =>
+          error={error}
+          helperText={error ? t<string>('filters.errorText', { min: MIN, max: MAX }) : ''}
+          onChange={(event) => {
+            // Field validation
+            const limit = parseInt(event.target.value);
+            setError(limit < MIN || limit > MAX);
+
             dispatch({
               type: Types.SetLimit,
-              payload: { entriesLimit: parseInt(event.target.value) }
-            })
-          }
+              payload: { entriesLimit: limit }
+            });
+          }}
         />
       </Box>
       <Box my={2}>

@@ -55,7 +55,8 @@
       "export": "Exportovat",
       "deleteAll": "Smazat vše"
     },
-    "entriesLimit": "Počet záznamů"
+    "entriesLimit": "Počet záznamů",
+    "errorText": "Lze zadat hodnoty mezi {{min}} a {{max}}"
   },
   "query": {
     "header": "Dotaz",

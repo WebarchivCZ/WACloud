@@ -55,7 +55,8 @@
       "export": "Export",
       "deleteAll": "Delete all"
     },
-    "entriesLimit": "Number of entries"
+    "entriesLimit": "Number of entries",
+    "errorText": "You can only enter values between {{min}} and {{max}}"
   },
   "query": {
     "header": "Query",

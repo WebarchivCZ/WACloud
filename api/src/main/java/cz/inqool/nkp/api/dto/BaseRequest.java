@@ -14,7 +14,7 @@ public class BaseRequest {
 
 	private final String[] harvests;
 
-	@Max(value = 10000, message = "maximal limit for testing is 10000 entries")
+	@Max(value = 1000, message = "maximal limit for testing is 10000 entries")
 	@Min(value = 10, message = "minimal limit for testing is 10 entries")
 	private final Integer entries;
 

@@ -166,7 +166,7 @@ export const HarvestsForm = ({ minimal }: HarvestsProps) => {
       .then((res) => res.json())
       .then(
         (result) => {
-          const harvests = result.filter((h: IHarvest) => h.state === 'INDEXED');
+          const harvests = result.filter((h: IHarvest) => h.state === 'INDEXED' && h.entries > 0);
           // TODO FAKE REMOVE start
           while (harvests.length < fakeData.length) {
             const fake = fakeData[harvests.length];

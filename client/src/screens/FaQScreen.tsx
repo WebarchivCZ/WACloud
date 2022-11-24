@@ -16,10 +16,10 @@ const FaQScreen = () => {
   const [page, setPage] = useState('');
 
   useEffect(() => {
-    fetch('/markdown/FaQ.md')
+    fetch('/markdown/FaQ.' + (i18n.language === 'cs' ? 'cs' : 'en') + '.md')
       .then((res) => res.text())
       .then((res) => setPage(res));
-  }, []);
+  }, [i18n.language]);
 
   return (
     <Header

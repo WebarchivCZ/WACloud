@@ -3,6 +3,7 @@ package cz.inqool.nkp.api.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.inqool.nkp.api.dto.*;
+import cz.inqool.nkp.api.exception.ResourceNotFoundException;
 import cz.inqool.nkp.api.exception.SearchStoppedException;
 import cz.inqool.nkp.api.model.AnalyticQuery;
 import cz.inqool.nkp.api.model.Harvest;
@@ -127,7 +128,7 @@ public class SearchServiceImpl implements SearchService {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void index(Search s) {
-        Search query = searchRepository.findById(s.getId()).get();
+        Search query = searchRepository.findById(s.getId()).orElseThrow(ResourceNotFoundException::new);
         if (query.getState().equals(Search.State.STOPPED)) {
             throw new SearchStoppedException();
         }
@@ -693,48 +694,48 @@ public class SearchServiceImpl implements SearchService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void setIndexed(Search s, int totalCount) {
-        Search search = searchRepository.findById(s.getId()).get();
+        Search search = searchRepository.findById(s.getId()).orElseThrow(ResourceNotFoundException::new);
         if (search.getState().equals(Search.State.STOPPED)) {
             search.setFinishedAt(new Date());
-            searchRepository.saveAndFlush(search);
+            searchRepository.save(search);
             throw new SearchStoppedException();
         }
         search.setIndexed(totalCount);
-        searchRepository.saveAndFlush(search);
+        searchRepository.save(search);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void startIndexing(Search s) {
-        Search search = searchRepository.findById(s.getId()).get();
+        Search search = searchRepository.findById(s.getId()).orElseThrow(ResourceNotFoundException::new);
         if (search.getState().equals(Search.State.STOPPED)) {
             search.setFinishedAt(new Date());
-            searchRepository.saveAndFlush(search);
+            searchRepository.save(search);
             throw new SearchStoppedException();
         }
         search.setState(Search.State.INDEXING);
         search.setStartedAt(new Date());
-        searchRepository.saveAndFlush(search);
+        searchRepository.save(search);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void startProcessing(Search s) {
-        Search search = searchRepository.findById(s.getId()).get();
+        Search search = searchRepository.findById(s.getId()).orElseThrow(ResourceNotFoundException::new);
         if (search.getState().equals(Search.State.STOPPED)) {
             search.setFinishedAt(new Date());
-            searchRepository.saveAndFlush(search);
+            searchRepository.save(search);
             throw new SearchStoppedException();
         }
         search.setState(Search.State.PROCESSING);
-        searchRepository.saveAndFlush(search);
+        searchRepository.save(search);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void startProcessingQuery(AnalyticQuery s) {
-        AnalyticQuery analyticQuery = analyticQueryRepository.findById(s.getId()).get();
+        AnalyticQuery analyticQuery = analyticQueryRepository.findById(s.getId()).orElseThrow(ResourceNotFoundException::new);
         Search search = analyticQuery.getSearch();
         if (search.getState().equals(Search.State.STOPPED)) {
             search.setFinishedAt(new Date());
-            searchRepository.saveAndFlush(search);
+            searchRepository.save(search);
             throw new SearchStoppedException();
         }
         analyticQuery.setState(AnalyticQuery.State.RUNNING);
@@ -744,7 +745,7 @@ public class SearchServiceImpl implements SearchService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void finishProcessingQuery(AnalyticQuery s, byte[] data) {
-        AnalyticQuery analyticQuery = analyticQueryRepository.findById(s.getId()).get();
+        AnalyticQuery analyticQuery = analyticQueryRepository.findById(s.getId()).orElseThrow(ResourceNotFoundException::new);
         analyticQuery.setData(data);
         analyticQuery.setState(AnalyticQuery.State.FINISHED);
         analyticQuery.setFinishedAt(new Date());
@@ -753,10 +754,10 @@ public class SearchServiceImpl implements SearchService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void finishProcessing(Search s, Search.State state) {
-        Search search = searchRepository.findById(s.getId()).get();
+        Search search = searchRepository.findById(s.getId()).orElseThrow(ResourceNotFoundException::new);
         search.setState(state);
         search.setFinishedAt(new Date());
-        searchRepository.saveAndFlush(search);
+        searchRepository.save(search);
     }
 
     @Override

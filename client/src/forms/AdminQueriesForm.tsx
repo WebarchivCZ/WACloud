@@ -22,6 +22,7 @@ import ISearch from '../interfaces/ISearch';
 import { DialogContext } from '../components/dialog/Dialog.context';
 import QueryDetailDialog from '../components/dialog/QueryDetailDialog';
 import { SearchContext } from '../components/Search.context';
+import IPageable from '../interfaces/IPageable';
 
 export const AdminQueriesForm = () => {
   const { t, i18n } = useTranslation();
@@ -29,7 +30,7 @@ export const AdminQueriesForm = () => {
 
   const { state, dispatch } = useContext(SearchContext);
 
-  const [queries, setQueries] = useState<ISearch[]>([]);
+  const [queries, setQueries] = useState<IPageable<ISearch>>();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -98,80 +99,82 @@ export const AdminQueriesForm = () => {
     return '?';
   };
 
-  const refreshSearches = () => {
-    fetch('/api/search/all')
+  const refreshSearches = (page: number, rowsPerPage: number) => {
+    fetch('/api/search/all?page=' + (page + 1) + '&size=' + rowsPerPage)
       .then((res) => res.json())
       .then(
         (result) => {
           setQueries(result);
         },
         () => {
-          setQueries([]);
+          setQueries(undefined);
         }
       );
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
+    refreshSearches(newPage, rowsPerPage);
   };
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+    refreshSearches(0, parseInt(event.target.value, 10));
   };
 
   useEffect(() => {
-    refreshSearches();
+    refreshSearches(page, rowsPerPage);
     const interval = setInterval(refreshSearches, 10000);
     return () => clearInterval(interval);
   }, []);
 
   return (
     <>
-      {queries.filter((v) => !['DONE', 'ERROR', 'STOPPED'].includes(v.state)).length > 0 && (
-        <>
-          <Typography variant="h1">{t<string>('header.currentQueries')}</Typography>
-          <Card variant="outlined">
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>{t<string>('query.header')}</TableCell>
-                    <TableCell>{t<string>('administration.queries.columns.startedBy')}</TableCell>
-                    <TableCell>{t<string>('query.created')}</TableCell>
-                    <TableCell>{t<string>('query.state')}</TableCell>
-                    <TableCell />
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {queries
-                    .filter((v) => !['DONE', 'ERROR', 'STOPPED'].includes(v.state))
-                    .map((row) => (
-                      <TableRow hover key={row.id}>
-                        <TableCell>
-                          <span aria-label={row.filter}>
-                            {row.filter.length > 60
-                              ? row.filter.substring(0, 60 - 3) + '...'
-                              : row.filter}
-                          </span>
-                        </TableCell>
-                        <TableCell>{row.user.name}</TableCell>
-                        <TableCell>
-                          {new Date(row.createdAt).toLocaleString(i18n.language)}
-                        </TableCell>
-                        <TableCell>{stateToString(row.state)}</TableCell>
-                        <TableCell>
-                          <CircularProgress size={15} />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Card>
-          <br />
-        </>
-      )}
+      {/*{queries.filter((v) => !['DONE', 'ERROR', 'STOPPED'].includes(v.state)).length > 0 && (*/}
+      {/*  <>*/}
+      {/*    <Typography variant="h1">{t<string>('header.currentQueries')}</Typography>*/}
+      {/*    <Card variant="outlined">*/}
+      {/*      <TableContainer>*/}
+      {/*        <Table>*/}
+      {/*          <TableHead>*/}
+      {/*            <TableRow>*/}
+      {/*              <TableCell>{t<string>('query.header')}</TableCell>*/}
+      {/*              <TableCell>{t<string>('administration.queries.columns.startedBy')}</TableCell>*/}
+      {/*              <TableCell>{t<string>('query.created')}</TableCell>*/}
+      {/*              <TableCell>{t<string>('query.state')}</TableCell>*/}
+      {/*              <TableCell />*/}
+      {/*            </TableRow>*/}
+      {/*          </TableHead>*/}
+      {/*          <TableBody>*/}
+      {/*            {queries*/}
+      {/*              .filter((v) => !['DONE', 'ERROR', 'STOPPED'].includes(v.state))*/}
+      {/*              .map((row) => (*/}
+      {/*                <TableRow hover key={row.id}>*/}
+      {/*                  <TableCell>*/}
+      {/*                    <span aria-label={row.filter}>*/}
+      {/*                      {row.filter.length > 60*/}
+      {/*                        ? row.filter.substring(0, 60 - 3) + '...'*/}
+      {/*                        : row.filter}*/}
+      {/*                    </span>*/}
+      {/*                  </TableCell>*/}
+      {/*                  <TableCell>{row.user.name}</TableCell>*/}
+      {/*                  <TableCell>*/}
+      {/*                    {new Date(row.createdAt).toLocaleString(i18n.language)}*/}
+      {/*                  </TableCell>*/}
+      {/*                  <TableCell>{stateToString(row.state)}</TableCell>*/}
+      {/*                  <TableCell>*/}
+      {/*                    <CircularProgress size={15} />*/}
+      {/*                  </TableCell>*/}
+      {/*                </TableRow>*/}
+      {/*              ))}*/}
+      {/*          </TableBody>*/}
+      {/*        </Table>*/}
+      {/*      </TableContainer>*/}
+      {/*    </Card>*/}
+      {/*    <br />*/}
+      {/*  </>*/}
+      {/*)}*/}
 
       <Typography variant="h1">{t<string>('header.myQueries')}</Typography>
       <Card variant="outlined">
@@ -187,9 +190,9 @@ export const AdminQueriesForm = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {queries
-                .filter((v) => ['DONE', 'ERROR', 'STOPPED'].includes(v.state))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              {queries?.content
+                // .filter((v) => ['DONE', 'ERROR', 'STOPPED'].includes(v.state))
+                // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row) => (
                   <TableRow hover key={row.id}>
                     <TableCell>
@@ -203,7 +206,12 @@ export const AdminQueriesForm = () => {
                     <TableCell>{new Date(row.createdAt).toLocaleString(i18n.language)}</TableCell>
                     <TableCell>{stateToString(row.state)}</TableCell>
                     <TableCell>
-                      <ActionsMenu actions={actions?.(row) ?? []} hideEmpty />
+                      {!['DONE', 'ERROR', 'STOPPED'].includes(row.state) && (
+                        <CircularProgress size={15} />
+                      )}
+                      {['DONE', 'ERROR', 'STOPPED'].includes(row.state) && (
+                        <ActionsMenu actions={actions?.(row) ?? []} hideEmpty />
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -213,7 +221,7 @@ export const AdminQueriesForm = () => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={queries.filter((v) => ['DONE', 'ERROR', 'STOPPED'].includes(v.state)).length}
+          count={queries ? queries.totalElements : 0}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

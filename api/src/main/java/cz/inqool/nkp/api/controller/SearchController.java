@@ -21,7 +21,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springdoc.api.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -64,7 +68,7 @@ public class SearchController {
         Search search = prepareSearch(request, authentication);
         Long estimated = searchService.estimate(search);
         search.setToIndex(estimated == null ? 0 : estimated.intValue());
-        searchRepository.saveAndFlush(search);
+        searchRepository.save(search);
 
         analyticQueryRepository.saveAllAndFlush(Arrays.stream(request.getQueries()).map(queryRequest -> {
             AnalyticQuery analyticQuery = new AnalyticQuery();
@@ -104,8 +108,8 @@ public class SearchController {
     @Operation(summary = "Get all requests (only for admins)")
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping(value="/api/search/all")
-    public List<Search> getAll() {
-        return searchRepository.findAll(Sort.by(Sort.Order.desc("id")));
+    public Page<Search> getAll(@ParameterObject @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable p) {
+        return searchRepository.findAll(p);
     }
 
     @Operation(summary = "Get a request")
@@ -124,7 +128,7 @@ public class SearchController {
             throw new RuntimeException("The search is already finished.");
         }
         search.setState(Search.State.STOPPED);
-        searchRepository.saveAndFlush(search);
+        searchRepository.save(search);
         return search;
     }
 
@@ -143,7 +147,7 @@ public class SearchController {
         Search search = findSearch(id, authentication);
         search.setName(request.getName());
         search.setFavorite(true);
-        searchRepository.saveAndFlush(search);
+        searchRepository.save(search);
         return search;
     }
 
@@ -154,7 +158,7 @@ public class SearchController {
         Search search = findSearch(id, authentication);
         search.setName("");
         search.setFavorite(false);
-        searchRepository.saveAndFlush(search);
+        searchRepository.save(search);
     }
 
     @Operation(summary = "Download a result")
@@ -175,7 +179,7 @@ public class SearchController {
             try {
                 // Process query
                 String filename = queryIndex + "_" + query.getType().toString() + ".";
-                switch (query.getFormat()){
+                switch (query.getFormat()) {
                     case CSV: filename = filename + "csv"; break;
                     default: filename = filename + "json"; break;
                 }
@@ -201,7 +205,7 @@ public class SearchController {
     private Search findSearch(@PathVariable Long id, Authentication authentication) {
         Search search = searchRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         AppUser user = ((AppUserPrincipal)authentication.getPrincipal()).getAppUser();
-        if(user.getId() != search.getUser().getId() && user.getRole().equals(AppUser.Role.ADMIN)) {
+        if(user.getId() != search.getUser().getId() && !user.getRole().equals(AppUser.Role.ADMIN)) {
             throw new RuntimeException("You are not allowed to view this saved search.");
         }
         return search;

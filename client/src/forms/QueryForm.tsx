@@ -9,6 +9,8 @@ import {
   Typography
 } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
+import GetAppIcon from '@material-ui/icons/GetApp';
+import PublishIcon from '@material-ui/icons/Publish';
 
 import { SearchContext, Stage } from '../components/Search.context';
 import { ValuableProps } from '../interfaces/ValuableProps';
@@ -23,6 +25,17 @@ const useStyles = makeStyles((theme: Theme) =>
       height: '40px',
       borderRadius: 0,
       padding: 0,
+      boxShadow: 'none',
+      color: theme.palette.primary.main,
+      fontSize: '12px',
+      fontWeight: 700
+    },
+    buttonQuery: {
+      width: 'auto',
+      height: '40px',
+      margin: '0px',
+      padding: '0.5rem',
+      minWidth: '40px',
       boxShadow: 'none',
       color: theme.palette.primary.main,
       fontSize: '12px',
@@ -53,6 +66,23 @@ export const QueryForm = ({
   const { t } = useTranslation();
 
   const { state, dispatch } = useContext(SearchContext);
+
+  const loadQueryFromFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    e.preventDefault();
+    const newQuery = await e.target.files?.[0].text();
+    dispatch({ type: Types.SetQuery, payload: { query: newQuery } });
+  };
+
+  const exportQueryToFile = () => {
+    const blob = new Blob([state.query], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'query.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   useEffect(() => {
     if (state.stage === Stage.ANALYTICS) {
@@ -124,16 +154,60 @@ export const QueryForm = ({
         <Grid item xs={12}>
           <Typography variant="h2">{t<string>('query.header')}</Typography>
         </Grid>
-        <Grid item xs={12}>
-          <TextField
-            multiline
-            rows={3}
-            variant="outlined"
-            fullWidth
-            value={value}
-            disabled={disabled}
-            onChange={handleChangeFilter}
-          />
+        <Grid item xs>
+          <Grid
+            container
+            spacing={2}
+            direction="row"
+            justifyContent="space-between"
+            alignItems="stretch">
+            <Grid item xs>
+              <TextField
+                multiline
+                rows={3}
+                variant="outlined"
+                fullWidth
+                value={value}
+                disabled={disabled}
+                onChange={handleChangeFilter}
+              />
+            </Grid>
+            <Grid item>
+              <Grid
+                container
+                spacing={2}
+                direction="column"
+                justifyContent="space-between"
+                alignItems="stretch">
+                <Grid item>
+                  <Button
+                    startIcon={<GetAppIcon />}
+                    variant="contained"
+                    component="label"
+                    disabled={disabled}
+                    className={classes.buttonQuery}>
+                    {t<string>('filters.stopWords.import')}
+                    <input
+                      type="file"
+                      hidden
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => loadQueryFromFile(e)}
+                    />
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button
+                    startIcon={<PublishIcon />}
+                    variant="contained"
+                    component="label"
+                    disabled={disabled}
+                    className={classes.buttonQuery}
+                    onClick={exportQueryToFile}>
+                    {t<string>('filters.stopWords.export')}
+                  </Button>
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
         </Grid>
 
         <Grid item xs={12}>

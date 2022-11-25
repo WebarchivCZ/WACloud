@@ -299,7 +299,7 @@ function AnalyticQueriesForm({
                             <Grid item xs={4}>
                               <TextField
                                 select
-                                label="Sorting"
+                                label={t<string>('filters.sorting')}
                                 fullWidth
                                 disabled={state.stage === Stage.PROCESS}
                                 value={
@@ -308,16 +308,36 @@ function AnalyticQueriesForm({
                                     : 'YEAR_ASC'
                                 }
                                 onChange={(event) => handleQuerySortingChange(index, event)}>
-                                <MenuItem value="YEAR_ASC">Year ASC</MenuItem>
-                                <MenuItem value="YEAR_DESC">Year DESC</MenuItem>
-                                <MenuItem value="LANGUAGE_ASC">Language ASC</MenuItem>
-                                <MenuItem value="LANGUAGE_DESC">Language DESC</MenuItem>
-                                <MenuItem value="TITLE_ASC">Title ASC</MenuItem>
-                                <MenuItem value="TITLE_DESC">Title DESC</MenuItem>
-                                <MenuItem value="URL_ASC">Url ASC</MenuItem>
-                                <MenuItem value="URL_DESC">Url DESC</MenuItem>
-                                <MenuItem value="SENTIMENT_ASC">Sentiment ASC</MenuItem>
-                                <MenuItem value="SENTIMENT_DESC">Sentiment DESC</MenuItem>
+                                <MenuItem value="YEAR_ASC">
+                                  {t<string>('filters.sorting_values.YEAR_ASC')}
+                                </MenuItem>
+                                <MenuItem value="YEAR_DESC">
+                                  {t<string>('filters.sorting_values.YEAR_DESC')}
+                                </MenuItem>
+                                <MenuItem value="LANGUAGE_ASC">
+                                  {t<string>('filters.sorting_values.LANGUAGE_ASC')}
+                                </MenuItem>
+                                <MenuItem value="LANGUAGE_DESC">
+                                  {t<string>('filters.sorting_values.LANGUAGE_DESC')}
+                                </MenuItem>
+                                <MenuItem value="TITLE_ASC">
+                                  {t<string>('filters.sorting_values.TITLE_ASC')}
+                                </MenuItem>
+                                <MenuItem value="TITLE_DESC">
+                                  {t<string>('filters.sorting_values.TITLE_DESC')}
+                                </MenuItem>
+                                <MenuItem value="URL_ASC">
+                                  {t<string>('filters.sorting_values.URL_ASC')}
+                                </MenuItem>
+                                <MenuItem value="URL_DESC">
+                                  {t<string>('filters.sorting_values.URL_DESC')}
+                                </MenuItem>
+                                <MenuItem value="SENTIMENT_ASC">
+                                  {t<string>('filters.sorting_values.SENTIMENT_ASC')}
+                                </MenuItem>
+                                <MenuItem value="SENTIMENT_DESC">
+                                  {t<string>('filters.sorting_values.SENTIMENT_DESC')}
+                                </MenuItem>
                               </TextField>
                             </Grid>
                             <Grid item xs={4}>

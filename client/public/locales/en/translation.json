@@ -55,6 +55,21 @@
       "export": "Export",
       "deleteAll": "Delete all"
     },
+    "sorting": "Sorting by",
+    "sorting_values": {
+      "YEAR_ASC": "Year ascending",
+      "YEAR_DESC": "Year descending",
+      "LANGUAGE_ASC": "Language ascending",
+      "LANGUAGE_DESC": "Language descending",
+      "TITLE_ASC": "Title ascending",
+      "TITLE_DESC": "Title descending",
+      "URL_ASC": "Url ascending",
+      "URL_DESC": "Url descending",
+      "SENTIMENT_ASC": "Sentiment ascending",
+      "SENTIMENT_DESC": "Sentiment descending",
+      "ASC": "ascending",
+      "DESC": "descending"
+    },
     "entriesLimit": "Number of entries",
     "errorText": "You can only enter values between {{min}} and {{max}}"
   },

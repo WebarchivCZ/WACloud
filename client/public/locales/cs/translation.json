@@ -55,6 +55,21 @@
       "export": "Exportovat",
       "deleteAll": "Smazat vše"
     },
+    "sorting": "Řazení dle",
+    "sorting_values": {
+      "YEAR_ASC": "Rok vzestupně",
+      "YEAR_DESC": "Rok sestupně",
+      "LANGUAGE_ASC": "Jazyk vzestupně",
+      "LANGUAGE_DESC": "Jazyk sestupně",
+      "TITLE_ASC": "Nadpis vzestupně",
+      "TITLE_DESC": "Nadpis sestupně",
+      "URL_ASC": "Url vzestupně",
+      "URL_DESC": "Url sestupně",
+      "SENTIMENT_ASC": "Sentiment vzestupně",
+      "SENTIMENT_DESC": "Sentiment sestupně",
+      "ASC": "Vzestupně",
+      "DESC": "Sestupně"
+    },
     "entriesLimit": "Počet záznamů",
     "errorText": "Lze zadat hodnoty mezi {{min}} a {{max}}"
   },

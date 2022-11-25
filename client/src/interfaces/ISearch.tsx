@@ -7,6 +7,7 @@ export default interface ISearch {
   id: number;
   user: IUser;
   state: SearchState;
+  warcArchiveState: SearchState;
   name: string;
   entries: number;
   indexed: number;

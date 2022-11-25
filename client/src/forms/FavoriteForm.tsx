@@ -18,13 +18,15 @@ import StarIcon from '@material-ui/icons/Star';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
 import ReplayIcon from '@material-ui/icons/Replay';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import { Archive } from '@material-ui/icons';
 import { useHistory } from 'react-router-dom';
 
 import ActionsMenu, { MenuAction } from '../components/ActionsMenu';
-import { addNotification } from '../config/notifications';
-import ISearch from '../interfaces/ISearch';
-import { DialogContext } from '../components/dialog/Dialog.context';
 import QueryDetailDialog from '../components/dialog/QueryDetailDialog';
+import ISearch from '../interfaces/ISearch';
+import WarcArchivesDialog from '../components/dialog/WarcArchivesDialog';
+import { addNotification } from '../config/notifications';
+import { DialogContext } from '../components/dialog/Dialog.context';
 import { SearchContext } from '../components/Search.context';
 import { Types } from '../components/reducers';
 
@@ -90,6 +92,17 @@ export const FavoriteForm = () => {
                 }
               });
               history.push('/search');
+            }
+          },
+          {
+            icon: <Archive color="primary" />,
+            title: t('administration.queries.warc.dialog.title'),
+            onClick: () => {
+              dialog.open({
+                size: 'md',
+                content: WarcArchivesDialog,
+                values: r
+              });
             }
           },
           !['STOPPED'].includes(r.state)

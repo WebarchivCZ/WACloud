@@ -19,10 +19,12 @@ import java.util.Set;
 @Table(name = "search")
 public class Search extends AuditModel {
 
-	public enum State {
-		WAITING,
-		INDEXING,
-		PROCESSING,
+	public enum State {		// Meaning by search state				by warc export state
+		WAITING,			// waiting for schedule to start 		waiting to start by an admin
+		REQUEST,			// -									user requests for an warc export
+		DENIED,				// -									admin denied the request
+		INDEXING,			// indexing data to solr				ready for scheduler
+		PROCESSING,			// processing analytic queries			generating warc archives
 		ERROR,
 		STOPPED,
 		DONE
@@ -77,6 +79,9 @@ public class Search extends AuditModel {
 	@Enumerated(EnumType.STRING)
 	private State state = State.WAITING;
 
+	@Enumerated(EnumType.STRING)
+	private State warcArchiveState = State.WAITING;
+
 	@Column(columnDefinition = "integer")
 	@NonNull
 	private Integer entries;
@@ -97,6 +102,10 @@ public class Search extends AuditModel {
 	private Date finishedAt;
 
 	public boolean isFinished() {
+		return state.equals(State.STOPPED) || state.equals(State.ERROR) || state.equals(State.DONE);
+	}
+
+	public boolean isWarcExportFinished() {
 		return state.equals(State.STOPPED) || state.equals(State.ERROR) || state.equals(State.DONE);
 	}
 }

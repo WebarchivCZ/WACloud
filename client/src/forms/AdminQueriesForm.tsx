@@ -15,14 +15,16 @@ import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import Visibility from '@material-ui/icons/Visibility';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import { Archive } from '@material-ui/icons';
 
 import ActionsMenu from '../components/ActionsMenu';
-import { addNotification } from '../config/notifications';
 import ISearch from '../interfaces/ISearch';
-import { DialogContext } from '../components/dialog/Dialog.context';
 import QueryDetailDialog from '../components/dialog/QueryDetailDialog';
-import { SearchContext } from '../components/Search.context';
 import IPageable from '../interfaces/IPageable';
+import WarcArchivesAdminDialog from '../components/dialog/WarcArchivesAdminDialog';
+import { addNotification } from '../config/notifications';
+import { DialogContext } from '../components/dialog/Dialog.context';
+import { SearchContext } from '../components/Search.context';
 
 export const AdminQueriesForm = () => {
   const { t, i18n } = useTranslation();
@@ -76,6 +78,17 @@ export const AdminQueriesForm = () => {
             .catch(() =>
               addNotification(t('query.error.title'), t('query.error.message'), 'danger')
             )
+      },
+      {
+        icon: <Archive color="primary" />,
+        title: t('administration.queries.warc.dialog.title'),
+        onClick: () => {
+          dialog.open({
+            size: 'md',
+            content: WarcArchivesAdminDialog,
+            values: r
+          });
+        }
       }
     ],
     []
@@ -99,8 +112,10 @@ export const AdminQueriesForm = () => {
     return '?';
   };
 
-  const refreshSearches = (page: number, rowsPerPage: number) => {
-    fetch('/api/search/all?page=' + (page + 1) + '&size=' + rowsPerPage)
+  const refreshSearches = (p: number, r: number) => {
+    if (!p) p = page;
+    if (!r) r = rowsPerPage;
+    fetch('/api/search/all?page=' + p + '&size=' + r)
       .then((res) => res.json())
       .then(
         (result) => {

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Scheduler {
-    private static final Logger log = LoggerFactory.getLogger(Scheduler.class);
 
     private final HarvestService harvestService;
     private final SearchService searchService;
@@ -27,5 +26,10 @@ public class Scheduler {
     @Scheduled(fixedDelay = 5000, initialDelay = 5000)
     public void scheduleSearchProcessing() {
         searchService.processOneScheduledJob();
+    }
+
+    @Scheduled(fixedDelay = 5000, initialDelay = 5000)
+    public void scheduleWarcArchiveProcessing() {
+        searchService.processOneScheduledWarcExportJob();
     }
 }

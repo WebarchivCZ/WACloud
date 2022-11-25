@@ -16,5 +16,9 @@ public interface SearchService {
     void clearStopWords();
     void changeStopWords(List<String> stopWords);
 
+    void generateWarc(Search query);
+
     void processOneScheduledJob();
+
+    void processOneScheduledWarcExportJob();
 }

@@ -2,15 +2,18 @@ package cz.inqool.nkp.api.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.math.IntMath;
 import cz.inqool.nkp.api.dto.*;
 import cz.inqool.nkp.api.exception.ResourceNotFoundException;
 import cz.inqool.nkp.api.exception.SearchStoppedException;
 import cz.inqool.nkp.api.model.AnalyticQuery;
 import cz.inqool.nkp.api.model.Harvest;
 import cz.inqool.nkp.api.model.Search;
+import cz.inqool.nkp.api.model.WarcArchive;
 import cz.inqool.nkp.api.repository.AnalyticQueryRepository;
 import cz.inqool.nkp.api.repository.HarvestRepository;
 import cz.inqool.nkp.api.repository.SearchRepository;
+import cz.inqool.nkp.api.repository.WarcArchiveRepository;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.hadoop.hbase.client.Result;
@@ -29,17 +32,22 @@ import org.apache.solr.common.util.NamedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import javax.annotation.Resource;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceContext;
 import java.io.IOException;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -57,24 +65,32 @@ public class SearchServiceImpl implements SearchService {
     private final SearchRepository searchRepository;
     private final HarvestRepository harvestRepository;
     private final AnalyticQueryRepository analyticQueryRepository;
+    private final WarcArchiveRepository warcArchiveRepository;
     private final HttpSolrClient solrBase;
     private final HttpSolrClient solrQuery;
     private final String solrQueryHost;
     private final ObjectMapper mapper;
+    private final Integer WARCRecordsPerArchive;
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    private WebClient warcExporterWebClient;
 
-    public SearchServiceImpl(@Value("${solr.base.host.query}") String solrBaseHost, @Value("${solr.query.host.query}") String solrQueryHost, HBaseService hbase, SearchRepository searchRepository, AnalyticQueryRepository analyticQueryRepository, HarvestRepository harvestRepository) {
+    @Resource(name = "warcExporterWebClient")
+    public void setSolrWebClient(WebClient webClient) {
+        this.warcExporterWebClient = webClient;
+    }
+
+    public SearchServiceImpl(@Value("${warc.records-per-archive}") Integer WARCRecordsPerArchive, @Value("${solr.base.host.query}") String solrBaseHost, @Value("${solr.query.host.query}") String solrQueryHost, HBaseService hbase, SearchRepository searchRepository, AnalyticQueryRepository analyticQueryRepository, HarvestRepository harvestRepository, WarcArchiveRepository warcArchiveRepository) {
         this.hbase = hbase;
         this.solrBase = new HttpSolrClient.Builder(solrBaseHost.trim()).build();
         this.searchRepository = searchRepository;
         this.harvestRepository = harvestRepository;
         this.analyticQueryRepository = analyticQueryRepository;
+        this.warcArchiveRepository = warcArchiveRepository;
         this.solrBase.setParser(new XMLResponseParser());
         this.solrQuery = new HttpSolrClient.Builder(solrQueryHost.trim()).build();
         this.solrQueryHost = solrQueryHost;
         this.mapper = new ObjectMapper();
+        this.WARCRecordsPerArchive = WARCRecordsPerArchive;
     }
 
     private SolrQuery prepareQueryForIndex(Search query) {
@@ -683,9 +699,65 @@ public class SearchServiceImpl implements SearchService {
         addStopWords(stopWords);
     }
 
+    private void createWarcForIDsTo(List<String> ids, int index, Search query) throws RuntimeException {
+        byte[] data = warcExporterWebClient.post().header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE).bodyValue(ids).retrieve().onStatus(HttpStatus::isError, res -> {
+            res.toEntity(String.class).subscribe(
+                    entity -> log.warn("Client error {}", entity)
+            );
+            return Mono.error(new HttpClientErrorException(res.statusCode()));
+        }).bodyToMono(ByteArrayResource.class).blockOptional().orElseThrow(RuntimeException::new).getByteArray();
+        WarcArchive archive = new WarcArchive();
+        archive.setName("part_"+String.format("%03d", index)+".warc.gz");
+        archive.setData(data);
+        archive.setSearch(query);
+        warcArchiveRepository.saveAndFlush(archive);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void generateWarc(Search s) {
+        Search query = searchRepository.findById(s.getId()).orElseThrow(ResourceNotFoundException::new);
+        try {
+            List<String> ids = query.getIds();
+            if (ids == null || ids.isEmpty()) {
+                SolrQuery baseQuery = prepareQueryForIndex(query);
+                int totalRows = baseQuery.getRows();
+                int windows = IntMath.divide(totalRows, WARCRecordsPerArchive, RoundingMode.CEILING);
+                baseQuery.setRows(WARCRecordsPerArchive);
+                for (int index = 0; index < windows; index++) {
+                    baseQuery.setStart(index * WARCRecordsPerArchive);
+                    ids = solrBase.query(baseQuery).getResults().stream().map(a -> (String) a.getFieldValue("id")).collect(Collectors.toList());
+                    createWarcForIDsTo(ids, index+1, query);
+                }
+
+            }
+            else {
+                int windows = IntMath.divide(ids.size(), WARCRecordsPerArchive, RoundingMode.CEILING);
+                for (int index = 0; index < windows; index++) {
+                    int start = index * WARCRecordsPerArchive;
+                    int end = Math.min(start + WARCRecordsPerArchive, ids.size());
+                    createWarcForIDsTo(ids.subList(start, end), index+1, query);
+                }
+            }
+        }
+        catch (Throwable ex) {
+            log.error("Cannot generate warc.", ex);
+            throw new RuntimeException("Cannot generate warc.");
+        }
+    }
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Search findFirstWaitingSearch() {
         List<Search> searches = searchRepository.findByState(Search.State.WAITING);
+        if (searches.isEmpty()) {
+            return null;
+        }
+        return searches.get(0);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Search findFirstWaitingForWarcExportSearch() {
+        List<Search> searches = searchRepository.findByWarcArchiveState(Search.State.INDEXING);
         if (searches.isEmpty()) {
             return null;
         }
@@ -730,6 +802,16 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void startWarcExport(Search s) {
+        Search search = searchRepository.findById(s.getId()).orElseThrow(ResourceNotFoundException::new);
+        if (search.getWarcArchiveState().equals(Search.State.STOPPED)) {
+            throw new SearchStoppedException();
+        }
+        search.setWarcArchiveState(Search.State.PROCESSING);
+        searchRepository.save(search);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void startProcessingQuery(AnalyticQuery s) {
         AnalyticQuery analyticQuery = analyticQueryRepository.findById(s.getId()).orElseThrow(ResourceNotFoundException::new);
         Search search = analyticQuery.getSearch();
@@ -757,6 +839,13 @@ public class SearchServiceImpl implements SearchService {
         Search search = searchRepository.findById(s.getId()).orElseThrow(ResourceNotFoundException::new);
         search.setState(state);
         search.setFinishedAt(new Date());
+        searchRepository.save(search);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void finishWarcExportProcessing(Search s, Search.State state) {
+        Search search = searchRepository.findById(s.getId()).orElseThrow(ResourceNotFoundException::new);
+        search.setWarcArchiveState(state);
         searchRepository.save(search);
     }
 
@@ -793,6 +882,29 @@ public class SearchServiceImpl implements SearchService {
 
             log.error("Error during processing", ex);
             finishProcessing(search, Search.State.ERROR);
+        }
+    }
+
+    @Override
+    public void processOneScheduledWarcExportJob() {
+        Search search = findFirstWaitingForWarcExportSearch();
+        if (search == null) {
+            return;
+        }
+
+        try {
+            startWarcExport(search);
+            generateWarc(search);
+            finishWarcExportProcessing(search, Search.State.DONE);
+        }
+        catch (Throwable ex) {
+            if (ex instanceof SearchStoppedException) {
+                log.info(ex.getMessage());
+                return;
+            }
+
+            log.error("Error during processing", ex);
+            finishWarcExportProcessing(search, Search.State.ERROR);
         }
     }
 }

@@ -149,6 +149,27 @@
       },
       "actions": {
         "stopAllQueries": "Zastavit všechny dotazy"
+      },
+      "warc": {
+        "dialog": {
+          "title": "WARC Archivy",
+          "generate": "Vygenerovat WARC archivy",
+          "regenerate": "Pregenerovat WARC archivy",
+          "generationStarted": "Proces generování byl zadán.",
+          "generationStartFailed": "Proces generování zlyhal.",
+          "requestGeneration": "Požádat o export WARC archivů.",
+          "denyRequest": "Zamítnout žádost o export.",
+          "states": {
+            "WAITING": "WARC archivy nebyly zatím generovány.",
+            "REQUEST": "Uživatel požádal o vygenerování WARC archivu.",
+            "DENIED": "Žádost uživatele o WARC archiv byla zamítnuta.",
+            "INDEXING": "Administrátor spustil process exportování WARC archivů.",
+            "PROCESSING": "Probíhá export záznamů do WARC archivů.",
+            "ERROR": "Nastala chyba při generování WARC archivů.",
+            "STOPPED": "Proces generování WARC archivů byl zastaven.",
+            "DONE": "WARC balíčky byly úspěšně vygenerovány a jsou Vám k dispozici ke stažení."
+          }
+        }
       }
     },
     "harvests": {

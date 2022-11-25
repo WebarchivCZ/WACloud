@@ -13,8 +13,10 @@ import cz.inqool.nkp.api.exception.ResourceNotFoundException;
 import cz.inqool.nkp.api.model.AnalyticQuery;
 import cz.inqool.nkp.api.model.AppUser;
 import cz.inqool.nkp.api.model.Search;
+import cz.inqool.nkp.api.model.WarcArchive;
 import cz.inqool.nkp.api.repository.AnalyticQueryRepository;
 import cz.inqool.nkp.api.repository.SearchRepository;
+import cz.inqool.nkp.api.repository.WarcArchiveRepository;
 import cz.inqool.nkp.api.security.AppUserPrincipal;
 import cz.inqool.nkp.api.service.SearchService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +30,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -39,11 +42,13 @@ public class SearchController {
     private final SearchService searchService;
     private final SearchRepository searchRepository;
     private final AnalyticQueryRepository analyticQueryRepository;
+    private final WarcArchiveRepository warcArchiveRepository;
 
-    public SearchController(SearchService searchService, SearchRepository searchRepository, AnalyticQueryRepository analyticQueryRepository) {
+    public SearchController(SearchService searchService, SearchRepository searchRepository, AnalyticQueryRepository analyticQueryRepository, WarcArchiveRepository warcArchiveRepository) {
         this.searchService = searchService;
         this.searchRepository = searchRepository;
         this.analyticQueryRepository = analyticQueryRepository;
+        this.warcArchiveRepository = warcArchiveRepository;
     }
 
     private Search prepareSearch(@RequestBody @Valid RequestDTO request, Authentication authentication) {
@@ -200,6 +205,80 @@ public class SearchController {
         IOUtils.closeQuietly(bufferedOutputStream);
         IOUtils.closeQuietly(byteArrayOutputStream);
         return byteArrayOutputStream.toByteArray();
+    }
+
+    @Operation(summary = "Create WARC export")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping(value="/api/search/{id}/warc")
+    @Transactional
+    public Search generateWarcExport(@PathVariable Long id, Authentication authentication) {
+        Search search = findSearch(id, authentication);
+        warcArchiveRepository.deleteAllBySearch(search);
+        search.setWarcArchiveState(Search.State.INDEXING);
+        searchRepository.save(search);
+        return search;
+    }
+
+    @Operation(summary = "Request WARC export")
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping(value="/api/search/{id}/warc/request")
+    public Search requestWarcExport(@PathVariable Long id, Authentication authentication) {
+        Search search = findSearch(id, authentication);
+        if (search.getWarcArchiveState() != null && !search.getWarcArchiveState().equals(Search.State.WAITING)) {
+            throw new RuntimeException("The WARC archive was already processed.");
+        }
+        search.setWarcArchiveState(Search.State.REQUEST);
+        searchRepository.save(search);
+        return search;
+    }
+
+    @Operation(summary = "Deny WARC export request")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @DeleteMapping(value="/api/search/{id}/warc/request")
+    public Search denyWarcExportRequest(@PathVariable Long id, Authentication authentication) {
+        Search search = findSearch(id, authentication);
+        if (search.getWarcArchiveState() == null || !search.getWarcArchiveState().equals(Search.State.REQUEST)) {
+            throw new RuntimeException("The WARC export is not requested.");
+        }
+        search.setWarcArchiveState(Search.State.DENIED);
+        searchRepository.save(search);
+        return search;
+    }
+
+    @Operation(summary = "Stop a warc export")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping(value="/api/search/{id}/warc/stop")
+    public Search stopWarcExportOne(@PathVariable Long id, Authentication authentication) {
+        Search search = findSearch(id, authentication);
+        if (search.isWarcExportFinished()) {
+            throw new RuntimeException("The search is already finished.");
+        }
+        search.setWarcArchiveState(Search.State.STOPPED);
+        searchRepository.save(search);
+        return search;
+    }
+
+    @Operation(summary = "Get WARC archives")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping(value="/api/search/{id}/warc")
+    public List<WarcArchive> getWarcExportArchives(@PathVariable Long id, Authentication authentication) {
+        Search search = findSearch(id, authentication);
+        return warcArchiveRepository.findBySearch(search);
+    }
+
+    @Operation(summary = "Download a WARC archive")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping(value="/api/search/{id}/warc/download/{warcId}", produces="application/zzip")
+    public byte[] downloadWarcArchive(@PathVariable Long id, @PathVariable Long warcId, Authentication authentication) {
+        Search search = findSearch(id, authentication);
+        if (!search.getWarcArchiveState().equals(Search.State.DONE)) {
+            throw new ResourceNotFoundException("Warc export is not processed yet.");
+        }
+        WarcArchive archive = warcArchiveRepository.findById(warcId).orElseThrow(ResourceNotFoundException::new);
+        if (!archive.getSearch().getId().equals(id)) {
+            throw new RuntimeException("You are not allowed to view this saved warc archive.");
+        }
+        return archive.getData();
     }
 
     private Search findSearch(@PathVariable Long id, Authentication authentication) {

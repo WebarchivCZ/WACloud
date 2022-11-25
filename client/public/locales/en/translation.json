@@ -149,6 +149,27 @@
       },
       "actions": {
         "stopAllQueries": "Stop all queries"
+      },
+      "warc": {
+        "dialog": {
+          "title": "WARC Archives",
+          "generate": "Generate WARC archives",
+          "regenerate": "Regenerate WARC archives",
+          "generationStarted": "Generation process was created.",
+          "generationStartFailed": "Generation process failed.",
+          "requestGeneration": "Request to export WARC archive.",
+          "denyRequest": "Reject the export request.",
+          "states": {
+            "WAITING": "WARC archives have not been generated yet.",
+            "REQUEST": "The user requested the generation of a WARC archive.",
+            "DENIED": "The user's request for a WARC archive was rejected.",
+            "INDEXING": "The administrator started the process of exporting WARC archives.",
+            "PROCESSING": "Records are being exported to WARC archives.",
+            "ERROR": "An error occurred while generating WARC archives.",
+            "STOPPED": "The process of generating WARC archives has been stopped.",
+            "DONE": "WARC packages have been successfully generated and are available for download."
+          }
+        }
       }
     },
     "harvests": {

@@ -164,7 +164,7 @@ export const QueryForm = ({
             <Grid item xs>
               <TextField
                 multiline
-                rows={3}
+                minRows={3}
                 variant="outlined"
                 fullWidth
                 value={value}
@@ -237,13 +237,15 @@ export const QueryForm = ({
                 </Typography>
               </Grid>
             )}
-            <Grid container xs={6} justifyContent="flex-end" alignItems="center" spacing={1}>
-              <Typography variant="body2">{t<string>('query.operators')}</Typography>
-              <LogicalButton label="AND" appendValue=" AND " />
-              <LogicalButton label="OR" appendValue=" OR " />
-              <LogicalButton label="NOT" appendValue=" NOT " />
-              <LogicalButton label="(" appendValue="(" />
-              <LogicalButton label=")" appendValue=")" />
+            <Grid item xs={6}>
+              <Grid container justifyContent="flex-end" alignItems="center" spacing={1}>
+                <Typography variant="body2">{t<string>('query.operators')}</Typography>
+                <LogicalButton label="AND" appendValue=" AND " />
+                <LogicalButton label="OR" appendValue=" OR " />
+                <LogicalButton label="NOT" appendValue=" NOT " />
+                <LogicalButton label="(" appendValue="(" />
+                <LogicalButton label=")" appendValue=")" />
+              </Grid>
             </Grid>
           </Grid>
         </Grid>

@@ -1,0 +1,304 @@
+{
+  "login": {
+    "header": "Sign in",
+    "name": "User name",
+    "password": "Password",
+    "button": "Log in",
+    "text": "Centralized interface for extracting big data from web archives",
+    "success": "You were successfully logged in.",
+    "error": "Login was not successful."
+  },
+  "logout": {
+    "header": "Log out",
+    "success": "You were successfully logged out."
+  },
+  "header": {
+    "query": "Query",
+    "newQuery": "New query",
+    "favorite": "Favorite",
+    "myQueries": "My queries",
+    "user": "User",
+    "logout": "Log out",
+    "currentQueries": "Last queries",
+    "adminZone": "Administration",
+    "clientZone": "Client zone",
+    "queriesAdmin": "Queries administration",
+    "harvestsAdmin": "Harvests administration",
+    "usersAdmin": "Users administration"
+  },
+  "filters": {
+    "filtersSectionHeader": "Filters",
+    "settingsSectionHeader": "Settings of limits",
+    "theme": "Theme",
+    "pageType": "Page type",
+    "date": "Date of harvest",
+    "dateFrom": "From",
+    "dateTo": "To",
+    "operator": {
+      "label": "Operator",
+      "contain": "Contain",
+      "contain-not": "Not contain",
+      "equal": "Equal",
+      "equal-not": "Not equal"
+    },
+    "url": "URL",
+    "sentiment": "Sentiment",
+    "stopWords": {
+      "title": "Stop words",
+      "addNext": "Add next word",
+      "list": "List of stop words",
+      "word": "Word",
+      "add": "Add",
+      "save": "Save",
+      "cancel": "Cancel",
+      "import": "Import",
+      "export": "Export",
+      "deleteAll": "Delete all"
+    },
+    "sorting": "Sorting by",
+    "sorting_values": {
+      "YEAR_ASC": "Year ascending",
+      "YEAR_DESC": "Year descending",
+      "LANGUAGE_ASC": "Language ascending",
+      "LANGUAGE_DESC": "Language descending",
+      "TITLE_ASC": "Title ascending",
+      "TITLE_DESC": "Title descending",
+      "URL_ASC": "Url ascending",
+      "URL_DESC": "Url descending",
+      "SENTIMENT_ASC": "Sentiment ascending",
+      "SENTIMENT_DESC": "Sentiment descending",
+      "ASC": "ascending",
+      "DESC": "descending"
+    },
+    "entriesLimit": "Number of entries",
+    "errorText": "You can only enter values between {{min}} and {{max}}"
+  },
+  "query": {
+    "header": "Query",
+    "settings": "Query settings",
+    "operators": "Logical operators:",
+    "error": {
+      "title": "An error occurred",
+      "message": "An unexpected error occurred. Try again later."
+    },
+    "start": {
+      "title": "Query was submitted",
+      "message": "Please wait, we are working on it."
+    },
+    "success": {
+      "title": "Query was successfully finished",
+      "message": "You can download and save the results of your query."
+    },
+    "queryIs": "Query is ",
+    "valid": "valid ",
+    "notValid": "not valid ",
+    "queryProcesses": " and it processes",
+    "entries": " entries",
+    "continue": "Continue",
+    "edit": "Edit",
+    "search": "Search",
+    "created": "Created",
+    "state": "State",
+    "name": "Name",
+    "buttons": {
+      "detail": "Show detail",
+      "repeat": "Repeat query",
+      "download": "Download",
+      "addToFavorites": "Add to favorites",
+      "removeFromFavorites": "Remove from favorites"
+    },
+    "favorites": {
+      "popUpHeader": "Adding to favorites",
+      "setNameFirst": "Set a name and add a query to favorites",
+      "insertName": "Set a name for the query",
+      "save": "Save",
+      "close": "Close"
+    }
+  },
+  "pagination": {
+    "rowsPerPage": "Rows per page:",
+    "from": "from"
+  },
+  "analytics": {
+    "title": "Analytic queries",
+    "queryType": "Query type",
+    "add": "+ Add new query",
+    "delete": "Delete",
+    "words": "List of words:",
+    "wordInput": "Insert text for search",
+    "context": "Add context",
+    "contextLength": "Number of words in context:",
+    "inputNodes": "Source nodes",
+    "outputNodes": "Target nodes",
+    "useDomainsOnly": "Group by domains"
+  },
+  "seed": {
+    "randomEntries": "Random records?",
+    "ownSeed": "Random seed"
+  },
+  "harvests": {
+    "title": "Harvests",
+    "name": "Harvest's name",
+    "size": "Size",
+    "type": "Type",
+    "WARCs": "Number of WARCs",
+    "date": "Date of start"
+  },
+  "process": {
+    "state": "State of process",
+    "waiting": "Waiting",
+    "indexing": "Indexing",
+    "processing": "Processing",
+    "statisticalQueries": "Statistical queries",
+    "finished": "Finished",
+    "error": "Error",
+    "done": "Done",
+    "stop": "Stop"
+  },
+  "administration": {
+    "queries": {
+      "menu": "Queries",
+      "title": "Queries administration",
+      "columns": {
+        "startedBy": "Started by"
+      },
+      "actions": {
+        "stopAllQueries": "Stop all queries"
+      },
+      "warc": {
+        "dialog": {
+          "title": "WARC Archives",
+          "generate": "Generate WARC archives",
+          "regenerate": "Regenerate WARC archives",
+          "generationStarted": "Generation process was created.",
+          "generationStartFailed": "Generation process failed.",
+          "requestGeneration": "Request to export WARC archive.",
+          "denyRequest": "Reject the export request.",
+          "states": {
+            "WAITING": "WARC archives have not been generated yet.",
+            "REQUEST": "The user requested the generation of a WARC archive.",
+            "DENIED": "The user's request for a WARC archive was rejected.",
+            "INDEXING": "The administrator started the process of exporting WARC archives.",
+            "PROCESSING": "Records are being exported to WARC archives.",
+            "ERROR": "An error occurred while generating WARC archives.",
+            "STOPPED": "The process of generating WARC archives has been stopped.",
+            "DONE": "WARC packages have been successfully generated and are available for download."
+          }
+        }
+      }
+    },
+    "harvests": {
+      "menu": "Harvests",
+      "title": "Harvests administration",
+      "columns": {
+        "id": "Harvest ID",
+        "type": "Type",
+        "numberOfRecords": "Number of records"
+      },
+      "actions": {
+        "import": "Import",
+        "delete": "Delete",
+        "deleteAll": "Delete all"
+      },
+      "states": {
+        "UNPROCESSED": "Waiting for processing",
+        "PROCESSING": "In progress",
+        "INDEXED": "Indexed",
+        "CLEARED": "Cleared from index",
+        "ERROR": "An error during index creation",
+        "UNKNOWN": "Unknown",
+        "STOPPED": "Stopped"
+      },
+      "notifications": {
+        "import": {
+          "start": {
+            "title": "Import",
+            "message": "Operation started"
+          },
+          "success": {
+            "title": "Import",
+            "message": "Operation successfully ended"
+          },
+          "error": {
+            "title": "Import",
+            "message": "An error occurred during operation"
+          }
+        },
+        "delete": {
+          "start": {
+            "title": "Delete",
+            "message": "Operation started"
+          },
+          "success": {
+            "title": "Delete",
+            "message": "Operation successfully ended"
+          },
+          "error": {
+            "title": "Delete",
+            "message": "An error occurred during operation"
+          }
+        },
+        "deleteAll": {
+          "start": {
+            "title": "Delete all",
+            "message": "Operation started"
+          },
+          "success": {
+            "title": "Delete all",
+            "message": "Operation successfully ended"
+          },
+          "error": {
+            "title": "Delete all",
+            "message": "An error occurred during operation"
+          }
+        }
+      }
+    },
+    "users": {
+      "menu": "Users",
+      "title": "Users administration",
+      "columns": {
+        "email": "Email",
+        "name": "Name",
+        "role": "Role",
+        "state": "State",
+        "accessToken": "Access token"
+      },
+      "actions": {
+        "create": "Create new user",
+        "changePassword": "Change password",
+        "generateAccessToken": "Generate access token",
+        "deleteAccessToken": "Delete access token",
+        "delete": "Delete user"
+      },
+      "states": {
+        "ACTIVE": "Active",
+        "DEACTIVATED": "Deactivated",
+        "UNKNOWN": "Unknown"
+      },
+      "roles": {
+        "USER": "User",
+        "ADMIN": "Administrator"
+      },
+      "token": {
+        "GENERATED": "Generated",
+        "NOT_GENERATED": "-",
+        "UNKNOWN": "Unknown"
+      },
+      "notifications": {
+        "passwordChangedSuccess": "Password successfully changed",
+        "passwordChangedError": "An error occurred during operation",
+        "changedSuccess": "User detail successfully changed",
+        "changedError": "An error occurred during operation",
+        "createSuccess": "Usr successfully created",
+        "createError": "An error occurred during operation",
+        "favoriteSuccess": "The query has been successfully marked as a favorite",
+        "favoriteError": "Failed to add query to favorites",
+        "removeFavoriteSuccess": "The query has been successfully removed from favorites",
+        "removeFovriteError": "Failed to remove query from favorites",
+        "stopQuerySuccess": "The query was successfully stopped",
+        "stopQueryError": "Failed to stop query"
+      }
+    }
+  }
+}

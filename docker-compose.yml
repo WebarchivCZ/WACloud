@@ -1,0 +1,43 @@
+version: '3'
+services:
+  db:
+    image: postgres:12-alpine
+    restart: always
+    container_name: nkp-db
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_USER: nkp
+    ports:
+      - "5432:5432"
+    volumes:
+      - nkp_db:/var/lib/postgresql
+  client:
+    build: ./client
+    image: inqool/nkp-client
+    container_name: nkp-client
+    ports:
+      - "5000:80"
+    environment:
+      - API_HOST=api
+  api:
+    build: ./api
+    image: inqool/nkp-api
+    container_name: nkp-api
+    env_file:
+      - ./.env
+    ports:
+      - "8080:8080"
+  solr:
+    build: ./solr
+    image: inqool/nkp-solr
+    container_name: nkp-solr
+    volumes:
+      - solr_data:/var/solr
+      - solr_cores_data:/opt/solr/server/solr/mycores
+    ports:
+      - "8983:8983"
+volumes:
+  nkp_db:
+  solr_data:
+  solr_cores_data:

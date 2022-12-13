@@ -1,0 +1,26 @@
+stages:
+  - deploy
+  
+before_script:
+  - "which ssh-agent >/dev/null || ( apk --update add openssh-client )"
+  - "eval $(ssh-agent -s)"
+  - "echo \"$SSH_KEY\" | tr -d '\r' | ssh-add -"
+  - "mkdir -p ~/.ssh"
+  - "chmod 700 ~/.ssh"
+  - "echo \"$SSH_KNOWN_HOSTS\" > ~/.ssh/known_hosts"
+
+deploy-test:
+  stage: deploy
+  tags:
+    - dev
+  when: manual
+  variables:
+    HOST: "10.3.1.64"
+    USER: "gitlab"
+    APP_DIR: "/opt/centralized-interface"
+  script:
+    - "which rsync >/dev/null || ( apk --update add rsync )"
+    - "rsync -O -arvce 'ssh' $PWD/* $USER@$HOST:$APP_DIR"
+    - "ssh $USER@$HOST \"(cd $APP_DIR; find . -type d -print0 | xargs -0 chmod 0775 && find . -type f -print0 | xargs -0 chmod 0664 && /home/gitlab/add-hosts.sh && docker-compose up -d --build) || exit 1\""
+  only:
+    - test

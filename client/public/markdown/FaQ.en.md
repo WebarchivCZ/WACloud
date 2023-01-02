@@ -10,7 +10,7 @@ First you need to enter filters (site and query parameters) on the home page. Th
 
 **What are harvests?**
 
-Harvesting is the process of harvesting web content. There are several types, such as full-screen, selective or thematic. You can learn more about Webarchive harvests [here](https://www.webarchiv.cz/cs/o-webarchivu) and [here](http://invenio.nusl.cz/record/432325).
+Harvesting is the process of harvesting web content. There are several types, such as comprehensive, selective or thematic. You can learn more about Webarchive harvests [here](https://www.webarchiv.cz/en/about) and [here](http://invenio.nusl.cz/record/432325).
 
 **How big are the harvests?**
 
@@ -32,6 +32,11 @@ No, the interface only works with Webarchive data that is embedded in the interf
 **Can I take the resulting datasets with me?**
 
 Yes, you can download the dataset and work with it later. 
+
+**How long does it take to process a query?**
+
+The processing time depends on the complexity and scope of the query, and the Process Status field provides information about the progress of the query. It may take a longer time.
+
 
 
 Detailed technical documentation and user manual is available [here](https://github.com/WebarchivCZ/WACloud_Docs) 

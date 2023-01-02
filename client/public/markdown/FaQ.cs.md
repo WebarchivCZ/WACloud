@@ -32,4 +32,9 @@ Ne, rozhraní pracuje pouze s daty Webarchivu, která jsou do rozhraní vložena
 
 Ano, datovou sadu je možné si stáhnout a později s ní pracovat. 
 
+**Jak dlouho trvá zpracování dotazu?**
+
+Doba zpracování dotazu závisí na jeho složitosti a rozsahu, o průběhu jeho zpracování informuje pole Stav procesu. To může trvat delší dobu.
+
+
 Podrobná technická dokumentace a uživatelský manuál je k dispozici [zde](https://github.com/WebarchivCZ/WACloud_Docs)

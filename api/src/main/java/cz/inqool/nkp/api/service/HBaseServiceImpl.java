@@ -115,7 +115,7 @@ public class HBaseServiceImpl implements HBaseService {
                     }).keySet());
         }
         catch (IOException exception) {
-            log.error("Cannot get topics from HBase.", exception);
+            log.error("Cannot get "+key+" from HBase config.", exception);
             return new TreeSet<>();
         }
     }

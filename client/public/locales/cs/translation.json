@@ -4,7 +4,8 @@
     "name": "Přihlašovací jméno",
     "password": "Heslo",
     "button": "Přihlásit se",
-    "text": "Centralizované rozhraní pro přístup k datům webového archivu",
+    "text": "WACloud: Centralizované rozhraní pro vytěžování velkých dat z webového archivu",
+    "textBottom": "Tato ověřená technologie vznikla v rámci projektu „Vývoj centralizovaného rozhraní pro vytěžování velkých dat z webových archivů“ č. DG18P02OVV016 financovaného z programu na podporu aplikovaného výzkumu a vývoje národní a kulturní identity (NAKI II, Ministerstvo kultury ČR).",
     "success": "Byl jste úspěšně přihlášen.",
     "error": "Přihlášení nebylo úspěšné."
   },

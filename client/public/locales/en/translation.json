@@ -4,7 +4,8 @@
     "name": "User name",
     "password": "Password",
     "button": "Log in",
-    "text": "Centralized interface for extracting big data from web archives",
+    "text": "WACloud: A centralized interface for mining big data from the web archive",
+    "textBottom": "This proven technology was created as part of the project “Development of a centralized interface for extracting big data from web archives” No. DG18P02OVV016 funded by the program for the support of applied research and development of national and cultural identity (NAKI II, Ministry of Culture Czech Republic).",
     "success": "You were successfully logged in.",
     "error": "Login was not successful."
   },

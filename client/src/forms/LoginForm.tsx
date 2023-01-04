@@ -87,62 +87,74 @@ function LoginForm() {
   };
 
   return (
-    <Grid container className={classes.root} justifyContent="center">
-      <Grid item xl={2} lg={3} md={4} sm={6} xs={12}>
-        {logging && <Spinner />}
-        {/*{!logging && (*/}
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <Link href="https://www.webarchiv.cz/" target="_blank">
-              <img src={logoWebArchive} alt="Logo Webarchiv" className={classes.logoWA} />
-            </Link>
+    <>
+      <Grid container className={classes.root} justifyContent="center">
+        <Grid item xl={2} lg={3} md={4} sm={6} xs={12}>
+          {logging && <Spinner />}
+          {/*{!logging && (*/}
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Link href="https://www.webarchiv.cz/" target="_blank">
+                <img src={logoWebArchive} alt="Logo Webarchiv" className={classes.logoWA} />
+              </Link>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Typography variant="h1">{t<string>('login.header')}</Typography>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Box mb={2}>
+                <Typography variant="body2" color="textSecondary">
+                  {t<string>('login.text')}
+                </Typography>
+              </Box>
+            </Grid>
+
+            <form onSubmit={formHandle} className={classes.fullWidth}>
+              <Box mb={2}>
+                <TextField
+                  label={t<string>('login.name')}
+                  variant="outlined"
+                  autoFocus
+                  value={username}
+                  onChange={handleChangeUsername}
+                  className={classes.fullWidth}
+                />
+              </Box>
+
+              <Box mb={2}>
+                <TextField
+                  label={t<string>('login.password')}
+                  type="password"
+                  variant="outlined"
+                  value={password}
+                  onChange={handleChangePassword}
+                  className={classes.fullWidth}
+                />
+              </Box>
+
+              <Box mt={2}>
+                <Button variant="contained" type="submit" color="primary" size="large">
+                  {t<string>('login.button')}
+                </Button>
+              </Box>
+            </form>
           </Grid>
-
-          <Grid item xs={12}>
-            <Typography variant="h1">{t<string>('login.header')}</Typography>
-          </Grid>
-
-          <Grid item xs={12}>
-            <Box mb={2}>
-              <Typography variant="body2" color="textSecondary">
-                {t<string>('login.text')}
-              </Typography>
-            </Box>
-          </Grid>
-
-          <form onSubmit={formHandle} className={classes.fullWidth}>
-            <Box mb={2}>
-              <TextField
-                label={t<string>('login.name')}
-                variant="outlined"
-                autoFocus
-                value={username}
-                onChange={handleChangeUsername}
-                className={classes.fullWidth}
-              />
-            </Box>
-
-            <Box mb={2}>
-              <TextField
-                label={t<string>('login.password')}
-                type="password"
-                variant="outlined"
-                value={password}
-                onChange={handleChangePassword}
-                className={classes.fullWidth}
-              />
-            </Box>
-
-            <Box mt={2}>
-              <Button variant="contained" type="submit" color="primary" size="large">
-                {t<string>('login.button')}
-              </Button>
-            </Box>
-          </form>
+          {/*)}*/}
         </Grid>
-        {/*)}*/}
       </Grid>
-    </Grid>
+
+      <Grid container className={classes.root} justifyContent="center">
+        <Grid item xl={4} lg={6} md={12} sm={12} xs={12}>
+          <Box mt={8}>
+            <Typography variant="body2" color="textSecondary">
+              {t<string>('login.textBottom')}
+            </Typography>
+          </Box>
+        </Grid>
+      </Grid>
+    </>
   );
 }
 
